@@ -14,4 +14,4 @@ const ISO=/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?Z$/;
 function shift(v,d){if(typeof v==='string'&&ISO.test(v))return new Date(Date.parse(v)+d).toISOString();if(Array.isArray(v))return v.map(x=>shift(x,d));if(v&&typeof v==='object')return Object.fromEntries(Object.entries(v).map(([k,x])=>[k,shift(x,d)]));return v;}
 const snapshot=()=>frozen?fixture:shift(fixture,Date.now()-Date.parse(fixture.serverTime));
 const server=createDashboardServer({snapshot,poll:async()=>snapshot()},{port,launchGame:async()=>({ok:false,reason:'FIXTURE_SERVER'}),onManualRefresh:()=>{}});
-server.listen(port,'127.0.0.1',()=>console.log(`Fixture "${name}" at http://127.0.0.1:${port}/  (routes: /api/live /api/state /api/brief /api/since)`));
+server.listen(port,'127.0.0.1',()=>console.log(`Fixture "${name}" at http://127.0.0.1:${port}/  (routes: /api/live /api/state /api/brief)`));

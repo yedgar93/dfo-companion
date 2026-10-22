@@ -79,7 +79,7 @@ main{grid-template-rows:auto auto auto auto 54px minmax(0,1fr) 18px}main>header{
 .quest-done{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:2px 10px;font-size:10px;color:#9fb894}.quest-done:empty{display:none}.quest-done li::before{content:'✓ '}
 .quest-actions{display:flex;gap:6px;align-items:center}.quest-actions button:disabled{opacity:.45}
 .deferred-stale{opacity:.7;transition:opacity .3s}.deferred-stale::after{content:'Updating after travel…';font-size:10px;color:#b7b1a0}
-.since-feed{bottom:auto;top:18px;left:auto;right:18px;max-width:min(360px,calc(100vw - 36px));max-height:180px;align-items:flex-start}.since-feed ul{margin:4px 0 0;padding-left:16px}
+
 .connection-health code{color:var(--gold)}.character-row.has-glossary span{text-decoration:underline dotted #8a7f5c;cursor:help}
 .attribute-stat[title]{cursor:help}
 
