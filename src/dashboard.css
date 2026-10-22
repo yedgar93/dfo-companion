@@ -256,3 +256,8 @@ footer{min-height:20px;line-height:14px;overflow:visible;align-items:center;box-
 .gear-pair .gear:has(.condition-label) .gear-name{padding-right:0}
 .gear-pair .condition-label{bottom:auto!important;top:17px!important;background:none}
 .gear-pair .gear img,.gear-pair .gear>.fallback{justify-self:start;margin-left:2px}
+
+/* 0.4.13 polish: thin glyphs ("1", "—") in small counts render softer than their colour; brighter ink keeps them over 4.5:1. */
+#item-summary,#filter-summary,#equipment-count,#item-summary .dg,#filter-summary .dg,#equipment-count .dg{color:#ecebdc!important}
+.tabs button #inventory-count,.tabs button #quest-count{color:#fff3cc!important;opacity:1!important}
+.tabs button #inventory-count,.tabs button #quest-count{display:inline-block;height:12px;line-height:12px;font-size:10px;vertical-align:-1px}
