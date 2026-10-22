@@ -116,7 +116,9 @@ main>#problem-plaque[hidden],main>#current-quest[hidden]{display:none!important}
 /* 0.4.13 polish: stale, empty and disabled are shown with colour and words, not whole-element opacity (contrast stays >= 4.5:1 for text, >= 3:1 for marks). */
 .stale-data .vitals,.stale-data .page{opacity:1}
 .stale-data .page{filter:saturate(.6)}
-.stale-data .page>.panel-heading>h2:after,.stale-data .equipment-panel .panel-heading h2:after,.stale-data .inventory-panel .panel-heading h2:after{content:'Last known';margin-left:8px;padding:0 4px;font-size:9px;line-height:13px;letter-spacing:.04em;vertical-align:middle;color:#f0dca0;border:1px solid #9b8a58;background:#3a3524;text-shadow:none}
+.stale-data .page>.panel-heading>h2:after,.stale-data .equipment-panel .panel-heading h2:after,.stale-data .inventory-panel .panel-heading h2:after{content:none}
+.stale-age-tag{display:none}
+.stale-data .stale-age-tag{display:inline-block;margin-left:8px;padding:0 4px;font-size:9px;line-height:13px;letter-spacing:.04em;vertical-align:middle;color:#f0dca0;border:1px solid #9b8a58;background:#3a3524;text-shadow:none}
 .stale-data .vitals strong{color:#cfc7ad}
 .gear.empty-slot,.accessory.empty-slot{opacity:1;background:#2b2f28;border-color:#5f6354 #1f241d #1f241d #5f6354;box-shadow:inset 0 0 0 1px #3b3f34}
 .gear.empty-slot .gear-label{color:#aeb19e}
@@ -147,9 +149,9 @@ button:disabled,select:disabled,#map-focus:disabled,.quest-actions button:disabl
 span.dg,.hud .vitals article span.dg,.vitals span.dg{display:inline-block;width:1ch!important;min-width:0;flex:none;margin:0;padding:0;text-align:center;font-size:inherit;color:inherit;letter-spacing:0}
 
 /* 0.4.13 polish: stale pages carry their age in words. */
-.stale-data .page>.panel-heading>h2:after,.stale-data .equipment-panel .panel-heading h2:after,.stale-data .inventory-panel .panel-heading h2:after{content:var(--stale-age,'Last known')}
+
 .stale-data #connection-page>.panel-heading>h2:after{content:none}
-.stale-data .hud .vitals:before{content:var(--stale-age,'Last known');position:absolute;margin-top:-13px;font-size:9px;line-height:11px;color:#f0dca0}
+
 .stale-data #freshness{color:#f0dca0}
 
 /* 0.4.13 polish: scrolling pages show that there is more: game-styled scrollbar, scroll shadows (pure CSS), reason help first on Connection. */
@@ -227,3 +229,5 @@ html.game-cursor input:not([type=range]):not([type=checkbox]):not([type=radio]):
 
 /* 0.4.13 polish: footer line gets its full height. */
 footer{min-height:20px;line-height:14px;overflow:visible;align-items:center;box-sizing:border-box}
+
+.stale-data .hud .vitals>.stale-age-tag{position:absolute;margin:-13px 0 0;border:0;background:none;padding:0;line-height:11px}
