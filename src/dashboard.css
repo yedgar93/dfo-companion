@@ -216,3 +216,6 @@ html.game-cursor input:not([type=range]):not([type=checkbox]):not([type=radio]):
 .gear .clothing-badge img{width:16px;height:16px;image-rendering:pixelated;object-fit:contain}
 .gear .clothing-badge .fallback{font-size:10px;line-height:1;color:#d9c98f}
 .gear.has-clothing .gear-name{padding-right:20px;box-sizing:border-box}
+
+/* 0.4.13 polish: equipment names start at the left edge and wrap, then ellipsize on the right; never cut on the left. */
+.gear .gear-name{text-align:left!important;justify-self:stretch;min-width:0;max-width:100%;white-space:normal!important;overflow:hidden;overflow-wrap:break-word;word-break:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;text-overflow:ellipsis;direction:ltr}
