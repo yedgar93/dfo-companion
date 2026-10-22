@@ -1,0 +1,695 @@
+{
+  "schemaVersion": 2,
+  "profiles": [
+    {
+      "reviewedVersion": "0.1.10165",
+      "reviewNotes": "Player and dungeon code identical to 0.1.10161 after chunk URL renaming; world differs only chunk URL renaming and 12-hex build stamp. Verified own-player GF export, direct GF imports, normal-play canvas listeners.",
+      "player": {
+        "healthFunction": "nxe",
+        "magickaFunction": "rxe",
+        "mapCurrentExport": "_k",
+        "mapRecordExport": "gk",
+        "mapModelBinding": "iE",
+        "learnedNamesExport": "zk",
+        "learnedNamesBinding": "MT",
+        "hotbarAnchorExport": "UD",
+        "hotbarBinding": "LK",
+        "url": "dagger://game/assets/worldTick-rMdniUw8.js",
+        "export": "GF",
+        "sha256": "e8cd1a1974d90df0d1dd5ec4b7ed0e127db807a8fbc11da56ae97e3af3e6c31a",
+        "copiedBaselineReviewed": true
+      },
+      "hosts": [
+        {
+          "url": "dagger://game/assets/world-DXqZfF9v.js",
+          "sha256": "d218f095e5cf2ed399326cbe018bd67df93f581a5ac059a107a998b16b7146d5",
+          "playerModule": "dagger://game/assets/worldTick-rMdniUw8.js",
+          "playerExport": "GF",
+          "scopeName": "DRt"
+        },
+        {
+          "url": "dagger://game/assets/dungeon-B__xXdnS.js",
+          "sha256": "c8579176cf066e000b8b995b92d258cd2e8348be6c3cd16ba589753d005f3300",
+          "playerModule": "dagger://game/assets/worldTick-rMdniUw8.js",
+          "playerExport": "GF",
+          "scopeName": "DRt"
+        }
+      ],
+      "navigationDependencies": [
+        {
+          "role": "town-ui",
+          "url": "dagger://game/assets/deepWaterRuntime-DtbN7aR9.js",
+          "sha256": "9f8516c1fd928a1cdbde963a50d900b8c3e51e87b049b232ec8fe20dc982a960"
+        },
+        {
+          "role": "world-modes",
+          "url": "dagger://game/assets/arenaGate-BKnlXV23.js",
+          "sha256": "6f6a8aca2d14f2a1331ea82ab907470c83bb29dd7a7fe14becf26c155afc14de"
+        },
+        {
+          "role": "scene-collider",
+          "url": "dagger://game/assets/propBodies-B8pm9seO.js",
+          "sha256": "d81456bedba9617dde13115be3227aa3fc397c9cf1ccd7f948fbcc9e282e9f54"
+        },
+        {
+          "role": "scene-renderer",
+          "url": "dagger://game/assets/renderer-DOdEnXoY.js",
+          "sha256": "21599884e4cc4f260c2a1c043bc63f1cfa5d73eba982b32fea2ca76321011aa2"
+        },
+        {
+          "role": "scene-peers",
+          "url": "dagger://game/assets/peerBodies-DCtN4IvC.js",
+          "sha256": "b63eb467dbd600c1e6937bd49d62ddccd73aec6b8a0e45766f6c0084a6c674d8"
+        },
+        {
+          "role": "quest-messages",
+          "url": "dagger://game/assets/person-SGnR9I9N.js",
+          "sha256": "c4420cf2df2ccd696849ef0a65b57c81f0fa0ab15df0395bc6ea614eb06b04ab"
+        },
+        {
+          "role": "item-readables",
+          "url": "dagger://game/assets/setCard-CeIK8RN_.js",
+          "sha256": "ebf33f1b42d26da8b3f31d373bc9afd0b07d0aacedda876094669f30ad145a44"
+        },
+        {
+          "role": "item-templates",
+          "url": "dagger://game/assets/wagonKinds-BKOEBsGj.js",
+          "sha256": "5ebf07c463d4afc1769305745d85134d78b2ab9385d63128634d77a8ae1cd4ef"
+        },
+        {
+          "role": "scene-concealment",
+          "url": "dagger://game/assets/mysticism-FPwTLsug.js",
+          "sha256": "3f2de8f0932d3fd7506719acd81083d4460e36ad7d05b0a3809cedc5df97630e"
+        },
+        {
+          "role": "spell-cost",
+          "url": "dagger://game/assets/spellcast-BGFNTbIM.js",
+          "sha256": "24a05d24dde59c684fb72ec66d62def38ceb16331ae6f4d2e2a759c4efe7239b"
+        },
+        {
+          "role": "scene-interior",
+          "url": "dagger://game/assets/interiorContext-CgnYy0uD.js",
+          "sha256": "a9a701e4a2517d6fa71f7edcde46964a842874b2d0c77ed9e1d70c03ee109552"
+        },
+        {
+          "role": "town-door-types",
+          "url": "dagger://game/assets/meshReader-DvJxhGCD.js",
+          "sha256": "b068d508e5cbe28521e88fc19062295b38acb3ac32881bc3326b599f2d2d06dd"
+        },
+        {
+          "role": "scene-ui",
+          "url": "dagger://game/assets/notify-BeE_0d05.js",
+          "sha256": "556960a7b2e7a3379eff36f4bf8667dc236ec7858a1c580ff25e0fd28614a68a"
+        },
+        {
+          "role": "skill-softcap",
+          "url": "dagger://game/assets/skillSoftcap-CTg-CqhB.js",
+          "sha256": "6f3ef8ae7532660e8791d7776ba16e7e46f7ffdd48aeaefe76358805cc5bc6be"
+        }
+      ],
+      "bindings": {
+        "W": "W",
+        "U": "U",
+        "H": "H",
+        "$": "$",
+        "gb": "gb",
+        "t": "t",
+        "J": "J",
+        "GD": "GD",
+        "Kp": "Kp",
+        "dp": "dp",
+        "gg": "gg",
+        "Pm": "Pm",
+        "kx": "kx",
+        "X": "X",
+        "RO": "RO",
+        "Bm": "Bm",
+        "Im": "Im",
+        "gP": "gP",
+        "lP": "lP",
+        "dP": "dP",
+        "G": "G",
+        "Rv": "Rv",
+        "Vo": "Vo",
+        "Dh": "Dh",
+        "UO": "UO",
+        "peerPose": "EI"
+      },
+      "insideBindings": {
+        "foes": "ii",
+        "guards": "Fi"
+      }
+    },
+    {
+      "reviewedVersion": "0.1.10165 executable; loaded runtime revision 2026-10-20b",
+      "reviewNotes": "Reviewed current singleton fy/qF imported as V; world HRt fixed bindings; pure map exports yk/vk and learned-name Vk/FT; health fxe/pxe; static owned-book tables Hc/Cc and cl/on; Qp/yr baseline and registered modifiers remain individually V8-guarded. Copied field serializers do not invoke gameplay methods.",
+      "player": {
+        "healthFunction": "fxe",
+        "magickaFunction": "pxe",
+        "mapCurrentExport": "yk",
+        "mapRecordExport": "vk",
+        "mapModelBinding": "sE",
+        "learnedNamesExport": "Vk",
+        "learnedNamesBinding": "FT",
+        "hotbarAnchorExport": "yk",
+        "hotbarBinding": "pq",
+        "url": "dagger://game/assets/worldTick-DvdqQBmf.js",
+        "export": "qF",
+        "sha256": "73cb0960a4060e76f4600afa2fccdc639e6f690f8c14f8b39e1c3b0851a1bb64",
+        "copiedBaselineReviewed": true
+      },
+      "hosts": [
+        {
+          "url": "dagger://game/assets/world-DYW0BB6w.js",
+          "sha256": "cbb13805999e7db0c42066764c821202986fb571f9b464464fab17a53790f727",
+          "playerModule": "dagger://game/assets/worldTick-DvdqQBmf.js",
+          "playerExport": "qF",
+          "scopeName": "HRt"
+        }
+      ],
+      "bindings": {
+        "Pm": "sm",
+        "kx": "Xb",
+        "gg": "Qh",
+        "gb": "Vy",
+        "Bm": "dm",
+        "Im": "cm",
+        "gP": "fN",
+        "lP": "oN",
+        "dP": "uN",
+        "RO": "SO",
+        "Kp": "kp",
+        "GD": "wD",
+        "Rv": "cv",
+        "Dh": "ih",
+        "UO": "DO",
+        "Vo": "zo",
+        "dp": "Qf",
+        "W": "W",
+        "U": "U",
+        "H": "H",
+        "$": "$",
+        "t": "t",
+        "J": "J",
+        "X": "X",
+        "G": "G",
+        "peerPose": "RF"
+      },
+      "insideBindings": {
+        "foes": "oi",
+        "guards": "Li"
+      },
+      "navigationDependencies": [
+        {
+          "role": "town-ui",
+          "url": "dagger://game/assets/deepWaterRuntime-CaTfy2WW.js",
+          "sha256": "76f4fd447989480eb74c66adba620b3d777ba548fd8ca76aac8e54e4d8c005b6"
+        },
+        {
+          "role": "world-modes",
+          "url": "dagger://game/assets/arenaGate-1KIp9DZq.js",
+          "sha256": "b79164fc35e9970a4a23b79152eab9da50097a51e7ac8402fbd68ad638c12fed"
+        },
+        {
+          "role": "scene-collider",
+          "url": "dagger://game/assets/propBodies-leT_00Bq.js",
+          "sha256": "d96a9f7e2f8866a7de1255428854062fe768a8d9227968b63e1104b37d78cde7"
+        },
+        {
+          "role": "scene-renderer",
+          "url": "dagger://game/assets/renderer-CDhpL_0r.js",
+          "sha256": "22582a7621bb47bea2416bceb5da9b3d17a11daac4cf25ef62958717394cf961"
+        },
+        {
+          "role": "scene-peers",
+          "url": "dagger://game/assets/peerBodies-BiQIkR-e.js",
+          "sha256": "39967d80529b424455328d2e4e2b725215b31a26c369e9e72ddf824dac5bdc71"
+        },
+        {
+          "role": "quest-messages",
+          "url": "dagger://game/assets/person-BtotpTKI.js",
+          "sha256": "0f54ee59bb2867f37694e3e44416eec45afc67aa91e120f825e389aaf3340857"
+        },
+        {
+          "role": "item-readables",
+          "url": "dagger://game/assets/setCard-CDyrN0Fs.js",
+          "sha256": "441457c83039e99735bf40b618c4d6e682f3fc4ebd0a4b0e09f97981b3761adb"
+        },
+        {
+          "role": "item-templates",
+          "url": "dagger://game/assets/wagonKinds-BKOEBsGj.js",
+          "sha256": "5ebf07c463d4afc1769305745d85134d78b2ab9385d63128634d77a8ae1cd4ef"
+        },
+        {
+          "role": "scene-concealment",
+          "url": "dagger://game/assets/mysticism-C70V_O5e.js",
+          "sha256": "65e898935d2e0ed5029c641e679e539653b44617ab365a92c01b1a0f7e9bc88a"
+        },
+        {
+          "role": "spell-cost",
+          "url": "dagger://game/assets/spellcast-BH-4MYbb.js",
+          "sha256": "05126e78366008eddc238294236c4be7c83c21dab449bd4c845c45f50d95d533"
+        },
+        {
+          "role": "scene-interior",
+          "url": "dagger://game/assets/interiorContext-DBwOJ3OJ.js",
+          "sha256": "88c6255a2ee858c1dd9ac7adf6cf5a99308becbac7cdce1527e0e6ef6d9056fc"
+        },
+        {
+          "role": "town-door-types",
+          "url": "dagger://game/assets/meshReader-DvJxhGCD.js",
+          "sha256": "b068d508e5cbe28521e88fc19062295b38acb3ac32881bc3326b599f2d2d06dd"
+        },
+        {
+          "role": "scene-ui",
+          "url": "dagger://game/assets/notify-Dv-SNNYC.js",
+          "sha256": "b9078a436459993c7be938d6d680ced8eb34cc552ad49532ee872332f09bbc41"
+        },
+        {
+          "role": "skill-softcap",
+          "url": "dagger://game/assets/skillSoftcap-CTg-CqhB.js",
+          "sha256": "6f3ef8ae7532660e8791d7776ba16e7e46f7ffdd48aeaefe76358805cc5bc6be"
+        },
+        {
+          "role": "cost-sigil-sets",
+          "url": "dagger://game/assets/sigilSetPowers-NR0t5Cg0.js",
+          "sha256": "0588a87b4ef35365c234480ae107d49a2875c370197a9494848706cc88dfa1b5"
+        },
+        {
+          "role": "cost-court",
+          "url": "dagger://game/assets/gateCourt-BWf1WXAZ.js",
+          "sha256": "e32ff9c991672bee3cea8aede90eed41a9e923e42e8abef1490bb3ded516f393"
+        },
+        {
+          "role": "cost-equipment",
+          "url": "dagger://game/assets/weaponRig-Cj_dIuP2.js",
+          "sha256": "a35bb1096a131b47d9d402eb794e82a3c169778aa86f5baaec80e9dd48c67f55"
+        },
+        {
+          "role": "cost-firmament-state",
+          "url": "dagger://game/assets/pauseDoor-B7Ntr7TO.js",
+          "sha256": "ad7c2222a27ebcb7b7f1ff62cd87cdecb2ab70261ea642b516e0b1a46789e132"
+        },
+        {
+          "role": "cost-disable-state",
+          "url": "dagger://game/assets/potionRecipes-DVwp6Xg3.js",
+          "sha256": "8b0bf05f9d4a0de4946075b460dd6d1266780daa8ff2eb91244ef59ee6756c66"
+        },
+        {
+          "role": "cost-firmament-math",
+          "url": "dagger://game/assets/firmamentLaw-DTf2h2hj.js",
+          "sha256": "9c8b9ab9923c5722ca7987ff81290f5d114284c29caeef10254b39b656f0f7fc"
+        },
+        {
+          "role": "cost-court-math",
+          "url": "dagger://game/assets/gateBoss-mGmfX6SG.js",
+          "sha256": "65ecfa880109b948d459dc7158f7dd841383c276b29aa83625395450a8499d02"
+        }
+      ],
+      "costCopies": {
+        "Jp": [
+          {
+            "registry": "Jp",
+            "index": 0,
+            "url": "dagger://game/assets/sigilSetPowers-NR0t5Cg0.js",
+            "sha256": "0588a87b4ef35365c234480ae107d49a2875c370197a9494848706cc88dfa1b5",
+            "location": {
+              "scriptId": "2424",
+              "lineNumber": 0,
+              "columnNumber": 12603
+            },
+            "functionSha256": "c08a5859c670ace2c77a940f01ae8b71b3b68241ed8ba19449826a58059922cc"
+          },
+          {
+            "registry": "Jp",
+            "index": 1,
+            "url": "dagger://game/assets/gateCourt-BWf1WXAZ.js",
+            "sha256": "e32ff9c991672bee3cea8aede90eed41a9e923e42e8abef1490bb3ded516f393",
+            "location": {
+              "scriptId": "2434",
+              "lineNumber": 0,
+              "columnNumber": 163171
+            },
+            "functionSha256": "962ef1225b0f2bb34fc56a996b6ca75796dfcbb2ef7c698cc1578aae8b491ad5"
+          },
+          {
+            "registry": "Jp",
+            "index": 2,
+            "url": "dagger://game/assets/weaponRig-Cj_dIuP2.js",
+            "sha256": "a35bb1096a131b47d9d402eb794e82a3c169778aa86f5baaec80e9dd48c67f55",
+            "location": {
+              "scriptId": "2542",
+              "lineNumber": 0,
+              "columnNumber": 146816
+            },
+            "functionSha256": "ad8cc24db1853250023d7a4bb2a3cf5e1f1cf7e79e96ec092c6afc7c797629be"
+          },
+          {
+            "registry": "Jp",
+            "index": 3,
+            "url": "dagger://game/assets/deepWaterRuntime-CaTfy2WW.js",
+            "sha256": "76f4fd447989480eb74c66adba620b3d777ba548fd8ca76aac8e54e4d8c005b6",
+            "location": {
+              "scriptId": "2547",
+              "lineNumber": 243,
+              "columnNumber": 27001
+            },
+            "functionSha256": "7f72d40881bfc97d27c440cda8d5b4663c9f60d5b2aafdcd0e0924b2cf26caf3"
+          },
+          {
+            "registry": "Jp",
+            "index": 4,
+            "url": "dagger://game/assets/deepWaterRuntime-CaTfy2WW.js",
+            "sha256": "76f4fd447989480eb74c66adba620b3d777ba548fd8ca76aac8e54e4d8c005b6",
+            "location": {
+              "scriptId": "2547",
+              "lineNumber": 243,
+              "columnNumber": 32556
+            },
+            "functionSha256": "23b64bdfde365eb84a1386509a0b35d065fa5952394abfcf6bce24bb7c5c2b69"
+          }
+        ],
+        "Xp": [
+          {
+            "registry": "Xp",
+            "index": 0,
+            "url": "dagger://game/assets/gateCourt-BWf1WXAZ.js",
+            "sha256": "e32ff9c991672bee3cea8aede90eed41a9e923e42e8abef1490bb3ded516f393",
+            "location": {
+              "scriptId": "2434",
+              "lineNumber": 0,
+              "columnNumber": 163650
+            },
+            "functionSha256": "535cca3e2d82526696ff8606a49d7b60ab869a9bbfff03ff31a136f82a85e39b"
+          }
+        ]
+      }
+    },
+    {
+      "reviewedVersion": "Loaded runtime revision 2026-10-20c; bounded planning recovery",
+      "reviewNotes": "Reviewed own singleton ly exported dI, world static import dI as H and executed gWt host. Verified data-only owner serializers, unchanged Lb/Rb health/magicka getter structure, pure kk/Ok map accessors, learned names Zk/KT and rG hotbar. Fixed world G motor/W camera/U world/$ modes/wy place/rh quest manager/K UI. Arena getters are direct fields, interior motor R and camera z. Quest data fields used by recorded-only serializers verified. This limited recovery profile deliberately leaves actor adapters, item-template enrichment, specialized current spell costs and updated dungeon hosts unavailable rather than carrying old aliases or hashes forward. Actor/town recovery: reviewed actual lateSolid broad-phase index, renderer view matrices, peerBodies public membership, guarded wF wire-to-scene identity converter, AD hidden-peer set, current pool aliases, interior static records and guarded living seats, si/Li interior foes/guards, K buildingDirectory getter and q_ public door records. Geometry estimates and source-limited names remain explicit. Exact current cost and item-template enrichment adapters remain unavailable. Reviewed UUe loaded-node Map s (nodesOf accessor), entry/nodes/local fields and pixel translation. Read existing herb/tree/mine/haul records only; no nodesOf generation, gone/plan/marks, loose fishing-node creation or action methods are invoked.",
+      "player": {
+        "healthFunction": "Lb",
+        "magickaFunction": "Rb",
+        "mapCurrentExport": "kk",
+        "mapRecordExport": "Ok",
+        "mapModelBinding": "aE",
+        "learnedNamesExport": "Zk",
+        "learnedNamesBinding": "KT",
+        "hotbarAnchorExport": "kk",
+        "hotbarBinding": "rG",
+        "url": "dagger://game/assets/worldTick-CMNNhtAP.js",
+        "export": "dI",
+        "sha256": "4128f2896c3682da8cb84232dc02cdbe8700d399e85d5a414818b43ce1801b58",
+        "copiedBaselineReviewed": false
+      },
+      "hosts": [
+        {
+          "url": "dagger://game/assets/world-CILj1P_b.js",
+          "sha256": "e760cf75cd622b5282698764fd18fa2bef6473aa4aa001003895a320d27ce020",
+          "playerModule": "dagger://game/assets/worldTick-CMNNhtAP.js",
+          "playerExport": "dI",
+          "scopeName": "gWt"
+        }
+      ],
+      "bindings": {
+        "W": "G",
+        "U": "W",
+        "H": "U",
+        "$": "$",
+        "gb": "wy",
+        "Dh": "rh",
+        "G": "K",
+        "t": "t",
+        "Pm": "Qp",
+        "kx": "Vb",
+        "gg": "Zh",
+        "Bm": "rm",
+        "Im": "$p",
+        "gP": "iN",
+        "lP": "eN",
+        "dP": "nN",
+        "RO": "AD",
+        "Kp": "lp",
+        "GD": "SE",
+        "Rv": "q_",
+        "UO": "FD",
+        "Vo": "Lo",
+        "dp": "Of",
+        "J": "Y",
+        "X": "X",
+        "peerPose": "wF"
+      },
+      "insideBindings": {
+        "motor": "R",
+        "camera": "z",
+        "foes": "si",
+        "guards": "Li"
+      },
+      "navigationDependencies": [
+        {
+          "role": "world-modes",
+          "url": "dagger://game/assets/arenaGate-CFtZCt_B.js",
+          "sha256": "17b746c13c27136eb1c72966cc9760ead515ec8e145388b5343237edeb6628b5"
+        },
+        {
+          "role": "quest-messages",
+          "url": "dagger://game/assets/person-BjGxxZpY.js",
+          "sha256": "c6ee8d17e9d5675c0a5c3c1efb7435e57d9a938efad71fad7441e94b3167571f"
+        },
+        {
+          "role": "town-ui",
+          "url": "dagger://game/assets/deepWaterRuntime-BKZGe1b3.js",
+          "sha256": "cd59ab2aefcd1c942c1308ec357f49de5d2fd9ae7b280b3e9b3da2d27aba13ed"
+        },
+        {
+          "role": "scene-collider",
+          "url": "dagger://game/assets/lateSolid-Ch2RQ76Q.js",
+          "sha256": "5e7b7f579c4b8cf6c40f528c754a809e21c5639a6dd492e11341583fba0da9c4"
+        },
+        {
+          "role": "scene-renderer",
+          "url": "dagger://game/assets/renderer-CHS4YdS5.js",
+          "sha256": "00e55e2450bc2eb81bff0fac0aa8ddb10b2fcee3a169bedc36ec59a85c1560fc"
+        },
+        {
+          "role": "scene-peers",
+          "url": "dagger://game/assets/peerBodies-fdCGzGm5.js",
+          "sha256": "daab7b4d2c250459ce11d931a4b46d6ba2b016dc1228a688fc02685016e0385d"
+        },
+        {
+          "role": "scene-concealment",
+          "url": "dagger://game/assets/deepWaterRuntime-BKZGe1b3.js",
+          "sha256": "cd59ab2aefcd1c942c1308ec357f49de5d2fd9ae7b280b3e9b3da2d27aba13ed"
+        },
+        {
+          "role": "scene-ui",
+          "url": "dagger://game/assets/deepWaterRuntime-BKZGe1b3.js",
+          "sha256": "cd59ab2aefcd1c942c1308ec357f49de5d2fd9ae7b280b3e9b3da2d27aba13ed"
+        },
+        {
+          "role": "scene-interior",
+          "url": "dagger://game/assets/interiorContext-C343zo5s.js",
+          "sha256": "e8894fc43913d0529ad72259ed26c4d7945758b7a7a642f5de86ce7420ef2a12"
+        },
+        {
+          "role": "town-door-types",
+          "url": "dagger://game/assets/meshReader-DvJxhGCD.js",
+          "sha256": "b068d508e5cbe28521e88fc19062295b38acb3ac32881bc3326b599f2d2d06dd"
+        },
+        {
+          "role": "gathering-host",
+          "url": "dagger://game/assets/world-CILj1P_b.js",
+          "sha256": "e760cf75cd622b5282698764fd18fa2bef6473aa4aa001003895a320d27ce020"
+        }
+      ],
+      "peerPoseFunctionSha256": "94e90006e141daa3ba31b18ba3b64cd58b501cabca14d04019610d85b47bc58e",
+      "peerPoseCopies": [
+        {
+          "kind": "world",
+          "nativeUnitsPerMetre": 40,
+          "functionSha256": "7146eaa3dcafbf6f18f1e2180a99fd0c4dc1f715e23d69b4076926b03cb6f046"
+        },
+        {
+          "kind": "local",
+          "conditionalY": true,
+          "functionSha256": "bfe00583113c60324985e1689e39741add75ef2409ac1456b2ee093833e24526"
+        }
+      ]
+    },
+    {
+      "reviewedVersion": "0.1.10435; current loaded core recovery",
+      "reviewNotes": "Source reviewed singleton/import/host proof, current max-health/magicka helper structure, pure map getters, learned-name and hotbar aliases, world position and recorded quest manager. Recovery is deliberately limited to own-character, recorded quests and own location; unreviewed actor/gathering/template/cost adapters remain unavailable. Current actor restoration: reviewed KUt NPC/travel/living pools, Gh collider, vM/mM/gM public peer render pools, BD hidden set, exact JP identity coordinate converter, current renderer/collider field semantics, and ri/Ri interior actor pools. Exterior terrain wrapper may refuse terrain coverage conservatively.",
+      "player": {
+        "healthFunction": "Xge",
+        "magickaFunction": "Zge",
+        "mapCurrentExport": "wk",
+        "mapRecordExport": "Ck",
+        "mapModelBinding": "nC",
+        "learnedNamesExport": "Kk",
+        "learnedNamesBinding": "AS",
+        "hotbarAnchorExport": "wk",
+        "hotbarBinding": "QH",
+        "url": "dagger://game/assets/worldTick-DxVCJApm.js",
+        "export": "oI",
+        "sha256": "65fcfc2e47dd0c0ac148d0b1f219e49ec6f4508b7416acfbb4bda8391834dc04",
+        "copiedBaselineReviewed": false,
+        "publicQuestTrackerExport": "tc",
+        "publicQuestTrackerLocal": "Q0"
+      },
+      "hosts": [
+        {
+          "url": "dagger://game/assets/world-BgtpDkJy.js",
+          "sha256": "de7c08cd29e90061d415d9bc2795992860ba671640fc3e8447f14aafc9a01e24",
+          "playerModule": "dagger://game/assets/worldTick-DxVCJApm.js",
+          "playerExport": "oI",
+          "scopeName": "KUt"
+        }
+      ],
+      "bindings": {
+        "W": "W",
+        "U": "U",
+        "H": "H",
+        "$": "$",
+        "gb": "uy",
+        "Dh": "Xm",
+        "G": "G",
+        "t": "t",
+        "Pm": "am",
+        "kx": "xb",
+        "gg": "Gh",
+        "Bm": "pm",
+        "Im": "cm",
+        "gP": "vM",
+        "lP": "mM",
+        "dP": "gM",
+        "RO": "BD",
+        "Kp": "vp",
+        "GD": "NE",
+        "dp": "Lf",
+        "J": "J",
+        "X": "X",
+        "peerPose": "JP"
+      },
+      "navigationDependencies": [
+        {
+          "role": "world-modes",
+          "url": "dagger://game/assets/arenaGate-DjXry7gX.js",
+          "sha256": "d8d038dbfae3a6314a7ed752b83e040ef99618a9f5511e41f00edd1bdd13f854"
+        },
+        {
+          "role": "quest-messages",
+          "url": "dagger://game/assets/person-Cbtn_mhu.js",
+          "sha256": "f797cd467cca2c0618685bd37bbcfa5f1c3f1397637b7036d1446c98c94e37e2"
+        },
+        {
+          "role": "town-ui",
+          "url": "dagger://game/assets/deepWaterRuntime-VNluyVq6.js",
+          "sha256": "d8fa90c95fe27ef074f0e3cc7028471fba799cfa12e570c88d61bb6570fad918"
+        },
+        {
+          "role": "scene-collider",
+          "url": "dagger://game/assets/lateSolid-CtEFEc19.js",
+          "sha256": "2083395eb9f5b75e1cb3c438cca868f8ff8099f0e49c4b8c0701bb3a467a9517"
+        },
+        {
+          "role": "scene-renderer",
+          "url": "dagger://game/assets/renderer-CRK85dND.js",
+          "sha256": "dfe9dfe5b5b242235d7218578898c0f0b6a0569d972c0c9c4ff20313e565f699"
+        },
+        {
+          "role": "scene-peers",
+          "url": "dagger://game/assets/peerBodies-Z2s17f5O.js",
+          "sha256": "3749591082cc44bb834a1deb727e1c6569f2c7f2827d90dd73ef275c75d90d49"
+        },
+        {
+          "role": "scene-concealment",
+          "url": "dagger://game/assets/deepWaterRuntime-VNluyVq6.js",
+          "sha256": "d8fa90c95fe27ef074f0e3cc7028471fba799cfa12e570c88d61bb6570fad918"
+        },
+        {
+          "role": "scene-ui",
+          "url": "dagger://game/assets/deepWaterRuntime-VNluyVq6.js",
+          "sha256": "d8fa90c95fe27ef074f0e3cc7028471fba799cfa12e570c88d61bb6570fad918"
+        },
+        {
+          "role": "scene-interior",
+          "url": "dagger://game/assets/interiorContext-Di1nbj32.js",
+          "sha256": "2b6f3e5d1bdce32b886870cf1d811dfec4af333a815616f5cbf485228f7ef244"
+        }
+      ],
+      "insideBindings": {
+        "motor": "L",
+        "camera": "R",
+        "foes": "ri",
+        "guards": "Ri"
+      },
+      "dungeonQuestTargetsReviewed": true,
+      "dungeonActionsReviewed": true,
+      "peerPoseFunctionSha256": "94e90006e141daa3ba31b18ba3b64cd58b501cabca14d04019610d85b47bc58e"
+    },
+    {
+      "reviewedVersion": "0.1.10461; reviewed own-character and dashboard core",
+      "reviewNotes": "Reviewed exact loaded hashes, own Rh singleton exported as oI and directly imported as H by executed QUt host; bounded own descriptor copies; current f_/p_ max-vital getter structure; pure current-map/record/learned-name getters; hotbar data; QUt motor G, camera W, world U, place Ay, recorded quest manager ch and UI K. Reviewed current modes closure motor R/camera z. Additional actors, custom templates, copied cost formulas and deeper scene adapters remain unavailable until separately reviewed. Public tracker c4 as tc reviewed unchanged views/follow/pinned schema and questLens public objective/done projection; public map catalogue $i and built tile Map hm reviewed for bounded town-local coordinates, raster and public service records.",
+      "player": {
+        "healthFunction": "f_",
+        "magickaFunction": "p_",
+        "mapCurrentExport": "wk",
+        "mapRecordExport": "Ck",
+        "mapModelBinding": "WS",
+        "learnedNamesExport": "Kk",
+        "learnedNamesBinding": "vS",
+        "hotbarAnchorExport": "wk",
+        "hotbarBinding": "lW",
+        "url": "dagger://game/assets/worldTick-CwP_zlZW.js",
+        "export": "oI",
+        "sha256": "7545cf4b971bbc7b3a8a24088b1895c2797a437c6d4f8e3fc71e09509629ce4a",
+        "copiedBaselineReviewed": false,
+        "publicQuestTrackerExport": "tc",
+        "publicQuestTrackerLocal": "c4"
+      },
+      "hosts": [
+        {
+          "url": "dagger://game/assets/world-DQSSEiph.js",
+          "sha256": "95afa96fafcc04f9972714967233db3c51571f55b87c1d1a88b4ddc550d44638",
+          "playerModule": "dagger://game/assets/worldTick-CwP_zlZW.js",
+          "playerExport": "oI",
+          "scopeName": "QUt"
+        }
+      ],
+      "bindings": {
+        "W": "G",
+        "U": "W",
+        "H": "U",
+        "$": "$",
+        "gb": "Ay",
+        "Dh": "ch",
+        "G": "K",
+        "t": "t",
+        "publicQuestPlaces": "$i",
+        "Bm": "hm"
+      },
+      "navigationDependencies": [
+        {
+          "role": "world-modes",
+          "url": "dagger://game/assets/arenaGate-B-2oE0ev.js",
+          "sha256": "3da00fa4a99c4c3c85538dd06b9c1649d12b8080b14880f16337086e2b061b96"
+        },
+        {
+          "role": "quest-messages",
+          "url": "dagger://game/assets/person-DPmA3red.js",
+          "sha256": "686b16e134a20304aa232fa51a31b2f3e0a5c48f2c07725714ec99762d7809b3"
+        },
+        {
+          "role": "town-ui",
+          "url": "dagger://game/assets/deepWaterRuntime-DxfOoAJk.js",
+          "sha256": "3aa32d3e2b43432340ccf941fe2a435bd3b6207e9c352d4584743d85f7c3533e"
+        }
+      ],
+      "insideBindings": {
+        "motor": "R",
+        "camera": "z"
+      }
+    }
+  ]
+}

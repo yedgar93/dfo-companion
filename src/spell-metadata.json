@@ -1,0 +1,1627 @@
+{
+  "sourceHashes": {
+    "spellcast": "24a05d24dde59c684fb72ec66d62def38ceb16331ae6f4d2e2a759c4efe7239b",
+    "spellEffects": "378adec3f94361a801ca1cf5c455c8262867fa374ef09172b16ec1ef761c6529"
+  },
+  "effects": [
+    {
+      "type": 0,
+      "subType": 255,
+      "name": "Paralyze",
+      "uses": [
+        "duration",
+        "chance"
+      ]
+    },
+    {
+      "type": 1,
+      "subType": 0,
+      "name": "Continuous Damage Health",
+      "uses": [
+        "duration",
+        "magnitude"
+      ]
+    },
+    {
+      "type": 1,
+      "subType": 1,
+      "name": "Continuous Damage Fatigue",
+      "uses": [
+        "duration",
+        "magnitude"
+      ]
+    },
+    {
+      "type": 1,
+      "subType": 2,
+      "name": "Continuous Damage Spell Points",
+      "uses": [
+        "duration",
+        "magnitude"
+      ]
+    },
+    {
+      "type": 2,
+      "subType": 255,
+      "name": "Create Item",
+      "uses": [
+        "duration"
+      ]
+    },
+    {
+      "type": 3,
+      "subType": 0,
+      "name": "Cure Disease",
+      "uses": [
+        "chance"
+      ]
+    },
+    {
+      "type": 3,
+      "subType": 1,
+      "name": "Cure Poison",
+      "uses": [
+        "chance"
+      ]
+    },
+    {
+      "type": 3,
+      "subType": 2,
+      "name": "Cure Paralyzation",
+      "uses": [
+        "chance"
+      ]
+    },
+    {
+      "type": 4,
+      "subType": 0,
+      "name": "Damage Health",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 4,
+      "subType": 1,
+      "name": "Damage Fatigue",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 4,
+      "subType": 2,
+      "name": "Damage Spell Points",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 5,
+      "subType": 255,
+      "name": "Disintegrate",
+      "uses": [
+        "chance"
+      ]
+    },
+    {
+      "type": 6,
+      "subType": 0,
+      "name": "Dispel Magic",
+      "uses": [
+        "chance"
+      ]
+    },
+    {
+      "type": 6,
+      "subType": 1,
+      "name": "Dispel Undead",
+      "uses": [
+        "chance"
+      ]
+    },
+    {
+      "type": 6,
+      "subType": 2,
+      "name": "Dispel Daedra",
+      "uses": [
+        "chance"
+      ]
+    },
+    {
+      "type": 8,
+      "subType": 0,
+      "name": "Elemental Resistance Fire",
+      "uses": [
+        "duration",
+        "chance"
+      ]
+    },
+    {
+      "type": 8,
+      "subType": 1,
+      "name": "Elemental Resistance Frost",
+      "uses": [
+        "duration",
+        "chance"
+      ]
+    },
+    {
+      "type": 8,
+      "subType": 2,
+      "name": "Elemental Resistance Poison",
+      "uses": [
+        "duration",
+        "chance"
+      ]
+    },
+    {
+      "type": 8,
+      "subType": 3,
+      "name": "Elemental Resistance Shock",
+      "uses": [
+        "duration",
+        "chance"
+      ]
+    },
+    {
+      "type": 8,
+      "subType": 4,
+      "name": "Elemental Resistance Magicka",
+      "uses": [
+        "duration",
+        "chance"
+      ]
+    },
+    {
+      "type": 12,
+      "subType": 255,
+      "name": "Soul Trap",
+      "uses": [
+        "duration",
+        "chance"
+      ]
+    },
+    {
+      "type": 13,
+      "subType": 0,
+      "name": "Invisibility Normal",
+      "uses": [
+        "duration"
+      ]
+    },
+    {
+      "type": 13,
+      "subType": 1,
+      "name": "Invisibility True",
+      "uses": [
+        "duration"
+      ]
+    },
+    {
+      "type": 14,
+      "subType": 255,
+      "name": "Levitate",
+      "uses": [
+        "duration"
+      ]
+    },
+    {
+      "type": 15,
+      "subType": 255,
+      "name": "Light",
+      "uses": [
+        "duration"
+      ]
+    },
+    {
+      "type": 16,
+      "subType": 255,
+      "name": "Lock",
+      "uses": [
+        "chance"
+      ]
+    },
+    {
+      "type": 17,
+      "subType": 255,
+      "name": "Open",
+      "uses": [
+        "chance"
+      ]
+    },
+    {
+      "type": 18,
+      "subType": 255,
+      "name": "Regenerate",
+      "uses": [
+        "duration",
+        "magnitude"
+      ]
+    },
+    {
+      "type": 19,
+      "subType": 255,
+      "name": "Silence",
+      "uses": [
+        "duration",
+        "chance"
+      ]
+    },
+    {
+      "type": 20,
+      "subType": 255,
+      "name": "Spell Absorption",
+      "uses": [
+        "duration",
+        "chance"
+      ]
+    },
+    {
+      "type": 21,
+      "subType": 255,
+      "name": "Spell Reflection",
+      "uses": [
+        "duration",
+        "chance"
+      ]
+    },
+    {
+      "type": 22,
+      "subType": 255,
+      "name": "Spell Resistance",
+      "uses": [
+        "duration",
+        "chance"
+      ]
+    },
+    {
+      "type": 23,
+      "subType": 0,
+      "name": "Chameleon Normal",
+      "uses": [
+        "duration"
+      ]
+    },
+    {
+      "type": 23,
+      "subType": 1,
+      "name": "Chameleon True",
+      "uses": [
+        "duration"
+      ]
+    },
+    {
+      "type": 24,
+      "subType": 0,
+      "name": "Shadow Normal",
+      "uses": [
+        "duration"
+      ]
+    },
+    {
+      "type": 24,
+      "subType": 1,
+      "name": "Shadow True",
+      "uses": [
+        "duration"
+      ]
+    },
+    {
+      "type": 25,
+      "subType": 255,
+      "name": "Slowfall",
+      "uses": [
+        "duration"
+      ]
+    },
+    {
+      "type": 26,
+      "subType": 255,
+      "name": "Free Action",
+      "uses": [
+        "duration"
+      ]
+    },
+    {
+      "type": 27,
+      "subType": 255,
+      "name": "Jumping",
+      "uses": [
+        "duration"
+      ]
+    },
+    {
+      "type": 28,
+      "subType": 255,
+      "name": "Climbing",
+      "uses": [
+        "duration"
+      ]
+    },
+    {
+      "type": 29,
+      "subType": 255,
+      "name": "Morph Self",
+      "uses": []
+    },
+    {
+      "type": 45,
+      "subType": 255,
+      "name": "Resurrect",
+      "uses": []
+    },
+    {
+      "type": 46,
+      "subType": 255,
+      "name": "Shared Cartography",
+      "uses": [
+        "duration"
+      ]
+    },
+    {
+      "type": 30,
+      "subType": 255,
+      "name": "Water Breathing",
+      "uses": [
+        "duration"
+      ]
+    },
+    {
+      "type": 31,
+      "subType": 255,
+      "name": "Water Walking",
+      "uses": [
+        "duration"
+      ]
+    },
+    {
+      "type": 33,
+      "subType": 0,
+      "name": "Pacify Animal",
+      "uses": [
+        "chance"
+      ]
+    },
+    {
+      "type": 33,
+      "subType": 1,
+      "name": "Pacify Undead",
+      "uses": [
+        "chance"
+      ]
+    },
+    {
+      "type": 33,
+      "subType": 2,
+      "name": "Pacify Humanoid",
+      "uses": [
+        "chance"
+      ]
+    },
+    {
+      "type": 33,
+      "subType": 3,
+      "name": "Pacify Daedra",
+      "uses": [
+        "chance"
+      ]
+    },
+    {
+      "type": 34,
+      "subType": 255,
+      "name": "Charm",
+      "uses": [
+        "chance"
+      ]
+    },
+    {
+      "type": 35,
+      "subType": 255,
+      "name": "Shield",
+      "uses": [
+        "duration",
+        "magnitude"
+      ]
+    },
+    {
+      "type": 39,
+      "subType": 0,
+      "name": "Detect Magic",
+      "uses": [
+        "duration"
+      ]
+    },
+    {
+      "type": 39,
+      "subType": 1,
+      "name": "Detect Enemy",
+      "uses": [
+        "duration"
+      ]
+    },
+    {
+      "type": 39,
+      "subType": 2,
+      "name": "Detect Treasure",
+      "uses": [
+        "duration"
+      ]
+    },
+    {
+      "type": 40,
+      "subType": 255,
+      "name": "Identify",
+      "uses": [
+        "chance"
+      ]
+    },
+    {
+      "type": 43,
+      "subType": 255,
+      "name": "Teleport",
+      "uses": []
+    },
+    {
+      "type": 44,
+      "subType": 255,
+      "name": "Comprehend Languages",
+      "uses": [
+        "duration",
+        "chance"
+      ]
+    },
+    {
+      "type": 7,
+      "subType": 0,
+      "name": "Drain Strength",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 7,
+      "subType": 1,
+      "name": "Drain Intelligence",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 7,
+      "subType": 2,
+      "name": "Drain Willpower",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 7,
+      "subType": 3,
+      "name": "Drain Agility",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 7,
+      "subType": 4,
+      "name": "Drain Endurance",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 7,
+      "subType": 5,
+      "name": "Drain Personality",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 7,
+      "subType": 6,
+      "name": "Drain Speed",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 7,
+      "subType": 7,
+      "name": "Drain Luck",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 9,
+      "subType": 0,
+      "name": "Fortify Attribute Strength",
+      "uses": [
+        "duration",
+        "magnitude"
+      ]
+    },
+    {
+      "type": 9,
+      "subType": 1,
+      "name": "Fortify Attribute Intelligence",
+      "uses": [
+        "duration",
+        "magnitude"
+      ]
+    },
+    {
+      "type": 9,
+      "subType": 2,
+      "name": "Fortify Attribute Willpower",
+      "uses": [
+        "duration",
+        "magnitude"
+      ]
+    },
+    {
+      "type": 9,
+      "subType": 3,
+      "name": "Fortify Attribute Agility",
+      "uses": [
+        "duration",
+        "magnitude"
+      ]
+    },
+    {
+      "type": 9,
+      "subType": 4,
+      "name": "Fortify Attribute Endurance",
+      "uses": [
+        "duration",
+        "magnitude"
+      ]
+    },
+    {
+      "type": 9,
+      "subType": 5,
+      "name": "Fortify Attribute Personality",
+      "uses": [
+        "duration",
+        "magnitude"
+      ]
+    },
+    {
+      "type": 9,
+      "subType": 6,
+      "name": "Fortify Attribute Speed",
+      "uses": [
+        "duration",
+        "magnitude"
+      ]
+    },
+    {
+      "type": 9,
+      "subType": 7,
+      "name": "Fortify Attribute Luck",
+      "uses": [
+        "duration",
+        "magnitude"
+      ]
+    },
+    {
+      "type": 10,
+      "subType": 0,
+      "name": "Heal Strength",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 10,
+      "subType": 1,
+      "name": "Heal Intelligence",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 10,
+      "subType": 2,
+      "name": "Heal Willpower",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 10,
+      "subType": 3,
+      "name": "Heal Agility",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 10,
+      "subType": 4,
+      "name": "Heal Endurance",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 10,
+      "subType": 5,
+      "name": "Heal Personality",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 10,
+      "subType": 6,
+      "name": "Heal Speed",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 10,
+      "subType": 7,
+      "name": "Heal Luck",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 10,
+      "subType": 8,
+      "name": "Heal Health",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 10,
+      "subType": 9,
+      "name": "Heal Fatigue",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 11,
+      "subType": 0,
+      "name": "Transfer Strength",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 11,
+      "subType": 1,
+      "name": "Transfer Intelligence",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 11,
+      "subType": 2,
+      "name": "Transfer Willpower",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 11,
+      "subType": 3,
+      "name": "Transfer Agility",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 11,
+      "subType": 4,
+      "name": "Transfer Endurance",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 11,
+      "subType": 5,
+      "name": "Transfer Personality",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 11,
+      "subType": 6,
+      "name": "Transfer Speed",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 11,
+      "subType": 7,
+      "name": "Transfer Luck",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 11,
+      "subType": 8,
+      "name": "Transfer Health",
+      "uses": [
+        "magnitude"
+      ]
+    },
+    {
+      "type": 11,
+      "subType": 9,
+      "name": "Transfer Fatigue",
+      "uses": [
+        "magnitude"
+      ]
+    }
+  ],
+  "costs": {
+    "0,255": {
+      "skill": 25,
+      "duration": {
+        "A": 28,
+        "B": 100,
+        "offset": 0
+      },
+      "chance": {
+        "A": 28,
+        "B": 100,
+        "offset": 0
+      }
+    },
+    "8,0": {
+      "skill": 25,
+      "duration": {
+        "A": 100,
+        "B": 100,
+        "offset": 0
+      },
+      "chance": {
+        "A": 8,
+        "B": 100,
+        "offset": 0
+      }
+    },
+    "8,1": {
+      "skill": 25,
+      "duration": {
+        "A": 100,
+        "B": 100,
+        "offset": 0
+      },
+      "chance": {
+        "A": 8,
+        "B": 100,
+        "offset": 0
+      }
+    },
+    "8,2": {
+      "skill": 25,
+      "duration": {
+        "A": 100,
+        "B": 100,
+        "offset": 0
+      },
+      "chance": {
+        "A": 8,
+        "B": 100,
+        "offset": 0
+      }
+    },
+    "8,3": {
+      "skill": 25,
+      "duration": {
+        "A": 100,
+        "B": 100,
+        "offset": 0
+      },
+      "chance": {
+        "A": 8,
+        "B": 100,
+        "offset": 0
+      }
+    },
+    "8,4": {
+      "skill": 25,
+      "duration": {
+        "A": 100,
+        "B": 100,
+        "offset": 0
+      },
+      "chance": {
+        "A": 8,
+        "B": 100,
+        "offset": 0
+      }
+    },
+    "25,255": {
+      "skill": 25,
+      "duration": {
+        "A": 20,
+        "B": 100,
+        "offset": 0
+      }
+    },
+    "27,255": {
+      "skill": 25,
+      "duration": {
+        "A": 20,
+        "B": 8,
+        "offset": 0
+      }
+    },
+    "28,255": {
+      "skill": 25,
+      "duration": {
+        "A": 20,
+        "B": 20,
+        "offset": 0
+      }
+    },
+    "30,255": {
+      "skill": 25,
+      "duration": {
+        "A": 20,
+        "B": 8,
+        "offset": 0
+      }
+    },
+    "35,255": {
+      "skill": 25,
+      "duration": {
+        "A": 28,
+        "B": 8,
+        "offset": 0
+      },
+      "magnitude": {
+        "A": 80,
+        "B": 60,
+        "offset": 0
+      }
+    },
+    "1,0": {
+      "skill": 22,
+      "duration": {
+        "A": 28,
+        "B": 8,
+        "offset": 0
+      },
+      "magnitude": {
+        "A": 40,
+        "B": 28,
+        "offset": 0
+      }
+    },
+    "1,1": {
+      "skill": 22,
+      "duration": {
+        "A": 20,
+        "B": 8,
+        "offset": 0
+      },
+      "magnitude": {
+        "A": 40,
+        "B": 28,
+        "offset": 0
+      }
+    },
+    "1,2": {
+      "skill": 22,
+      "duration": {
+        "A": 40,
+        "B": 8,
+        "offset": 0
+      },
+      "magnitude": {
+        "A": 40,
+        "B": 28,
+        "offset": 0
+      }
+    },
+    "4,0": {
+      "skill": 22,
+      "magnitude": {
+        "A": 20,
+        "B": 28,
+        "offset": 0
+      }
+    },
+    "4,1": {
+      "skill": 22,
+      "magnitude": {
+        "A": 20,
+        "B": 28,
+        "offset": 0
+      }
+    },
+    "4,2": {
+      "skill": 22,
+      "magnitude": {
+        "A": 20,
+        "B": 28,
+        "offset": 0
+      }
+    },
+    "5,255": {
+      "skill": 22,
+      "chance": {
+        "A": 80,
+        "B": 140,
+        "offset": 0
+      }
+    },
+    "7,0": {
+      "skill": 22,
+      "magnitude": {
+        "A": 8,
+        "B": 100,
+        "offset": 116
+      }
+    },
+    "7,1": {
+      "skill": 22,
+      "magnitude": {
+        "A": 8,
+        "B": 100,
+        "offset": 116
+      }
+    },
+    "7,2": {
+      "skill": 22,
+      "magnitude": {
+        "A": 8,
+        "B": 100,
+        "offset": 116
+      }
+    },
+    "7,3": {
+      "skill": 22,
+      "magnitude": {
+        "A": 8,
+        "B": 100,
+        "offset": 116
+      }
+    },
+    "7,4": {
+      "skill": 22,
+      "magnitude": {
+        "A": 8,
+        "B": 100,
+        "offset": 116
+      }
+    },
+    "7,5": {
+      "skill": 22,
+      "magnitude": {
+        "A": 8,
+        "B": 100,
+        "offset": 116
+      }
+    },
+    "7,6": {
+      "skill": 22,
+      "magnitude": {
+        "A": 8,
+        "B": 100,
+        "offset": 116
+      }
+    },
+    "7,7": {
+      "skill": 22,
+      "magnitude": {
+        "A": 8,
+        "B": 100,
+        "offset": 116
+      }
+    },
+    "11,0": {
+      "skill": 22,
+      "magnitude": {
+        "A": 60,
+        "B": 100,
+        "offset": 40
+      }
+    },
+    "11,1": {
+      "skill": 22,
+      "magnitude": {
+        "A": 60,
+        "B": 100,
+        "offset": 40
+      }
+    },
+    "11,2": {
+      "skill": 22,
+      "magnitude": {
+        "A": 60,
+        "B": 100,
+        "offset": 40
+      }
+    },
+    "11,3": {
+      "skill": 22,
+      "magnitude": {
+        "A": 60,
+        "B": 100,
+        "offset": 40
+      }
+    },
+    "11,4": {
+      "skill": 22,
+      "magnitude": {
+        "A": 60,
+        "B": 100,
+        "offset": 40
+      }
+    },
+    "11,5": {
+      "skill": 22,
+      "magnitude": {
+        "A": 60,
+        "B": 100,
+        "offset": 40
+      }
+    },
+    "11,6": {
+      "skill": 22,
+      "magnitude": {
+        "A": 60,
+        "B": 100,
+        "offset": 40
+      }
+    },
+    "11,7": {
+      "skill": 22,
+      "magnitude": {
+        "A": 60,
+        "B": 100,
+        "offset": 40
+      }
+    },
+    "11,8": {
+      "skill": 22,
+      "magnitude": {
+        "A": 60,
+        "B": 100,
+        "offset": 40
+      }
+    },
+    "11,9": {
+      "skill": 22,
+      "magnitude": {
+        "A": 60,
+        "B": 100,
+        "offset": 40
+      }
+    },
+    "13,0": {
+      "skill": 24,
+      "duration": {
+        "A": 40,
+        "B": 120,
+        "offset": 0
+      }
+    },
+    "13,1": {
+      "skill": 24,
+      "duration": {
+        "A": 60,
+        "B": 140,
+        "offset": 0
+      }
+    },
+    "15,255": {
+      "skill": 24,
+      "duration": {
+        "A": 8,
+        "B": 40,
+        "offset": 0
+      }
+    },
+    "23,0": {
+      "skill": 24,
+      "duration": {
+        "A": 20,
+        "B": 80,
+        "offset": 0
+      }
+    },
+    "23,1": {
+      "skill": 24,
+      "duration": {
+        "A": 40,
+        "B": 120,
+        "offset": 0
+      }
+    },
+    "24,0": {
+      "skill": 24,
+      "duration": {
+        "A": 20,
+        "B": 80,
+        "offset": 0
+      }
+    },
+    "24,1": {
+      "skill": 24,
+      "duration": {
+        "A": 40,
+        "B": 120,
+        "offset": 0
+      }
+    },
+    "29,255": {
+      "skill": 24
+    },
+    "45,255": {
+      "skill": 23
+    },
+    "2,255": {
+      "skill": 27,
+      "duration": {
+        "A": 60,
+        "B": 120,
+        "offset": 0
+      }
+    },
+    "6,0": {
+      "skill": 27,
+      "chance": {
+        "A": 120,
+        "B": 180,
+        "offset": 0
+      }
+    },
+    "6,1": {
+      "skill": 27,
+      "chance": {
+        "A": 80,
+        "B": 140,
+        "offset": 0
+      }
+    },
+    "6,2": {
+      "skill": 27,
+      "chance": {
+        "A": 120,
+        "B": 180,
+        "offset": 0
+      }
+    },
+    "12,255": {
+      "skill": 27,
+      "duration": {
+        "A": 60,
+        "B": 68,
+        "offset": 0
+      },
+      "chance": {
+        "A": 40,
+        "B": 68,
+        "offset": 0
+      }
+    },
+    "16,255": {
+      "skill": 27,
+      "chance": {
+        "A": 28,
+        "B": 120,
+        "offset": 120
+      }
+    },
+    "17,255": {
+      "skill": 27,
+      "chance": {
+        "A": 20,
+        "B": 100,
+        "offset": 0
+      }
+    },
+    "19,255": {
+      "skill": 27,
+      "duration": {
+        "A": 20,
+        "B": 100,
+        "offset": 0
+      },
+      "chance": {
+        "A": 20,
+        "B": 100,
+        "offset": 0
+      }
+    },
+    "43,255": {
+      "skill": 27
+    },
+    "46,255": {
+      "skill": 27,
+      "duration": {
+        "A": 8,
+        "B": 8,
+        "offset": 0
+      }
+    },
+    "44,255": {
+      "skill": 27,
+      "duration": {
+        "A": 60,
+        "B": 68,
+        "offset": 0
+      },
+      "chance": {
+        "A": 40,
+        "B": 68,
+        "offset": 0
+      }
+    },
+    "3,0": {
+      "skill": 23,
+      "chance": {
+        "A": 8,
+        "B": 100,
+        "offset": 0
+      }
+    },
+    "3,1": {
+      "skill": 23,
+      "chance": {
+        "A": 8,
+        "B": 100,
+        "offset": 0
+      }
+    },
+    "3,2": {
+      "skill": 23,
+      "chance": {
+        "A": 20,
+        "B": 140,
+        "offset": 0
+      }
+    },
+    "9,0": {
+      "skill": 23,
+      "duration": {
+        "A": 28,
+        "B": 100,
+        "offset": 0
+      },
+      "magnitude": {
+        "A": 40,
+        "B": 120,
+        "offset": 0
+      }
+    },
+    "9,1": {
+      "skill": 23,
+      "duration": {
+        "A": 28,
+        "B": 100,
+        "offset": 0
+      },
+      "magnitude": {
+        "A": 40,
+        "B": 120,
+        "offset": 0
+      }
+    },
+    "9,2": {
+      "skill": 23,
+      "duration": {
+        "A": 28,
+        "B": 100,
+        "offset": 0
+      },
+      "magnitude": {
+        "A": 40,
+        "B": 120,
+        "offset": 0
+      }
+    },
+    "9,3": {
+      "skill": 23,
+      "duration": {
+        "A": 28,
+        "B": 100,
+        "offset": 0
+      },
+      "magnitude": {
+        "A": 40,
+        "B": 120,
+        "offset": 0
+      }
+    },
+    "9,4": {
+      "skill": 23,
+      "duration": {
+        "A": 28,
+        "B": 100,
+        "offset": 0
+      },
+      "magnitude": {
+        "A": 40,
+        "B": 120,
+        "offset": 0
+      }
+    },
+    "9,5": {
+      "skill": 23,
+      "duration": {
+        "A": 28,
+        "B": 100,
+        "offset": 0
+      },
+      "magnitude": {
+        "A": 40,
+        "B": 120,
+        "offset": 0
+      }
+    },
+    "9,6": {
+      "skill": 23,
+      "duration": {
+        "A": 28,
+        "B": 100,
+        "offset": 0
+      },
+      "magnitude": {
+        "A": 40,
+        "B": 120,
+        "offset": 0
+      }
+    },
+    "9,7": {
+      "skill": 23,
+      "duration": {
+        "A": 28,
+        "B": 100,
+        "offset": 0
+      },
+      "magnitude": {
+        "A": 40,
+        "B": 120,
+        "offset": 0
+      }
+    },
+    "10,0": {
+      "skill": 23,
+      "magnitude": {
+        "A": 40,
+        "B": 28,
+        "offset": 0
+      }
+    },
+    "10,1": {
+      "skill": 23,
+      "magnitude": {
+        "A": 40,
+        "B": 28,
+        "offset": 0
+      }
+    },
+    "10,2": {
+      "skill": 23,
+      "magnitude": {
+        "A": 40,
+        "B": 28,
+        "offset": 0
+      }
+    },
+    "10,3": {
+      "skill": 23,
+      "magnitude": {
+        "A": 40,
+        "B": 28,
+        "offset": 0
+      }
+    },
+    "10,4": {
+      "skill": 23,
+      "magnitude": {
+        "A": 40,
+        "B": 28,
+        "offset": 0
+      }
+    },
+    "10,5": {
+      "skill": 23,
+      "magnitude": {
+        "A": 40,
+        "B": 28,
+        "offset": 0
+      }
+    },
+    "10,6": {
+      "skill": 23,
+      "magnitude": {
+        "A": 40,
+        "B": 28,
+        "offset": 0
+      }
+    },
+    "10,7": {
+      "skill": 23,
+      "magnitude": {
+        "A": 40,
+        "B": 28,
+        "offset": 0
+      }
+    },
+    "10,8": {
+      "skill": 23,
+      "magnitude": {
+        "A": 20,
+        "B": 28,
+        "offset": 0
+      }
+    },
+    "10,9": {
+      "skill": 23,
+      "magnitude": {
+        "A": 8,
+        "B": 28,
+        "offset": 0
+      }
+    },
+    "18,255": {
+      "skill": 23,
+      "duration": {
+        "A": 100,
+        "B": 20,
+        "offset": 0
+      },
+      "magnitude": {
+        "A": 8,
+        "B": 8,
+        "offset": 0
+      }
+    },
+    "20,255": {
+      "skill": 23,
+      "duration": {
+        "A": 28,
+        "B": 140,
+        "offset": 0
+      },
+      "chance": {
+        "A": 28,
+        "B": 140,
+        "offset": 0
+      }
+    },
+    "26,255": {
+      "skill": 23,
+      "duration": {
+        "A": 20,
+        "B": 8,
+        "offset": 0
+      }
+    },
+    "14,255": {
+      "skill": 26,
+      "duration": {
+        "A": 60,
+        "B": 100,
+        "offset": 0
+      }
+    },
+    "21,255": {
+      "skill": 26,
+      "duration": {
+        "A": 28,
+        "B": 140,
+        "offset": 0
+      },
+      "chance": {
+        "A": 28,
+        "B": 140,
+        "offset": 0
+      }
+    },
+    "22,255": {
+      "skill": 26,
+      "duration": {
+        "A": 20,
+        "B": 100,
+        "offset": 0
+      },
+      "chance": {
+        "A": 20,
+        "B": 100,
+        "offset": 0
+      }
+    },
+    "31,255": {
+      "skill": 26,
+      "duration": {
+        "A": 20,
+        "B": 8,
+        "offset": 0
+      }
+    },
+    "33,0": {
+      "skill": 26,
+      "chance": {
+        "A": 60,
+        "B": 100,
+        "offset": 160
+      }
+    },
+    "33,1": {
+      "skill": 26,
+      "chance": {
+        "A": 80,
+        "B": 140,
+        "offset": 60
+      }
+    },
+    "33,2": {
+      "skill": 26,
+      "chance": {
+        "A": 80,
+        "B": 140,
+        "offset": 60
+      }
+    },
+    "33,3": {
+      "skill": 26,
+      "chance": {
+        "A": 60,
+        "B": 120,
+        "offset": 36
+      }
+    },
+    "34,255": {
+      "skill": 26,
+      "chance": {
+        "A": 40,
+        "B": 60,
+        "offset": 0
+      }
+    },
+    "39,0": {
+      "skill": 26,
+      "duration": {
+        "A": 20,
+        "B": 8,
+        "offset": 200
+      }
+    },
+    "39,1": {
+      "skill": 26,
+      "duration": {
+        "A": 20,
+        "B": 8,
+        "offset": 200
+      }
+    },
+    "39,2": {
+      "skill": 26,
+      "duration": {
+        "A": 20,
+        "B": 8,
+        "offset": 160
+      }
+    },
+    "40,255": {
+      "skill": 26,
+      "chance": {
+        "A": 40,
+        "B": 100,
+        "offset": 28
+      }
+    }
+  }
+}

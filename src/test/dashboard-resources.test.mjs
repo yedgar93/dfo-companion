@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {readResource,readResourceSync,CACHE_ROOT} from '../dashboard-resources.mjs';
+test('dashboard resources return exact packaged bytes and reject traversal',async()=>{const html=await readResource('dashboard.html','utf8');assert.match(html,/<html/);assert.equal(html,readResourceSync('dashboard.html','utf8'));for(const p of ['../reviewed-bundles.json','/dashboard.html','dashboard-art\\x.png']){await assert.rejects(async()=>readResource(p));assert.throws(()=>readResourceSync(p));}assert.match(CACHE_ROOT,/DFOCompanion$/);});
