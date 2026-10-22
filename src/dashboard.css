@@ -165,3 +165,15 @@ span.dg,.hud .vitals article span.dg,.vitals span.dg{display:inline-block;width:
 .stale-data #connection-page>.panel-heading>h2:after{content:none}
 .stale-data .hud .vitals:before{content:var(--stale-age,'Last known');position:absolute;margin-top:-13px;font-size:9px;line-height:11px;color:#f0dca0}
 .stale-data #freshness{color:#f0dca0}
+
+/* 0.4.13 polish: scrolling pages show that there is more: game-styled scrollbar, scroll shadows (pure CSS), reason help first on Connection. */
+.scroll-area,#character-record,#quest-items,#inventory-items,.map-quest{scrollbar-width:auto;scrollbar-color:#8f8a68 #1d221a;scrollbar-gutter:stable;
+ background:linear-gradient(#2e322b 30%,#2e322b00) top/100% 18px no-repeat local,linear-gradient(#2e322b00,#2e322b 70%) bottom/100% 18px no-repeat local,radial-gradient(farthest-side at 50% 0,#0009,#0000) top/100% 9px no-repeat scroll,radial-gradient(farthest-side at 50% 100%,#000a,#0000) bottom/100% 9px no-repeat scroll}
+#connection-page .scroll-area{display:flex;flex-direction:column}
+#connection-page .scroll-area>*{flex:none}
+#connection-page .scroll-area>#last-success{order:-3}
+#connection-page .scroll-area>.connection-health{order:-2}
+#connection-page .scroll-area>#game-start-panel{order:-1}
+.reason-code code,.connection-health .reason-code code{font-size:10px;color:#c9c3a5;font-family:var(--game-font)}
+.scroll-area{overflow-x:hidden}
+#reason,.reason-code code{font-family:var(--game-font)!important;font-size:10px;color:#c9c3a5;overflow-wrap:anywhere}
