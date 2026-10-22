@@ -184,3 +184,16 @@ span.dg,.hud .vitals article span.dg,.vitals span.dg{display:inline-block;width:
 #character-record>.character-card:nth-child(9){order:3}#character-record>.character-card:nth-child(12){order:4}#character-record>.character-card:nth-child(10){order:5}#character-record>.character-card:nth-child(11){order:6}
 #character-record>.character-card:nth-child(7){order:7}#character-record>.character-card:nth-child(8){order:8}
 #character-record>.character-card:nth-child(3){order:9}#character-record>.character-card:nth-child(4){order:10}#character-record>.character-card:nth-child(5){order:11}#character-record>.character-card:nth-child(6){order:12}
+
+/* 0.4.13 polish: standing numbers carry a sign glyph and a word, not colour alone. */
+.character-row strong.standing-good{color:#a9dd98}.character-row strong.standing-bad{color:#f2b49c}.character-row strong.standing-neutral{color:#d6d2bd}
+.attribute-stat.boosted strong:before{content:'▲';margin-right:2px;font-size:.8em}
+.attribute-stat.reduced strong:before{content:'▼';margin-right:2px;font-size:.8em}
+.hud .connection .lamp{width:auto;height:auto;background:none!important;border-radius:0;font-size:9px;line-height:1;color:#d4b570}
+.hud .connection .lamp:before{content:'◐'}
+.hud .connection.live .lamp{color:#9bcc92}.hud .connection.live .lamp:before{content:'●'}
+.hud .connection.error .lamp,.hud .connection.review .lamp,.hud .connection.reconnect .lamp{color:#f0a884}
+.hud .connection.error .lamp:before,.hud .connection.review .lamp:before,.hud .connection.reconnect .lamp:before{content:'✕'}
+.hud .connection.stopped .lamp{color:#c9c6b0}.hud .connection.stopped .lamp:before{content:'■'}
+.gear.low .condition-label:before{content:'! ';color:#f0b07a}
+.item.magic:after{content:'✦';position:absolute;right:4px;top:2px;font-size:9px;line-height:9px;color:#a9c4e6;pointer-events:none}
