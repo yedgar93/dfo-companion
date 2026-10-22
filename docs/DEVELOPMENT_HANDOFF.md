@@ -145,6 +145,7 @@ This regression occurred twice and has a concrete source-level explanation:
 ### Artwork
 
 - Use actual game item artwork and real layered paperdoll, not generic replacement icons or a cropped screenshot. Keep accessories in a compact single row.
+- The dashboard uses DFO Enhanced Plus's exact embedded gauntlet cursor frames. The paperdoll backdrop and character are composited separately so the backdrop can cover the full portrait viewport while only the character receives the subtle CSS idle-breath animation. This is presentation-only, respects reduced-motion preferences, and adds no game reads or redraw polling.
 - Sources include installed game ASAR sprite PNGs and original ARENA2 indexed files (palette + TEXTURE archives). Custom DFO items are not all in the classic template catalogue.
 - Electron virtualizes ASAR filesystem paths. Ordinary fs opening the game `app.asar` can produce EISDIR. `archive-io.mjs` uses Electron `original-fs` when appropriate and normal fs outside Electron. Preserve this abstraction.
 - `item-icon-assets.mjs` maps item template/material/race/gender/dye, decodes/crops transparent indexed pixels and caches PNGs. Use the reviewed template records, not name-based art guesses.

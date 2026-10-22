@@ -1,10 +1,12 @@
 import {renderCharacterRecord} from './dashboard-character.mjs';
+import {installGameCursor} from './dashboard-cursor.mjs';
 import {QuietAlerts} from './dashboard-alerts.mjs';
 import {pairingQrSvg} from './dashboard-qr.mjs';
 import {updateJourney}from'./dashboard-map-ui.mjs';
 import {renderPortrait} from './paperdoll-preview.mjs';
 import {CATEGORIES,SLOT_NAMES,isEquipped,isMagic,filterItems,matchesCategory,conditionOf,artworkFor,compareEquipment,comparisonIndicator,sortInventory,compatibleSlots} from './dashboard-items.mjs';
 const $=id=>document.getElementById(id),text=(id,s)=>{$(id).textContent=s;};
+installGameCursor();
 const fmt=n=>Number.isFinite(n)?new Intl.NumberFormat(undefined,{maximumFractionDigits:1}).format(n):'—';
 const el=(tag,cls,value)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(value!==undefined)n.textContent=value;return n;};
 const quietAlerts=new QuietAlerts();let quietKey='';let preferences={sort:'equipped',alerts:true,compareView:'all'};try{const p=JSON.parse(localStorage.getItem('dfo-dashboard-preferences')??'{}');if(['equipped','name','value','weight','condition','upgrades'].includes(p.sort))preferences.sort=p.sort;if(typeof p.alerts==='boolean')preferences.alerts=p.alerts;if(['all','gear','upgrades','tradeoffs','unknown'].includes(p.compareView))preferences.compareView=p.compareView;}catch{}function savePreferences(){try{localStorage.setItem('dfo-dashboard-preferences',JSON.stringify(preferences));}catch{}}
