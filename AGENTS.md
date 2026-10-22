@@ -6,6 +6,6 @@ Preserve smooth gameplay: no additional game reads for UI features, maps, compar
 
 Closing the last window must stop the companion reader and exit the app. Automatic updates may briefly run an installer to replace and reopen only the companion without taking game focus.
 
-After a completed, tested user change intended for deployment, increment the patch version with `npm version patch --no-git-tag-version`, commit package.json and package-lock.json with the change, and push main when authorized. GitHub Actions builds both Electron apps and publishes the new version only when both jobs pass. Wait for the release outcome; do not claim it is live while builds are running or failing. Existing managed installs update from that release.
+Keep fixes local and batch them. Do not increment versions, push, or publish until the user explicitly requests a new release. Once the user requests deployment, increment the patch version with `npm version patch --no-git-tag-version`, commit package.json and package-lock.json with the change, and push main when authorized. GitHub Actions builds both Electron apps and publishes the new version only when both jobs pass. Wait for the release outcome; do not claim it is live while builds are running or failing. Existing managed installs update from that release.
 
 Keep the pinned Ed25519 public key. Its private half lives only in the repository's UPDATE_SIGNING_KEY Actions secret. Never generate a replacement key casually or commit credentials, game archives, character snapshots, logs, caches, or local testing artifacts.

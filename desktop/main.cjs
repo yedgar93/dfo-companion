@@ -1,4 +1,4 @@
-const {app,BrowserWindow,utilityProcess,dialog,Menu,nativeImage}=require('electron');
+const {app,BrowserWindow,utilityProcess,dialog,Menu,nativeImage,screen}=require('electron');
 const path=require('node:path');
 const {autoUpdater}=require('electron-updater');
 const {MacReleaseUpdater}=require('./mac-updater.cjs');
@@ -10,14 +10,22 @@ app.setName('DFO Companion');
 let window,helper,updates,quitting=false,shutdownStarted=false,shutdownDone=false;
 const restartFlag=path.join(app.getPath('userData'),'restart-in-background');
 const quietRestart=fileSystem.existsSync(restartFlag);if(quietRestart)try{fileSystem.unlinkSync(restartFlag);}catch{}
+const {restoreBounds}=require('./window-state.cjs');
+const windowStateFile=path.join(app.getPath('userData'),'window-state.json');
+let updateStatus={state:'idle'};
+function saveWindow(){if(!window||window.isDestroyed())return;try{fileSystem.mkdirSync(path.dirname(windowStateFile),{recursive:true});fileSystem.writeFileSync(windowStateFile,JSON.stringify({bounds:window.getNormalBounds(),maximized:window.isMaximized()}));}catch{}}
+function showUpdateStatus(){if(!window||window.isDestroyed()||window.webContents.isLoading())return;const {state,version,percent}=updateStatus;const message=state==='downloading'?'Downloading newest version'+(version?' '+version:'')+(Number.isFinite(percent)?' · '+Math.floor(percent)+'%':'')+'…':state==='ready'?'Update downloaded · restarting companion…':state==='error'?'Update unavailable · will retry automatically':'';window.setProgressBar(state==='downloading'?(Number.isFinite(percent)?percent/100:2):-1);void window.webContents.executeJavaScript('('+function(message){let node=document.getElementById('desktop-update-status');if(!node){node=document.createElement('div');node.id='desktop-update-status';node.setAttribute('role','status');node.style.cssText='position:fixed;bottom:10px;left:50%;transform:translateX(-50%);z-index:99999;background:#252b1f;color:#edce79;border:1px solid #b2a46a;padding:10px 16px;max-width:90%;font:14px sans-serif;pointer-events:none';document.body.append(node);}node.textContent=message;node.hidden=!message;}.toString()+')('+JSON.stringify(message)+')').catch(()=>{});}
 const origin='http://127.0.0.1:9234';
 function createWindow(){
- window=new BrowserWindow({width:1050,height:820,minWidth:420,minHeight:480,title:'DFO Companion · '+build.label,backgroundColor:'#191e17',show:false,webPreferences:{nodeIntegration:false,contextIsolation:true,sandbox:true,backgroundThrottling:true}});
+ let saved;try{saved=JSON.parse(fileSystem.readFileSync(windowStateFile,'utf8'));}catch{}
+ const bounds=restoreBounds(saved?.bounds,screen.getAllDisplays());
+ window=new BrowserWindow({...bounds,minWidth:420,minHeight:480,title:'DFO Companion · '+build.label,backgroundColor:'#191e17',show:false,webPreferences:{nodeIntegration:false,contextIsolation:true,sandbox:true,backgroundThrottling:true}});
  window.on('page-title-updated',event=>{event.preventDefault();window.setTitle('DFO Companion · '+build.label);});
  window.webContents.setWindowOpenHandler(()=>({action:'deny'}));
  window.webContents.on('will-navigate',(event,url)=>{if(url!==origin+'/')event.preventDefault();});
  window.webContents.session.setPermissionRequestHandler((_contents,_permission,callback)=>callback(false));
- window.once('ready-to-show',()=>quietRestart?window.showInactive():window.show());
+ window.once('ready-to-show',()=>{if(saved?.maximized)window.maximize();quietRestart?window.showInactive():window.show();showUpdateStatus();});
+ let boundsTimer;for(const event of ['move','resize'])window.on(event,()=>{clearTimeout(boundsTimer);boundsTimer=setTimeout(saveWindow,250);});window.on('close',()=>{clearTimeout(boundsTimer);saveWindow();});window.webContents.on('did-finish-load',showUpdateStatus);
  window.on('closed',()=>{window=null;app.quit();});
  return window.webContents.session.clearCache().then(()=>window.loadURL(origin+'/')); 
 }
@@ -27,7 +35,7 @@ else{
  app.whenReady().then(()=>{
   if(app.dock)app.dock.setIcon(nativeImage.createFromPath(path.join(__dirname,'icon.png')));
   const updateMenu=()=>{const state=updates?.state;Menu.setApplicationMenu(Menu.buildFromTemplate([{label:'DFO Companion',submenu:[{label:'About DFO Companion',click:()=>dialog.showMessageBox({type:'info',title:'DFO Companion',message:build.label,detail:'Build '+build.id})},{type:'separator'},{label:state==='ready'?'Install downloaded update…':state==='available'?'Download update…':state==='downloading'?'Downloading update…':'Check for updates…',enabled:state!=='checking'&&state!=='downloading',click:()=>state==='ready'?updates.install():state==='available'?void updates.download():void updates.check(true)},{role:'quit'}]},{role:'editMenu'},{label:'View',submenu:[{role:'reload'},{role:'togglefullscreen'}]},{role:'windowMenu'}]));};
-  updates=setupUpdates({app,updater:process.platform==='darwin'?new MacReleaseUpdater({app,publicKey}):autoUpdater,beforeRestart:()=>{fileSystem.mkdirSync(path.dirname(restartFlag),{recursive:true});fileSystem.writeFileSync(restartFlag,'1');},dialog,shell:require('electron').shell,build,onStatus:updateMenu});updateMenu();
+  updates=setupUpdates({app,updater:process.platform==='darwin'?new MacReleaseUpdater({app,publicKey}):autoUpdater,beforeRestart:()=>{saveWindow();fileSystem.mkdirSync(path.dirname(restartFlag),{recursive:true});fileSystem.writeFileSync(restartFlag,'1');},dialog,shell:require('electron').shell,build,onStatus:status=>{updateStatus=status;updateMenu();showUpdateStatus();}});updateMenu();
   helper=utilityProcess.fork(path.join(__dirname,'service.mjs'),[],{serviceName:'DFO Companion data service',stdio:'pipe'});
   let ready=false;const deadline=setTimeout(()=>fail('The companion helper took too long to start.'),20000);
   helper.on('message',async message=>{if(message.error)fail(message.error);else if(message.ready&&!ready){ready=true;clearTimeout(deadline);try{const response=await fetch(origin+'/api/identity',{signal:AbortSignal.timeout(3000),redirect:'error'});const identity=await response.json();if(!response.ok||!message.instanceToken||identity.instanceToken!==message.instanceToken)throw Error('The window reached a different companion helper. The old dashboard will not be opened.');await createWindow();}catch(error){fail(error.message);}}});

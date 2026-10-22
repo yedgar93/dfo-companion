@@ -87,7 +87,7 @@ export function readPlayer(playerOverride,dashboard=false,dashboardSlice=null) {
    return {
     index:index+(itemsOnly?dashboardSlice.start:0),name:str(item,'name')??str(item,'shortName'),group:str(item,'group'),templateIndex:n(item,'templateIndex'),
     count,material:str(item,'material')??n(item,'material'),appearance:{dye:n(item,'dye'),variant:n(item,'variant'),message:n(item,'message')},
-    equipSlot:item===lightSource?27:n(item,'equipSlot')??str(item,'equipSlot'),
+    equipSlot:(item===lightSource||(!lightSource&&n(item,'templateIndex')===248&&val(item,'beltLantern')===true))?27:n(item,'equipSlot')??str(item,'equipSlot'),
     condition:{current:n(item,'currentCondition'),max:n(item,'maxCondition')},
     weight:perUnitWeight,perUnitWeightKg:perUnitWeight,totalStoredStackWeightKg:perUnitWeight===null?null:perUnitWeight*count,value:n(item,'value'),identified,
     description:identified===true?(description(item,'description')??description(item,'shortDescription')):null,
