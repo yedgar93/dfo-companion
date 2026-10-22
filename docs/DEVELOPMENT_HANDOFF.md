@@ -8,6 +8,7 @@ Read this file, `AGENTS.md`, `README.md`, and `docs/RELEASING.md` before changin
 
 - Public canonical repository: https://github.com/yedgar93/dfo-companion
 - Default development branch: `main`.
+- `0.4.10` release source commit: `15b87de8d58ef60f62425162811f7edb68188c12`.
 - Clone on the current machine; no original developer checkout, external skill, local screenshot, private snapshot, or removable drive is required.
 - Node >=22.15: `npm ci`, `npm test`, `npm run build`, `npm start`.
 - `npm run dist:win` builds Windows x64 NSIS on Windows.
