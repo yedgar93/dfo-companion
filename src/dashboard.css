@@ -126,3 +126,26 @@ main>#problem-plaque{grid-row:3;min-height:0;overflow:hidden}
 main>#problem-plaque[hidden],main>#current-quest[hidden]{display:none!important}
 .problem-plaque button{font-size:12px;padding:4px 10px;line-height:16px;color:#d9c38d;border:2px solid;border-color:#8a876e #191e16 #191e16 #73775c;background:linear-gradient(#464a3c,#303628);box-shadow:inset 0 1px #c4c5a725}
 @media(min-width:801px){#character-meta{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}}
+
+/* 0.4.13 polish: stale, empty and disabled are shown with colour and words, not whole-element opacity (contrast stays >= 4.5:1 for text, >= 3:1 for marks). */
+.stale-data .vitals,.stale-data .page{opacity:1}
+.stale-data .page{filter:saturate(.6)}
+.stale-data .page>.panel-heading>h2:after,.stale-data .equipment-panel .panel-heading h2:after,.stale-data .inventory-panel .panel-heading h2:after{content:'Last known';margin-left:8px;padding:0 4px;font-size:9px;line-height:13px;letter-spacing:.04em;vertical-align:middle;color:#f0dca0;border:1px solid #9b8a58;background:#3a3524;text-shadow:none}
+.stale-data .vitals strong{color:#cfc7ad}
+.gear.empty-slot,.accessory.empty-slot{opacity:1;background:#2b2f28;border-color:#5f6354 #1f241d #1f241d #5f6354;box-shadow:inset 0 0 0 1px #3b3f34}
+.gear.empty-slot .gear-label{color:#aeb19e}
+.gear.empty-slot .gear-name{color:#a9ab9a}
+.gear.empty-slot .fallback,.accessory.empty-slot .fallback{color:#8d917f}
+.accessory.empty-slot small,.accessory-caption{color:#b5b8a5}
+button:disabled,select:disabled,#map-focus:disabled,.quest-actions button:disabled,#nearest-service-buttons button:disabled,.service-finder select:disabled,#manual-refresh:disabled,#game-start-button:disabled{opacity:1;color:#a6a189;border-color:#5b5d4e #1e221b #1e221b #5b5d4e;background:#2d3128;box-shadow:none}
+.tabs button span{opacity:1;color:#b7b9a6}
+.tabs button.active span{color:#d9c58a}
+.categories button.active span{color:#d6d9c2}
+.tabs button span,.tabs button.active span{opacity:1!important}.tabs button span{color:#bfc1ae}.tabs button.active span{color:#ead9a0}
+.categories span,.categories button span{color:#c3c9b0;opacity:1}
+.upgrade-indicator.downgrade{color:#f0aa92}
+.attribute-stat.reduced strong{color:#f2b49c}.attribute-stat.boosted strong{color:#9fe38f}
+.detail-note,#item-detail>p.detail-note{color:#b3baa2}
+.accessory-caption,.accessory-group>small.accessory-caption{color:#c6c8b6}
+.gear .fallback,.gear>.fallback,.item .fallback{color:#bcc0ad}
+.tabs button>span{color:#c2c4b1!important}.tabs button.active>span{color:#efdea5!important}
