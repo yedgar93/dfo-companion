@@ -205,3 +205,7 @@ span.dg,.hud .vitals article span.dg,.vitals span.dg{display:inline-block;width:
 html.game-cursor,html.game-cursor *,html.game-cursor *::before,html.game-cursor *::after{cursor:var(--dfo-cursor-point),auto!important}
 html.game-cursor.game-cursor-press,html.game-cursor.game-cursor-press *,html.game-cursor.game-cursor-press *::before,html.game-cursor.game-cursor-press *::after{cursor:var(--dfo-cursor-press),auto!important}
 html.game-cursor input:not([type=range]):not([type=checkbox]):not([type=radio]):not([type=button]):not([type=submit]),html.game-cursor textarea,html.game-cursor [contenteditable=true]{cursor:text!important}
+
+/* 0.4.13 polish: dungeon Plan/Height buttons use the stone button style of the rest of the dashboard. */
+#map-dungeon-plan,#map-dungeon-height,.map-legend button{border:1px solid #746b4b!important;background:#303629!important;color:#e0c47e!important;box-shadow:none;border-radius:0;font-family:var(--game-font)}
+#map-dungeon-plan[aria-pressed=true],#map-dungeon-height[aria-pressed=true],.map-legend button[aria-pressed=true]{background:#4a4630!important;border-color:#baaa70!important;color:#f2e2b0!important}
