@@ -417,3 +417,38 @@ body.awaiting-data .gear .gear-name{color:transparent!important;position:relativ
 body.awaiting-data .gear .gear-name::after{content:'';position:absolute;inset:25% 0;background:#4d5043;animation:dfo-skeleton 1.6s ease-in-out infinite}
 body.awaiting-data #inventory-items:empty{position:relative}
 body.awaiting-data #inventory-items:empty::after{content:'';position:absolute;inset:4px;background:repeating-linear-gradient(#0000 0 80px,#1d221a 80px 86px),repeating-linear-gradient(90deg,#45483c 0 64px,transparent 64px 70px);-webkit-mask:linear-gradient(#000 0 172px,transparent 172px);mask:linear-gradient(#000 0 172px,transparent 172px);animation:dfo-skeleton 1.6s ease-in-out infinite}
+
+/* ==== Branding: splash, About, first-run guide (original artwork only) ==== */
+.about-button{margin-left:var(--sp-4);padding:0 var(--sp-3);font-size:var(--fs-2xs);line-height:14px;letter-spacing:.06em;color:var(--parchment-300);background:transparent;border:1px solid var(--edge-mid)}
+.about-button:hover{color:var(--gold-300);border-color:var(--gold-700)}
+.splash{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:radial-gradient(circle at 50% 45%,#2b3027,#121510 70%);opacity:1;transition:opacity .45s var(--ease)}
+.splash.leaving{opacity:0;pointer-events:none}
+.splash-card{display:grid;justify-items:center;gap:var(--sp-4);transform:none;transition:transform .45s var(--ease)}
+.splash.leaving .splash-card{transform:scale(.98)}
+.splash .brand-mark{width:96px;height:96px;filter:drop-shadow(0 4px 0 #0008)}
+.splash-title{font-size:var(--fs-3xl);color:var(--gold-400);letter-spacing:.08em;text-shadow:1px 2px #000}
+.splash-sub{font-size:var(--fs-md);color:var(--parchment-300)}
+.brand-dialog{max-width:min(520px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;padding:var(--sp-6);color:var(--parchment-200);background:var(--panel-frame-bg);border:2px solid #625c49;border-image:url('/dashboard-art/game-frame.svg') 12 / 11px / 3px;box-shadow:4px 6px 0 #000a}
+.brand-dialog::backdrop{background:#0b0d0acc}
+.brand-dialog h2{margin:0;font-size:var(--fs-2xl);color:var(--gold-400);letter-spacing:.04em}
+.brand-dialog p{font-size:var(--fs-md);line-height:var(--lh-body);margin:0 0 var(--sp-4)}
+.about-head,.first-run-top{display:flex;align-items:center;gap:var(--sp-5);margin-bottom:var(--sp-5);padding-bottom:var(--sp-4);border-bottom:2px groove var(--edge-mid)}
+.about-version{margin:var(--sp-2) 0 0!important;font-size:var(--fs-sm)!important;color:var(--parchment-300)}
+.about-body p:nth-child(2){background:var(--panel-parchment-bg);color:var(--parchment-ink);border:3px double var(--gold-900);padding:var(--sp-4) var(--sp-5)}
+.brand-actions{display:flex;gap:var(--sp-4);justify-content:flex-end;margin-top:var(--sp-5);flex-wrap:wrap}
+.brand-actions button,.first-run-go{font-size:var(--fs-md);padding:var(--sp-3) var(--sp-5);background:var(--panel-raised-bg);border:2px solid;border-color:var(--panel-raised-border);color:var(--parchment-100)}
+.brand-actions button.primary,.first-run-go{color:var(--gold-300);border-color:var(--gold-500) var(--gold-900) var(--gold-900) var(--gold-500)}
+.brand-actions button.quiet{margin-right:auto;background:transparent;border-color:transparent;color:var(--parchment-300)}
+.brand-actions button:disabled{opacity:.55;cursor:default}
+.first-run-steps{display:flex;gap:var(--sp-3);list-style:none;margin:0 0 var(--sp-5);padding:0;counter-reset:s}
+.first-run-steps li{flex:1;counter-increment:s;font-size:var(--fs-xs);color:var(--parchment-300);padding-top:var(--sp-3);border-top:3px solid var(--stone-500)}
+.first-run-steps li::before{content:counter(s) '. '}
+.first-run-steps li.done{border-top-color:var(--gold-700)}
+.first-run-steps li.current{border-top-color:var(--gold-400);color:var(--gold-300)}
+.first-run-card{background:var(--panel-parchment-bg);color:var(--parchment-ink);border:3px double var(--gold-900);padding:var(--sp-5) var(--sp-6);box-shadow:inset 0 0 0 1px #f4e7c288}
+.first-run-card h3{margin:var(--sp-2) 0 var(--sp-3);font-size:var(--fs-xl);color:var(--parchment-ink)}
+.first-run-card p{color:var(--parchment-ink)}
+.first-run-count{font-size:var(--fs-xs);color:var(--parchment-ink-2);letter-spacing:.06em;text-transform:uppercase}
+.first-run-card .first-run-go{background:linear-gradient(#4a4c3e,#2f3428);margin-top:var(--sp-2)}
+.brand-dialog[open]{animation:dfo-fade-in .25s var(--ease) both}
+@media (prefers-reduced-motion:reduce){.splash,.splash-card{transition:none!important}.brand-dialog[open]{animation:none!important}}

@@ -7,3 +7,5 @@ h1{margin:0;font-size:20px;color:#e7d69b;letter-spacing:.03em}
 .about-credit{margin:auto 0 8px;padding-top:12px;border-top:1px solid #3a4234;color:#d4bd87}
 .about-author{font-family:'Jacquard 12',monospace;font-size:22px;line-height:1;color:#f4d071}
 button{align-self:center;padding:5px 22px;background:#293428;color:#eee5ca;border:1px solid #baaa70;font:inherit;cursor:pointer}
+.about-mark{align-self:center;width:56px;height:56px;image-rendering:auto}
+.about-legal{margin:6px 0 0;padding:8px 10px;font-size:11px;line-height:1.4;color:#2b2114;background:linear-gradient(160deg,#d8c79c,#c6b07e);border:3px double #695429;text-align:left}

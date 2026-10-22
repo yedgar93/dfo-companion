@@ -16,7 +16,8 @@ Read this file, `AGENTS.md`, `README.md`, and `docs/RELEASING.md` before changin
 - GitHub Actions supplies both native build environments. Do not require a Windows developer to produce a native Mac build locally.
 - Runtime dependencies are pinned in the lockfile. Read `package.json` rather than installing arbitrary latest versions.
 - Never hard-code a developer username, drive, installed game path, cache location, or original artwork folder. OS-relative discovery and app-relative resources apply to development builds too.
-- The requested app icon is the Daggerfall dragon D, already in repository assets. Preserve Windows icon, Mac Dock/Finder icon, and dashboard identification.
+- App icon: an original compass-in-roundel mark (`assets/brand/mark.svg`), pre-rendered to `assets/icons/icon-*.png`, `assets/icon.ico` (256 last) and `assets/icon.png`; `scripts/build-icons.mjs` assembles `assets/icon.icns`. It replaced the dragon-D (publisher artwork). Branding must not use Daggerfall/Elder Scrolls/Bethesda logos or art; game textures may appear only when loaded from the user's install at runtime.
+- Splash, About dialog and the once-only 3-step first-run guide (QR-only pairing, `dfo-companion-first-run-seen` in localStorage) live in `src/dashboard-brand.mjs`. About (dashboard and menu window) says fan-made, not affiliated with Bethesda.
 
 ## Product requirements and collaboration rules
 

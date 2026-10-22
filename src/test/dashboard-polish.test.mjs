@@ -17,3 +17,17 @@ test('quiet state changes animate only opacity/transform and stop under reduced 
 test('design tokens: type scale never goes below 9px',()=>{
  const root=css.match(/--fs-2xs:(\d+)px/);assert(root&&+root[1]>=9);
 });
+const brand=fs.readFileSync(new URL('../dashboard-brand.mjs',import.meta.url),'utf8');
+test('first-run guide: three steps, phone pairing by QR only, shown once via a local flag',()=>{
+ const steps=brand.slice(brand.indexOf('FIRST_RUN_STEPS=['),brand.indexOf('];',brand.indexOf('FIRST_RUN_STEPS=[')));
+ assert.equal((steps.match(/\{title:/g)||[]).length,3);assert.match(steps,/QR/);assert.doesNotMatch(steps,/\bPIN\b|\bcode entry\b/i);
+ assert.match(brand,/localStorage,FIRST_RUN_KEY\),isLocal\(\)/);assert.match(brand,/addEventListener\('close',\(\)=>store\(localStorage,FIRST_RUN_KEY,'1'\)\)/);
+ assert.doesNotMatch(brand,/fetch\(|\/api\//,'branding makes no requests');
+});
+test('About says fan-made and not affiliated with Bethesda',()=>{assert.match(brand,/Fan-made and unofficial/);assert.match(brand,/Not affiliated with[^.]*Bethesda/);});
+test('app icon: original mark wired for Windows .ico (256 last) and Mac .icns sizes',async()=>{
+ const ico=fs.readFileSync(new URL('../../assets/icon.ico',import.meta.url)),count=ico.readUInt16LE(4),last=6+16*(count-1);assert(count>=5);assert.equal(ico[last],0,'last entry is 256px');
+ for(const n of [128,256,512,1024])assert(fs.existsSync(new URL(`../../assets/icons/icon-${n}.png`,import.meta.url)));
+ const cfg=fs.readFileSync(new URL('../../electron-builder.cjs',import.meta.url),'utf8');assert.match(cfg,/icon:'assets\/icon\.ico'/);assert.match(cfg,/icon:'assets\/icon\.icns'/);
+ assert.match(fs.readFileSync(new URL('../../assets/brand/mark.svg',import.meta.url),'utf8'),/original artwork/);
+});
