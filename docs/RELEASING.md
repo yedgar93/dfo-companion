@@ -6,7 +6,7 @@ No paid Apple account is required. The Mac runner applies a free ad-hoc signatur
 
 Mac updates verify the release signature and ZIP hash, download in the background, stop only the companion, verify the unpacked app identity/version and macOS signature, replace the installed app atomically, delete the old app, and reopen the new one without taking game focus. Install into a writable Applications folder such as ~/Applications. Windows uses electron-updater with the NSIS installer. DFO is never restarted.
 
-The companion checks once after startup and every five minutes. A normal window close quits its reader too. During an automatic update a short-lived installer may run after the window closes; it exits after replacement and relaunch.
+The companion checks about one second after startup and every five minutes. It shows download progress and a five-second explanation before automatically closing and reopening to install, using the dashboard font. A normal window close quits its reader too. During an automatic update a short-lived installer may run after the window closes; it exits after replacement and relaunch.
 
 For a release, increment `version` in package.json, commit and push main (or push its matching vX.Y.Z tag). Download one repository release once to replace the earlier manually assembled test app. Subsequent versions update themselves.
 

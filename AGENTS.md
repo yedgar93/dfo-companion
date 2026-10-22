@@ -1,5 +1,7 @@
 # Repository working rules
 
+Before continuing development in a new chat or tool, read `docs/DEVELOPMENT_HANDOFF.md`. Keep it current when findings or integration behavior change.
+
 This is the canonical source for DFO Companion. Keep changes portable between Windows and Apple Silicon Mac. Resolve packaged files relative to the app and installations from the current OS/user environment.
 
 Preserve smooth gameplay: no additional game reads for UI features, maps, comparisons, tooltips, service searches, phone pairing, or updater checks. Reuse the current bounded idle-time snapshots. Never restart or control DFO to install a companion update.

@@ -12,6 +12,8 @@ Mac builds use free ad-hoc signing in GitHub Actions. No paid Apple account is r
 
 ## Development
 
+For work from a new computer or AI tool, start with [the development handoff](docs/DEVELOPMENT_HANDOFF.md) and [repository working rules](AGENTS.md). They record the game integration findings, performance requirements, past regressions, current limitations, and release workflow.
+
 Install Node 22.15 or newer, clone the repository, then run `npm ci` and `npm start`.
 
 - `npm test` runs isolated tests with mocked game data and temporary local servers.
