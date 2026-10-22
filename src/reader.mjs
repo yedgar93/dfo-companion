@@ -89,7 +89,7 @@ export function readPlayer(playerOverride,dashboard=false,dashboardSlice=null) {
    const enchantment=e=>({name:str(e,'name'),description:description(e,'description'),kind:str(e,'kind'),key:str(e,'key'),type:n(e,'type')??str(e,'type'),param:n(e,'param')??str(e,'param'),magnitude:n(e,'magnitude'),duration:n(e,'duration')});
    return {
     index:index+(itemsOnly?dashboardSlice.start:0),name:str(item,'name')??str(item,'shortName'),group:str(item,'group'),templateIndex:n(item,'templateIndex'),
-    count,material:str(item,'material')??n(item,'material'),appearance:{dye:n(item,'dye'),variant:n(item,'variant'),message:n(item,'message')},
+    count,material:str(item,'material')??n(item,'material'),appearance:{dye:n(item,'dye'),variant:n(item,'variant'),message:n(item,'message')},iconSource:{worldTextureArchive:n(item,'worldTextureArchive'),worldTextureRecord:n(item,'worldTextureRecord'),playerTextureArchive:n(item,'playerTextureArchive'),playerTextureRecord:n(item,'playerTextureRecord')},
     equipSlot:(item===lightSource||(!lightSource&&n(item,'templateIndex')===248&&val(item,'beltLantern')===true))?27:n(item,'equipSlot')??str(item,'equipSlot'),
     condition:{current:n(item,'currentCondition'),max:n(item,'maxCondition')},
     weight:perUnitWeight,perUnitWeightKg:perUnitWeight,totalStoredStackWeightKg:perUnitWeight===null?null:perUnitWeight*count,value:n(item,'value'),identified,

@@ -1,6 +1,6 @@
 export function copyOwnedTemplates(custom,extra,indices){
  const own=(o,k)=>{const d=o&&typeof o==='object'?Object.getOwnPropertyDescriptor(o,k):null;return d&&'value'in d?d.value:undefined;};
- return indices.slice(0,500).map(index=>{const t=(custom instanceof Map?custom.get(index):null)??own(this,String(index))??(extra instanceof Map?extra.get(index):null);return {index,name:own(t,'name')??null,baseWeight:own(t,'baseWeight')??null,basePrice:own(t,'basePrice')??null,isOneHanded:own(t,'isOneHanded')??null,hasNoEncumbrance:own(t,'hasNoEncumbrance')??false,weaponSkillUsed:own(t,'weaponSkillUsed')??null,enchantmentPoints:own(t,'enchantmentPoints')??null};});
+ return indices.slice(0,500).map(index=>{const t=(custom instanceof Map?custom.get(index):null)??own(this,String(index))??(extra instanceof Map?extra.get(index):null);return {index,name:own(t,'name')??null,baseWeight:own(t,'baseWeight')??null,basePrice:own(t,'basePrice')??null,isOneHanded:own(t,'isOneHanded')??null,hasNoEncumbrance:own(t,'hasNoEncumbrance')??false,weaponSkillUsed:own(t,'weaponSkillUsed')??null,enchantmentPoints:own(t,'enchantmentPoints')??null,worldTextureArchive:own(t,'worldTextureArchive')??null,worldTextureRecord:own(t,'worldTextureRecord')??null,playerTextureArchive:own(t,'playerTextureArchive')??null,playerTextureRecord:own(t,'playerTextureRecord')??null,variants:own(t,'variants')??0,isIngredient:own(t,'isIngredient')===true};});
 }
 
 export function enrichInventory(items,templates){
@@ -18,7 +18,7 @@ export function enrichInventory(items,templates){
   const baseArmor=item.group!=='Armor'?null:[109,110,111,112].includes(item.templateIndex)?item.templateIndex-108:material===0?3:material===256||material===259?6:material>=512&&material<=521?[7,9,9,11,13,15,15,17,19,21][material-512]:null;
   item.displayStats={perUnitWeightKg:weight,stackWeightKg:weight===null?null:Number((weight*item.count).toFixed(6)),materialName:item.group==='Armor'&&material===0?'Leather':item.group==='Armor'&&(material===256||material===259)?'Chain':materialNames[metal]??null,damage:item.group==='Weapons'&&item.storedStats.minDamage!==null&&item.storedStats.maxDamage!==null?{min:item.storedStats.minDamage+modifier,max:item.storedStats.maxDamage+modifier,scope:'Stored base damage plus material modifier; conditional affix/combat bonuses separate'}:null,baseArmour:baseArmor,hands:item.group==='Weapons'&&item.templateIndex!==131&&typeof t.isOneHanded==='boolean'?t.isOneHanded?'One-handed':'Two-handed':null,baseValue:t.basePrice,source:'Copied static template data and reviewed weight/material formulas; no game calculation methods called'};
   item.perUnitWeightKg=weight;item.weight=weight;item.totalStoredStackWeightKg=weight===null?null:weight*item.count;
-  item.template={name:t.name,weaponSkillUsed:t.weaponSkillUsed,enchantmentPoints:t.enchantmentPoints,hasNoEncumbrance:t.hasNoEncumbrance};
+  item.template={name:t.name,weaponSkillUsed:t.weaponSkillUsed,enchantmentPoints:t.enchantmentPoints,hasNoEncumbrance:t.hasNoEncumbrance,art:{worldTextureArchive:t.worldTextureArchive,worldTextureRecord:t.worldTextureRecord,playerTextureArchive:t.playerTextureArchive,playerTextureRecord:t.playerTextureRecord,variants:t.variants,isIngredient:t.isIngredient}};
  }
 }
 
