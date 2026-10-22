@@ -109,3 +109,20 @@ main{grid-template-rows:auto auto auto auto 54px minmax(0,1fr) 18px}main>header{
 .gear-pair>.gear+.gear .gear-label{font-size:9px;line-height:11px;flex:none}
 .gear-pair>.gear+.gear .gear-name{font-size:10px;line-height:12px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;text-align:left}
 .gear-pair>.gear+.gear .condition-label{position:static;font-size:9px;flex:none}
+
+/* 0.4.13 polish: per-reason error plaque in the quest banner's slot. */
+main>#problem-plaque{grid-row:3;min-height:0;overflow:hidden}
+.problem-plaque{display:grid;grid-template-columns:minmax(165px,.6fr) minmax(0,1.6fr) auto;gap:12px;align-items:center;padding:4px 12px;border-left:4px solid #c9634f}
+.problem-plaque>div:first-child{display:flex;flex-direction:column;gap:2px;min-width:0}
+.problem-plaque span{font-size:9px;letter-spacing:.05em;color:#d9b9a4;text-transform:uppercase}
+.problem-plaque strong{font-size:16px;line-height:18px;color:#f2c1a8;text-shadow:1px 1px #111}
+.problem-plaque.waiting strong{color:#e8cf8a}.problem-plaque.waiting{border-left-color:#c9a24f}
+.problem-plaque.stopped strong{color:#e5d1a0}.problem-plaque.stopped{border-left-color:#8c8f78}
+.problem-plaque p{margin:0;font-size:12px;line-height:15px;color:#d8dbc8;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.problem-plaque p+p{color:#e9dfba;-webkit-line-clamp:1}
+.problem-plaque strong:before{content:'✕ ';color:inherit}.problem-plaque.waiting strong:before{content:'… '}.problem-plaque.stopped strong:before{content:'■ '}
+@media(min-width:801px){main>#problem-plaque{height:68px}}
+@media(max-width:800px){main>#problem-plaque{height:auto;overflow:visible}.problem-plaque{grid-template-columns:minmax(0,1fr);padding:12px}.problem-plaque p{-webkit-line-clamp:4;font-size:14px;line-height:1.4}body.phone-brief main>#problem-plaque:not([hidden]){display:grid}}
+main>#problem-plaque[hidden],main>#current-quest[hidden]{display:none!important}
+.problem-plaque button{font-size:12px;padding:4px 10px;line-height:16px;color:#d9c38d;border:2px solid;border-color:#8a876e #191e16 #191e16 #73775c;background:linear-gradient(#464a3c,#303628);box-shadow:inset 0 1px #c4c5a725}
+@media(min-width:801px){#character-meta{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}}

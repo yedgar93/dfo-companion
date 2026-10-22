@@ -99,3 +99,17 @@ export const GLOSSARY={
  'Critical Strike':'Raises your chance to land a hit with any weapon.'
 };
 export function glossaryFor(term){return GLOSSARY[String(term??'').trim()]??null;}
+
+// Error plaque wording per existing snapshot reason code. Presentation only: no reads.
+const PLAQUES={
+ GAME_NOT_RUNNING:{tone:'stopped',title:'Game is closed',action:'Start DFO with Companion from the Connection tab when you’re ready.',start:true},
+ PAGE_CHANGED:{tone:'error',title:'Game left the play screen',action:'Choose Play and load your character.'},
+ GAME_CANVAS_UNAVAILABLE:{tone:'waiting',title:'Game screen is loading',action:'Leave this window open; no action needed.'},
+ GAME_TARGET_UNAVAILABLE:{tone:'waiting',title:'Game is still loading',action:'Finish loading or logging in to DFO.'},
+ GAME_RUNNING_WITHOUT_FLAGS:{tone:'error',title:'Game has no companion connection',action:'When it’s safe, quit DFO and start it from the Connection tab.',start:true},
+ UPDATER_DROPPED_FLAGS:{tone:'error',title:'Game update dropped the connection',action:'When it’s safe, quit DFO and start it from the Connection tab.',start:true}
+};
+export const NO_READER_REASONS=new Set(['GAME_NOT_RUNNING','PAGE_CHANGED','GAME_CANVAS_UNAVAILABLE','GAME_TARGET_UNAVAILABLE','GAME_RUNNING_WITHOUT_FLAGS','UPDATER_DROPPED_FLAGS','DASHBOARD_UNREACHABLE']);
+export function problemPlaque(s){const code=s?.reason;if(!code||code==='LIVE_PLAYER_VERIFIED'||code==='STARTING')return null;if(s?.status?.kind==='live'&&!s?.stale)return null;const known=PLAQUES[code],hasData=!!s?.lastSuccess;
+ const base=known??{tone:'error',title:hasData?'Can’t read the game right now':'Can’t read the game yet',action:hasData?'The panels below show your last known data, marked as old.':'The companion retries automatically.'};
+ return {code,tone:base.tone,title:base.title,message:explainReason(code),action:base.action,start:!!base.start,hasData};}
