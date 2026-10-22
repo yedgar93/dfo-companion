@@ -236,3 +236,10 @@ Public workflow/release status can be read through GitHub's API or normal GitHub
 - Earlier conversation approved a compact dungeon navigation summary, a local What changed? feed, and map-view undo for a future fix. Their full implementation is **not established by this handoff**; inspect before planning them.
 - Loadout workbench, dungeon bookmarks and protected sell-shortlist were discussed as ideas, not evidence of completed features.
 - Keep README, this handoff and tests aligned with actual implementation. A future AI should distinguish requests, code, tests, synthetic previews, user confirmation and release evidence.
+
+## Upgrade scoring (phase 1, inventory only)
+
+- `src/upgrade-scoring.mjs` is pure and uses only fields already in the detail snapshot. `comparisonContext` now also carries live attributes, level, race, class name, primary/major skill indices and the carrying summary, all copied from the existing snapshot (no new reads).
+- Weapons: expected damage per swing = mean over the displayed damage range (already material-adjusted) of max(0, roll×(1+damage affix%) + STR damageModifier + expertise + racial), times hit chance against a stated reference foe (monster armour 5: +15), with skill, expertise, racial, material×10, luck/agility and expected Critical Strike, clamped 3..97 (DFO `combat/formulas.js`, DFU `FormulaHelper`).
+- Armour: per body part, rating×5 plus armour-affix points, weighted by the struck-part table (2,3,3,4,4,3,1 of 20) = average enemy hit-chance points blocked per blow (DFO `armorMaterials.js`, `ui/armourCard.js`).
+- Green only with a gain (>2% per swing or >=0.25 points) and no meaningful loss or unknown. Comparisons are computed once per pack snapshot, never on hover.
