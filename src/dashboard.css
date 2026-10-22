@@ -159,3 +159,9 @@ button:disabled,select:disabled,#map-focus:disabled,.quest-actions button:disabl
 
 /* 0.4.13 polish: each digit in a live number gets a 1ch box so values do not shift as they tick. */
 span.dg,.hud .vitals article span.dg,.vitals span.dg{display:inline-block;width:1ch!important;min-width:0;flex:none;margin:0;padding:0;text-align:center;font-size:inherit;color:inherit;letter-spacing:0}
+
+/* 0.4.13 polish: stale pages carry their age in words. */
+.stale-data .page>.panel-heading>h2:after,.stale-data .equipment-panel .panel-heading h2:after,.stale-data .inventory-panel .panel-heading h2:after{content:var(--stale-age,'Last known')}
+.stale-data #connection-page>.panel-heading>h2:after{content:none}
+.stale-data .hud .vitals:before{content:var(--stale-age,'Last known');position:absolute;margin-top:-13px;font-size:9px;line-height:11px;color:#f0dca0}
+.stale-data #freshness{color:#f0dca0}
