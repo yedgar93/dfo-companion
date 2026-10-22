@@ -1,6 +1,6 @@
 # DFO Companion: development handoff
 
-Last reconciled: 2026-10-22. Baseline release: **0.4.6**, published successfully for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
+Last reconciled: 2026-10-22. Current release source: **0.4.9**; the last fully verified packaged baseline was **0.4.8** for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
 
 Read this file, `AGENTS.md`, `README.md`, and `docs/RELEASING.md` before changing the application. Inspect the current source and latest release: this document records findings at the baseline, not a promise that future game versions have identical internals. Keep this document updated as findings change.
 
