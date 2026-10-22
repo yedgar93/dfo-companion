@@ -20,6 +20,7 @@ try{
  result={available:player?.available===true,player:{identity:player.identity,vitals:player.vitals,resources:{goldPieces:player.resources?.goldPieces}},pose:player.dashboardPose??null,capturedAt:player.dashboardCapturedAt??new Date().toISOString(),reason:player?.reason??null};
  if(result.available){
   result.timings={ownReadMs:Date.now()-started,rendererCopyMs:player.dashboardPerformance?.copyMs??player.dashboardCopyMs??null,guard:player.dashboardPerformance??null,dungeonCopyMs:player.dashboardDungeonCost??null,deferred:player.dashboardDeferred??null,lanes:player.dashboardLaneMs??null,journalReused:player.dashboardJournalReused===true};
+  result.dungeonReader={needsReference:player.dashboardDungeonNeedsReference===true,status:player.dashboardDungeonStatus??null,resetScene:player.dashboardDungeonResetScene??null};
   if(process.env.DFO_DEBUG_LANES==='1'&&player.dashboardLaneMs)console.error('[dfo lanes]',Object.entries(player.dashboardLaneMs).map(([k,v])=>k+'='+Number(v).toFixed(2)+'ms').join(' '),player.dashboardJournalReused?'journal=reused':'',player.dashboardDeferred?'deferred':'');
   const ownLocation=player.dashboardPose?.location??null;
   const detailsAt=player.dashboardDetailsAt??result.capturedAt;if(lastProjectedAt===detailsAt&&lastProjectedDetails){result.details={...lastProjectedDetails,location:ownLocation};}else {result.details=projectDetails(player,ownLocation);try{const icons=await buildItemIcons(player);for(let i=0;i<result.details.items.length;i++)result.details.items[i].iconUrl=icons[i]??null;}catch{}

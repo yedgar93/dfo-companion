@@ -1,4 +1,5 @@
 import {startIdleDungeonMap} from './dashboard-dungeon-reader.mjs';
+import {interiorSceneKey,dungeonKeyMatches} from './dashboard-interior-model.mjs';
 import {randomUUID} from 'node:crypto';
 import {readPlayer} from './reader.mjs';
 import {copyPublicQuestTracker,enrichTrackerDestinations} from './quest-tracker.mjs';
@@ -25,7 +26,7 @@ export function copyFastDashboard(readOwn,readTracker,readJournal,readPose,coreO
   else {p.dashboardPose=null;}
  }
  lane('pose');const waitMs=(this.deferUntil??0)-performance.now();p.dashboardDeferred=waitMs>0?{until:new Date(Date.now()+waitMs).toISOString(),panels:['details','quests']}:null;p.dashboardLaneMs=lanes;
- p.dashboardDungeonNeedsReference=this.dungeonNeedsReference===true;p.dashboardDungeonCost=this.dungeonDiagnostics?.copyMs??null;this.lastCorePose=p.dashboardPose??null;p.dashboardCopyMs=performance.now()-started;
+ p.dashboardDungeonNeedsReference=this.dungeonNeedsReference===true;p.dashboardDungeonStatus=typeof this.dungeonStatus==='string'?this.dungeonStatus:null;p.dashboardDungeonCost=this.dungeonDiagnostics?.copyMs??null;this.lastCorePose=p.dashboardPose??null;p.dashboardCopyMs=performance.now()-started;
  return p;
 }
 export function fastDashboardEligible(session,context,now=Date.now()){const cache=session?.lowImpact;return !!cache&&cache.contextId===context.uniqueId;}
@@ -41,9 +42,9 @@ export async function readFastDashboard(c,cache){
  if(Number.isFinite(cache.snapshot.vitals?.health?.rawBase)){const h=merged.vitals.health,b=cache.snapshot.vitals.health.rawBase;h.max=(h.limiter>=1&&h.limiter<b?h.limiter:b)+(h.renownBonus??0)+(h.spireBonus??0);}
  for(const k of ['health','magicka'])if(merged.vitals[k]?.max===null)merged.vitals[k].max=cache.snapshot.vitals?.[k]?.max??null;
  if(merged.questTracker?.available){enrichTrackerDestinations(merged.questTracker,merged.journal);for(const v of merged.questTracker.views??[]){const d=v.destination;if(!d)continue;const old=cache.snapshot.questTracker?.views?.find(x=>x.id===v.id&&x.destination?.locationName===d.locationName&&x.destination?.regionName===d.regionName)?.destination;if(old?.point)d.point=old.point;}}
- const loc=merged.dashboardPose?.location;if(loc){const place=c.dashboardPlaces?.get(loc.mapPixel?.x+','+loc.mapPixel?.y);if(place)loc.place={...loc.place,name:place.name,regionName:place.regionName??loc.place?.regionName??(place.region===17?'Daggerfall':null),regionIndex:place.region};const key=loc.mapPixel?.x+','+loc.mapPixel?.y;merged.dashboardMapUpdate=c.dashboardMaps?.get(key)??null;}const oldTown=cache.snapshot.dashboardPose?.town;
+ const loc=merged.dashboardPose?.location;if(loc?.mode==='dungeon')loc.dungeonSceneKey=interiorSceneKey(loc);if(loc){const place=c.dashboardPlaces?.get(loc.mapPixel?.x+','+loc.mapPixel?.y);if(place)loc.place={...loc.place,name:place.name,regionName:place.regionName??loc.place?.regionName??(place.region===17?'Daggerfall':null),regionIndex:place.region};const key=loc.mapPixel?.x+','+loc.mapPixel?.y;merged.dashboardMapUpdate=c.dashboardMaps?.get(key)??null;}const oldTown=cache.snapshot.dashboardPose?.town;
  if(loc?.mode==='exterior'&&oldTown?.origin&&oldTown.pixelKey===loc.mapPixel?.x+','+loc.mapPixel?.y){const f=loc.floatingOrigin,p=loc.position,m=loc.mapPixel;if(f?.compensation)merged.dashboardPose.town={pixelKey:oldTown.pixelKey,origin:oldTown.origin,headingDegrees:loc.orientation?.headingDegrees,position:{x:p.x-(m.x-f.mapPixelX)*819.2-f.compensation[0]-oldTown.origin[0],z:p.z+(m.y-f.mapPixelY)*819.2-f.compensation[2]-oldTown.origin[2],frame:'town local'}};}
- const dungeon=c.dashboardDungeon;if(loc?.mode==='dungeon'&&dungeon?.sceneKey===[loc.mode,loc.mapPixel?.x,loc.mapPixel?.y,loc.place?.buildingKey,loc.place?.buildingName,loc.place?.dungeonName??loc.place?.name].join('|'))merged.dashboardDungeonMap=dungeon;
+ const dungeon=c.dashboardDungeon;if(loc?.mode==='dungeon'&&dungeonKeyMatches(dungeon?.sceneKey,loc))merged.dashboardDungeonMap=dungeon;if(loc?.mode==='dungeon')merged.dashboardDungeonResetScene=dungeon?.sceneKey??null;
  merged.readerProfile=cache.snapshot.readerProfile;
  merged.dashboardLowImpact=true;
  merged.dashboardMetadataAt=new Date(cache.reviewedAt).toISOString();

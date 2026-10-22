@@ -247,3 +247,9 @@ Public workflow/release status can be read through GitHub's API or normal GitHub
 - Armour: parts start at 100, each rating point ×5 off; clothing Shoes/Tall boots/Boots (147-149, 186-188) count as leather on Feet, sandals do not (`equip.js:452+`). Special non-shield pieces stay "?" because the snapshot cannot tell an artifact (halved) from other specials.
 - Enchantments from the existing `enchantments` copy: Strengthens Armor (12) −5 on every part, non-stacking; Weakens Armor (24) inert — `enchantments.js:131-136` keeps DFU's `<` setter on purpose (bug-for-bug), so it never applies; Increased Weight Allowance (7) +25%/+50%, highest only. Other types stay "?".
 - Not modelled (JS-only hooks that can diverge from DFU): `weaponDamageMods` beyond the loot damage affix, `damageScale`, mentor armour scaling, `entityArmorPoints` beyond armour affixes.
+
+## Dungeon map: unstored automap records and scene keys (fix/dungeon-map)
+
+- Some floors (generated levels, arena floors; game `dungeonContext.js` ~8270) bind a live automap record that is never put in the `${regionIndex}/${name}` store, and `restoreAutomap` can swap the stored record. The idle reader used to wait forever for `mapRecord(mapAccessor())===view.rec`. It now asks for a new reference once per scene; if the record still differs and the reference is for this scene, it copies `view.rec`/`view.model` (status `unstored-record`). Reader status reaches the Map footer through `result.dungeonReader`.
+- The canonical dungeon key is computed from the raw game location (`loc.dungeonSceneKey`) before `readFastDashboard` applies the place-table name; match, reference refresh and UI use it. The match also accepts the renamed key.
+- TEMP-DEBUG: a "Copy map debug" button (Map tab, Interior view, empty rooms only) in `dashboard-map-ui.mjs`/`dashboard.html`. Remove once the issue is confirmed fixed in game.

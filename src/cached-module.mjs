@@ -1,4 +1,5 @@
 import {acceptDungeonMapEvent} from './dashboard-dungeon-cache.mjs';
+import {interiorSceneKey} from './dashboard-interior-model.mjs';
 import {deriveCompatibleProfile} from './automatic-profile.mjs';
 import {fastDashboardEligible,readFastDashboard,retainDashboardReader} from './dashboard-fast-reader.mjs';
 import {readResource} from './dashboard-resources.mjs';
@@ -89,7 +90,7 @@ async function closureBinding(c,fnId,name){
 }
 async function refreshDungeonReference(c,cache,loc,needsReference=false){
  if(!cache?.mapBinding||loc?.mode!=='dungeon'){if(cache)cache.dungeonScene=null;return;}
- const key=[loc.mode,loc.mapPixel?.x,loc.mapPixel?.y,loc.place?.buildingKey,loc.place?.buildingName,loc.place?.dungeonName??loc.place?.name].join('|');
+ const key=interiorSceneKey(loc);
  if(cache.dungeonScene!==key){cache.dungeonScene=key;cache.dungeonSince=Date.now();cache.dungeonReady=false;}
  if(needsReference)cache.dungeonReady=false;
  if(cache.dungeonReady||Date.now()-cache.dungeonSince<1500||Date.now()-(cache.dungeonAttempt??0)<5000)return;
