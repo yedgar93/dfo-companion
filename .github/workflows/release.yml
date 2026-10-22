@@ -65,6 +65,9 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      - name: Test native Mac app replacement
+        if: matrix.platform == 'mac'
+        run: node scripts/smoke-mac-install.mjs
       - uses: actions/upload-artifact@v4
         with:
           name: desktop-${{ matrix.platform }}
