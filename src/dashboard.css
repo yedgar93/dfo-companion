@@ -115,7 +115,7 @@ main>#problem-plaque[hidden],main>#current-quest[hidden]{display:none!important}
 
 /* 0.4.13 polish: stale, empty and disabled are shown with colour and words, not whole-element opacity (contrast stays >= 4.5:1 for text, >= 3:1 for marks). */
 .stale-data .vitals,.stale-data .page{opacity:1}
-.stale-data .page{filter:saturate(.6)}
+.stale-data .page:not(#map){filter:saturate(.6)}.stale-data #map>*:not(#map-stage):not(:has(#map-stage)){filter:saturate(.6)}.stale-data #map-stage,.stale-data #map-stage *,.stale-data #dungeon-map,.stale-data #travel-map{filter:none!important;opacity:1!important}
 .stale-data .page>.panel-heading>h2:after,.stale-data .equipment-panel .panel-heading h2:after,.stale-data .inventory-panel .panel-heading h2:after{content:none}
 .stale-age-tag{display:none}
 .stale-data .stale-age-tag{display:inline-block;margin-left:8px;padding:0 4px;font-size:9px;line-height:13px;letter-spacing:.04em;vertical-align:middle;color:#f0dca0;border:1px solid #9b8a58;background:#3a3524;text-shadow:none}
