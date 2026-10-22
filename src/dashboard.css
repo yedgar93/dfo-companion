@@ -261,3 +261,6 @@ footer{min-height:20px;line-height:14px;overflow:visible;align-items:center;box-
 #item-summary,#filter-summary,#equipment-count,#item-summary .dg,#filter-summary .dg,#equipment-count .dg{color:#ecebdc!important}
 .tabs button #inventory-count,.tabs button #quest-count{color:#fff3cc!important;opacity:1!important}
 .tabs button #inventory-count,.tabs button #quest-count{display:inline-block;height:12px;line-height:12px;font-size:10px;vertical-align:-1px}
+
+/* 0.4.15: on desktop the quiet alert sits in the footer's empty middle at the end of the page, not over the viewport, so a scrolled short window never shows it over content. */
+@media (min-width:801px){body{position:relative}.quiet-alerts{position:absolute!important;bottom:12px;max-width:max(160px,calc(100% - 640px))!important;min-width:0!important}}
