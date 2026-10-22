@@ -219,3 +219,8 @@ html.game-cursor input:not([type=range]):not([type=checkbox]):not([type=radio]):
 
 /* 0.4.13 polish: equipment names start at the left edge and wrap, then ellipsize on the right; never cut on the left. */
 .gear .gear-name{text-align:left!important;justify-self:stretch;min-width:0;max-width:100%;white-space:normal!important;overflow:hidden;overflow-wrap:break-word;word-break:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;text-overflow:ellipsis;direction:ltr}
+
+/* 0.4.13 polish: quest-time hint wraps instead of clipping; the banner grows to fit it. */
+#current-quest-clock-hint,.quest-clock-hint{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:10px}
+@media (min-width:801px) and (min-height:521px){main{grid-template-rows:auto 32px auto minmax(0,1fr) auto!important}main>.current-quest{min-height:64px}}
+@media (min-width:801px) and (min-height:521px){main>.current-quest{height:auto!important;max-height:none!important;overflow:visible}}
