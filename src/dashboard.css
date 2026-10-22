@@ -156,3 +156,6 @@ button:disabled,select:disabled,#map-focus:disabled,.quest-actions button:disabl
 #pack.deferred-stale .panel-heading h2:after,#current-quest.deferred-stale #current-quest-source:after{content:'Updating after travel…';display:inline-block;margin-left:8px;padding:0 4px;font-size:9px;line-height:13px;letter-spacing:.04em;text-transform:none;vertical-align:middle;color:#efe2b4;border:1px solid #8f8558;background:#37352a;text-shadow:none;animation:dfo-tag-in .3s ease-out both}
 @keyframes dfo-tag-in{from{opacity:0;transform:translateY(-2px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){#pack.deferred-stale .panel-heading h2:after,#current-quest.deferred-stale #current-quest-source:after{animation:none}}
+
+/* 0.4.13 polish: each digit in a live number gets a 1ch box so values do not shift as they tick. */
+span.dg,.hud .vitals article span.dg,.vitals span.dg{display:inline-block;width:1ch!important;min-width:0;flex:none;margin:0;padding:0;text-align:center;font-size:inherit;color:inherit;letter-spacing:0}

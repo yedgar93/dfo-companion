@@ -113,3 +113,8 @@ export const NO_READER_REASONS=new Set(['GAME_NOT_RUNNING','PAGE_CHANGED','GAME_
 export function problemPlaque(s){const code=s?.reason;if(!code||code==='LIVE_PLAYER_VERIFIED'||code==='STARTING')return null;if(s?.status?.kind==='live'&&!s?.stale)return null;const known=PLAQUES[code],hasData=!!s?.lastSuccess;
  const base=known??{tone:'error',title:hasData?'Can’t read the game right now':'Can’t read the game yet',action:hasData?'The panels below show your last known data, marked as old.':'The companion retries automatically.'};
  return {code,tone:base.tone,title:base.title,message:explainReason(code),action:base.action,start:!!base.start,hasData};}
+
+// Fixed-width digits: the pixel font's figures are proportional (1 is narrower than 0), so live numbers
+// shift as they change. Each digit gets a 1ch box (CSS .dg); text content is unchanged.
+export function digitBoxes(node,value){if(!node)return;const s=String(value??'');if(node.dataset.dg===s)return;node.dataset.dg=s;if(typeof document==='undefined'||!/\d/.test(s)){node.textContent=s;return;}
+ const parts=[];let run='';for(const ch of s){if(ch>='0'&&ch<='9'){if(run){parts.push(document.createTextNode(run));run='';}const d=document.createElement('span');d.className='dg';d.textContent=ch;parts.push(d);}else run+=ch;}if(run)parts.push(document.createTextNode(run));node.replaceChildren(...parts);}
