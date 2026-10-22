@@ -21,7 +21,7 @@ Invented characters only (no real character data). Each JSON file is one `Dashbo
 node scripts/serve-fixture.mjs town-full --port=9235
 ```
 
-Open `http://127.0.0.1:9235/` (headless: `google-chrome --headless=new --screenshot ... http://127.0.0.1:9235/`). The real `createDashboardServer` serves the fixture at `/api/state`, `/api/live`, `/api/brief`, `/api/since`, plus the dashboard files. Timestamps are moved forward so the fixture's `serverTime` is now. Stale fixtures stay stale, and the deferral window in `location-changed` lasts 2 s from server start of each request. `--frozen` serves the timestamps exactly as stored. Game start and Refresh all do nothing.
+Open `http://127.0.0.1:9235/` (headless: `google-chrome --headless=new --screenshot ... http://127.0.0.1:9235/`). The real `createDashboardServer` serves the fixture at `/api/state`, `/api/live`, `/api/brief`, plus the dashboard files. Timestamps are moved forward so the fixture's `serverTime` is now. Stale fixtures stay stale, and the deferral window in `location-changed` lasts 2 s from server start of each request. `--frozen` serves the timestamps exactly as stored. Game start and Refresh all do nothing.
 
 Not filled: `appearance` (paperdoll), `map`, `townMap`, `iconUrl`, and dungeon geometry `parts`. Each needs extracted game artwork, so the UI shows its placeholders.
 

@@ -10,11 +10,10 @@ import {fileURLToPath,pathToFileURL} from 'node:url';
 import {dirname,join} from 'node:path';
 import {existsSync} from 'node:fs';
 import {DashboardSampler,CORE_INTERVAL} from './dashboard-model.mjs';
-import {SinceLastLook} from './dashboard-since.mjs';
 const root=RESOURCE_ROOT;
 export const PORT=9234,ORIGIN=`http://127.0.0.1:${PORT}`,APP_ID='dfo-companion-dashboard-v1';
 export function runSample(options){return sampleDashboard(options);}
-export function createDashboardServer(sampler,{port=PORT,instanceToken=null,onView=()=>{},phoneStatus=()=>({enabled:false}),launchGame=launchOfficialGame,onManualRefresh=requestDashboardRefresh,since=new SinceLastLook()}={}){
+export function createDashboardServer(sampler,{port=PORT,instanceToken=null,onView=()=>{},phoneStatus=()=>({enabled:false}),launchGame=launchOfficialGame,onManualRefresh=requestDashboardRefresh}={}){
  const uiVersion=Promise.all(['dashboard.html','dashboard.css','dashboard-ui.mjs','dashboard-cursor.mjs','dashboard-character.mjs','dashboard-map-ui.mjs','dashboard-interior-ui.mjs','dashboard-interior-model.mjs','dashboard-dungeon-route.mjs','dashboard-extras.mjs'].map(name=>readResource(name))).then(parts=>{const hash=createHash('sha256');for(const part of parts)hash.update(part);return hash.digest('hex').slice(0,16);});
  const origin=`http://127.0.0.1:${port}`;let gameStartPending=false,lastManualRefresh=0;
  return http.createServer(async(req,res)=>{
@@ -28,13 +27,6 @@ export function createDashboardServer(sampler,{port=PORT,instanceToken=null,onVi
  let body='',size=0;for await(const chunk of req){size+=chunk.length;if(size<=64)body+=chunk.toString();}if(size>64||body.trim()!=='{}')return send(400,'text/plain','Empty request required');
  if(Date.now()-lastManualRefresh<10000)return send(429,'text/plain','Please wait before refreshing again');
  lastManualRefresh=Date.now();onView();onManualRefresh();void sampler.poll();return send(202,'application/json',JSON.stringify({queued:true}));
- }
- if(req.url==='/api/since/seen'){
-  if(req.method!=='POST')return send(405,'text/plain','Use Mark seen');
-  if(req.headers.origin!==origin)return send(403,'text/plain','Local dashboard only');
-  if((req.headers['content-type']??'').split(';')[0]!=='application/json')return send(415,'text/plain','JSON required');
-  let body='',size=0;for await(const chunk of req){size+=chunk.length;if(size<=64)body+=chunk.toString();}if(size>64||body.trim()!=='{}')return send(400,'text/plain','Empty request required');
-  return send(200,'application/json',JSON.stringify(since.markSeen(sampler.snapshot())));
  }
  if(req.url==='/api/game/start'){
 
@@ -53,7 +45,6 @@ export function createDashboardServer(sampler,{port=PORT,instanceToken=null,onVi
   if(req.url==='/api/identity')return send(200,'application/json',JSON.stringify({appId:APP_ID,root,uiVersion:await uiVersion,instanceToken}));
   if(req.url==='/api/live'){onView();const s=sampler.snapshot();const {details,...live}=s;return send(200,'application/json',JSON.stringify({...live,uiVersion:await uiVersion}));}
   if(req.url==='/api/brief'){onView();const s=sampler.snapshot(),tracker=s.details?.questTracker,quests=tracker?.views??[],quest=quests.find(q=>q.id===tracker?.pinned)??quests.find(q=>q.id===tracker?.journalFocus)??null;return send(200,'application/json',JSON.stringify({status:s.status,stale:s.stale,capturedAt:s.lastSuccess,detailsAt:s.detailsAt,player:s.player,location:s.pose?.location??null,quest:quest?{title:quest.title,objective:quest.objective,destination:quest.destination,completed:quest.completed}:null,attributes:s.details?.attributes??null,inventoryCount:s.details?.items?.length??null,readOnly:true}));}
-  if(req.url==='/api/since')return send(200,'application/json',JSON.stringify(since.changes(sampler.snapshot())));
   if(req.url==='/api/state'){
 onView();return send(200,'application/json',JSON.stringify(sampler.snapshot()));}
   const art=/^\/api\/art\/([a-f0-9]{64}\.(?:json|png))$/.exec(req.url);if(art){try{return send(200,art[1].endsWith('.png')?'image/png':'application/json',await readFile(join(CACHE_ROOT,'paperdoll',art[1])),{'Cache-Control':'private, max-age=31536000, immutable'});}catch{return send(404,'text/plain','Artwork unavailable');}}

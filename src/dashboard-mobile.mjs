@@ -95,21 +95,3 @@ if (pack && sourceDetail) {
   mobile.addEventListener('change', () => { updateView(); if (!mobile.matches && sheet.open) sheet.close(); });
   updateView();
 }
-
-// Slim phone view: shows only the brief and the quest card. Presentation only.
-{
-  const toggle = document.createElement('button');
-  toggle.type = 'button';
-  toggle.className = 'phone-brief-toggle';
-  let brief = true;
-  try { brief = localStorage.getItem('dfo-phone-brief') !== '0'; } catch {}
-  const apply = () => {
-    document.body.classList.toggle('phone-brief', brief && mobile.matches);
-    toggle.textContent = brief ? 'Full view' : 'Brief view';
-    toggle.setAttribute('aria-pressed', String(brief));
-  };
-  toggle.addEventListener('click', () => { brief = !brief; try { localStorage.setItem('dfo-phone-brief', brief ? '1' : '0'); } catch {} apply(); });
-  document.body.append(toggle);
-  mobile.addEventListener('change', apply);
-  apply();
-}
