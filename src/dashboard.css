@@ -308,3 +308,61 @@ footer{min-height:20px;line-height:14px;overflow:visible;align-items:center;box-
 .gear-pair .track{grid-column:1!important;width:auto!important;justify-self:stretch!important}
 .gear-pair .condition-label{grid-column:2!important;justify-self:end}
 .gear-pair .gear-name{display:block;min-width:0;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;-webkit-line-clamp:unset!important;line-clamp:none}
+
+/* ==== Design system (design/official-polish) ====
+   One source of truth for colour, spacing, type and panel styles. Later rules below
+   consume these tokens; earlier per-release layers stay for structure only.
+   Contrast: every --ink-* on every --panel-* surface is >=4.5:1; --edge-* on surfaces >=3:1. */
+:root{
+ /* colour: gold, parchment, stone */
+ --gold-500:#e0c47e;--gold-400:#f0cf6a;--gold-300:#f6dd92;--gold-700:#a8915a;--gold-900:#695429;
+ --parchment-100:#efe6cc;--parchment-200:#e4dfcc;--parchment-300:#c9c3a8;--parchment-400:#b4b09c;
+ --parchment-bg:#d8c79c;--parchment-bg-2:#c6b07e;--parchment-ink:#2b2114;--parchment-ink-2:#4a3a22;
+ --stone-950:#111410;--stone-900:#161918;--stone-850:#1b2019;--stone-800:#20271d;--stone-700:#2b3027;--stone-600:#343730;--stone-500:#454940;
+ --edge-light:#8a876e;--edge-dark:#151a14;--edge-mid:#6e6a55;--edge-gold:#b39a5c;
+ --good:#91dc80;--warn:#e0a94a;--bad:#e79c84;--magic:#9fbde3;
+ --gold:var(--gold-500);--text:var(--parchment-200);--muted:var(--parchment-400);
+ /* spacing scale (only these) */
+ --sp-1:2px;--sp-2:4px;--sp-3:6px;--sp-4:8px;--sp-5:12px;--sp-6:16px;--sp-7:24px;
+ /* type scale (only these; nothing below 9px) */
+ --fs-2xs:9px;--fs-xs:10px;--fs-sm:11px;--fs-md:12px;--fs-lg:14px;--fs-xl:16px;--fs-2xl:20px;--fs-3xl:22px;
+ --lh-tight:1.15;--lh-body:1.45;
+ /* panel variants */
+ --panel-frame-bg:url('/dashboard-art/game-grain.svg'),repeating-conic-gradient(#ffffff04 0 25%,transparent 0 50%) 0 0/4px 4px,var(--stone-600);
+ --panel-inset-bg:linear-gradient(#1d241bf2,#1a2018f2);--panel-inset-border:1px solid var(--edge-mid);--panel-inset-shadow:inset 1px 1px 0 #0008,inset -1px -1px 0 #ffffff0d;
+ --panel-raised-bg:url('/dashboard-art/game-grain.svg'),linear-gradient(130deg,#454940,#30362d);--panel-raised-border:var(--edge-light) var(--edge-dark) var(--edge-dark) var(--edge-light);
+ --panel-parchment-bg:linear-gradient(160deg,var(--parchment-bg),var(--parchment-bg-2));
+ --radius:0;--dur-fade:.24s;--ease:cubic-bezier(.2,.7,.2,1);
+}
+/* panel: frame (stone, gilded border image) */
+.stone{background:var(--panel-frame-bg)}
+/* panel: inset (cards inside a frame) */
+.character-card,.quest,.phone-panel,.connection-health,.quiet-settings,.map-quest,.panel-inset{background:var(--panel-inset-bg);border:var(--panel-inset-border);box-shadow:var(--panel-inset-shadow);padding:var(--sp-5)}
+.connection-health,.quiet-settings{margin:var(--sp-5) 0}
+/* panel: raised (tiles and buttons) */
+.current-quest button,.map-switch button,#manual-refresh,#game-start-button,#phone-copy,.map-legend button,.panel-raised{background:var(--panel-raised-bg);border:2px solid;border-color:var(--panel-raised-border);color:var(--parchment-100);box-shadow:inset 0 1px #c4c5a725}
+.current-quest button:hover,.map-switch button:hover,#manual-refresh:hover,#game-start-button:hover,#phone-copy:hover,.map-legend button:hover{color:var(--gold-300);border-color:var(--gold-500) var(--gold-900) var(--gold-900) var(--gold-500)}
+.current-quest button:disabled{color:var(--parchment-400)}
+/* headings */
+.panel-heading{padding-bottom:var(--sp-3);border-bottom:2px groove var(--edge-mid)}
+.panel-heading h2{font-size:var(--fs-lg);color:var(--gold-500)}
+.panel-heading>span{font-size:var(--fs-xs);color:var(--parchment-300)}
+.character-card h3,.connection-page h3,.quest h3,.map-quest h3{color:var(--gold-500);line-height:var(--lh-tight)}
+.character-card h3{font-size:var(--fs-md);margin:0 0 var(--sp-4);padding-bottom:var(--sp-2);border-bottom:1px solid #6e6a5566}
+.connection-page h3{font-size:var(--fs-xl);margin:0 0 var(--sp-4)}
+.quest h3{font-size:var(--fs-xl)}
+.map-quest h3{font-size:var(--fs-2xl)}
+/* body text */
+.quest p,.connection-page p{font-size:var(--fs-md);line-height:var(--lh-body);color:var(--parchment-200);margin:0 0 var(--sp-4)}
+.connection-page small,.phone-panel small{font-size:var(--fs-sm);color:var(--parchment-300)}
+.character-row span{color:var(--parchment-300)}.character-row strong{color:var(--parchment-100)}
+.gear-label,.accessory small{font-size:var(--fs-2xs);color:var(--parchment-300)}
+.gear .condition-label{font-size:var(--fs-2xs)}
+.art-note,footer{font-size:var(--fs-xs)}
+footer{color:var(--parchment-400)}
+.tabs button{color:var(--parchment-300)}.tabs button.active{color:var(--gold-400)}
+/* spacing */
+.equipment-panel,.inventory-panel,.character-page,.journal,.connection-page,.map-page{padding:var(--sp-5)}
+.connection-page .scroll-area,.journal .scroll-area{padding-right:var(--sp-3)}
+.quest{margin-bottom:var(--sp-4)}
+#character-record{gap:var(--sp-4)!important}
