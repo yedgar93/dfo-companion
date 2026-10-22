@@ -7,7 +7,7 @@ if (pack && sourceDetail) {
   nav.className = 'mobile-pack-nav';
   nav.setAttribute('aria-label', 'Pack sections');
   let view = 'character';
-  for (const [value, label, target] of [['character', 'Character', '.equipment-panel'], ['inventory', 'Inventory', '.inventory-panel']]) {
+  for (const [value, label, target] of [['character', 'Equipment', '.equipment-panel'], ['inventory', 'Inventory', '.inventory-panel']]) {
     const panel = pack.querySelector(target);
     panel.id ||= `mobile-${value}`;
     const button = document.createElement('button');
