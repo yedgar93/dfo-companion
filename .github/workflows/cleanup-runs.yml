@@ -18,7 +18,7 @@ jobs:
       actions: write
       contents: read
     steps:
-      - name: Delete runs beyond the newest five, keeping release commits
+      - name: Delete old runs, keeping the newest five release-workflow runs and release commits
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
@@ -34,14 +34,19 @@ jobs:
             sha=$(gh api "repos/$REPO/commits/$tag" --jq '.sha' 2>/dev/null || true)
             [ -n "$sha" ] && echo "$sha" >> keep-shas.txt
           done < tags.txt
-          # All runs, newest first: id, status, head_sha.
+          # The release workflow's id, resolved from its file so a rename of its display name cannot widen the count.
+          release_id=$(gh api "repos/$REPO/actions/workflows/release.yml" --jq '.id')
+          gh api --paginate "repos/$REPO/actions/workflows/$release_id/runs?per_page=100" --jq '.workflow_runs[].id' > release-runs.txt
+          head -n "$KEEP" release-runs.txt > keep-release.txt
+          # All runs, newest first: id, status, head_sha. The newest $KEEP overall are kept too.
           gh api --paginate "repos/$REPO/actions/runs?per_page=100" --jq '.workflow_runs[] | [.id, .status, .head_sha] | @tsv' > runs.tsv
           n=0; deleted=0
           while IFS=$'\t' read -r id status sha; do
             n=$((n+1))
             [ "$n" -le "$KEEP" ] && continue
             [ "$status" = "completed" ] || continue
+            grep -qxF "$id" keep-release.txt && continue
             grep -qxF "$sha" keep-shas.txt && continue
             if gh api -X DELETE "repos/$REPO/actions/runs/$id" >/dev/null; then deleted=$((deleted+1)); else echo "::warning::Could not delete run $id"; fi
           done < runs.tsv
-          echo "Kept newest $KEEP runs and $(sort -u keep-shas.txt | wc -l) release commits; deleted $deleted runs."
+          echo "Kept newest $KEEP release-workflow runs, newest $KEEP overall, and $(sort -u keep-shas.txt | wc -l) release commits; deleted $deleted runs."
