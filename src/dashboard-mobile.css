@@ -103,3 +103,6 @@
   .tabs button{flex:0 0 auto;white-space:nowrap;padding-left:9px;padding-right:9px}
   .tabs>span{display:none}
 }
+
+/* 0.4.13 polish: narrow windows size every row to its content so the quest banner never runs under the tabs. */
+@media (max-width:800px){main{grid-template-rows:none!important;grid-auto-rows:auto!important;height:auto!important;min-height:100vh}}
