@@ -224,3 +224,6 @@ html.game-cursor input:not([type=range]):not([type=checkbox]):not([type=radio]):
 #current-quest-clock-hint,.quest-clock-hint{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:10px}
 @media (min-width:801px) and (min-height:521px){main{grid-template-rows:auto 32px auto minmax(0,1fr) auto!important}main>.current-quest{min-height:64px}}
 @media (min-width:801px) and (min-height:521px){main>.current-quest{height:auto!important;max-height:none!important;overflow:visible}}
+
+/* 0.4.13 polish: footer line gets its full height. */
+footer{min-height:20px;line-height:14px;overflow:visible;align-items:center;box-sizing:border-box}
