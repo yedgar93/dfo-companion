@@ -1,8 +1,9 @@
 @font-face{font-family:'Jacquard 12';src:url('fonts/Jacquard12-Regular.ttf') format('truetype');font-display:swap}
-html,body{margin:0;height:100%;background:#191e17;color:#eee5ca;font:14px/1.5 system-ui,sans-serif;user-select:none}
+@font-face{font-family:'Pixelify Sans';src:url('fonts/pixelify-sans.woff2') format('woff2');font-display:swap}
+html,body{margin:0;height:100%;background:#191e17;color:#eee5ca;font:14px/1.5 'Pixelify Sans',system-ui,sans-serif;user-select:none}
 .about{box-sizing:border-box;height:100%;padding:22px 26px;display:flex;flex-direction:column;gap:6px;text-align:center;border:1px solid #6d6440}
 h1{margin:0;font-size:20px;color:#e7d69b;letter-spacing:.03em}
-.about-label{margin:0;font-weight:600}.about-build{margin:0;color:#b7b1a0;font-size:12px}
+.about-label{margin:0}.about-build{margin:0;color:#b7b1a0;font-size:12px}
 .about-credit{margin:auto 0 8px;padding-top:12px;border-top:1px solid #3a4234;color:#d4bd87}
 .about-author{font-family:'Jacquard 12',monospace;font-size:22px;line-height:1;color:#f4d071}
 button{align-self:center;padding:5px 22px;background:#293428;color:#eee5ca;border:1px solid #baaa70;font:inherit;cursor:pointer}
