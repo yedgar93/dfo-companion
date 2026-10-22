@@ -209,3 +209,8 @@ html.game-cursor input:not([type=range]):not([type=checkbox]):not([type=radio]):
 /* 0.4.13 polish: dungeon Plan/Height buttons use the stone button style of the rest of the dashboard. */
 #map-dungeon-plan,#map-dungeon-height,.map-legend button{border:1px solid #746b4b!important;background:#303629!important;color:#e0c47e!important;box-shadow:none;border-radius:0;font-family:var(--game-font)}
 #map-dungeon-plan[aria-pressed=true],#map-dungeon-height[aria-pressed=true],.map-legend button[aria-pressed=true]{background:#4a4630!important;border-color:#baaa70!important;color:#f2e2b0!important}
+
+/* 0.4.13 polish: remaining contrast misses (counts and hints over dim or tinted panels). */
+#item-summary,#filter-summary,#equipment-count,#item-summary .dg,#filter-summary .dg,#equipment-count .dg{color:#c8cab9!important}
+.quest-clock-hint,#current-quest-clock-hint{color:#d6d2bd}
+.tabs button.active span,.tabs button.active #inventory-count{color:#efdca0!important}
