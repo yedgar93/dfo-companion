@@ -233,5 +233,10 @@ footer{min-height:20px;line-height:14px;overflow:visible;align-items:center;box-
 .stale-data .hud .vitals>.stale-age-tag{position:absolute;margin:-13px 0 0;border:0;background:none;padding:0;line-height:11px}
 
 /* 0.4.13 polish: the ◇ placeholder on the tan selected/upgrade tile sits on its own dark chip (was 1.29:1). */
-.selected .fallback,.upgrade .fallback,.gear.selected>.fallback,.item.selected .fallback,.accessory.selected .fallback{opacity:1!important;color:#efe0ad!important;background:#1d221a;box-shadow:0 0 0 1px #8f7f4e;text-shadow:none}
+.selected .fallback,.upgrade .fallback,.gear.selected>.fallback,.item.selected .fallback,.accessory.selected .fallback{opacity:1!important;color:#f4e6b4!important;background:none;text-shadow:1px 1px 0 #1d221a,-1px -1px 0 #1d221a,1px -1px 0 #1d221a,-1px 1px 0 #1d221a,0 1px 0 #1d221a,0 -1px 0 #1d221a,1px 0 0 #1d221a,-1px 0 0 #1d221a}
 #portrait-placeholder,#portrait-placeholder p{color:#cfd4bf}
+
+/* 0.4.13 polish: quiet alerts dock in the empty middle of the footer, so they never cover the upgrade summary or tiles. */
+@media (min-width:801px){.quiet-alerts{top:auto;bottom:1px;left:50%;right:auto;transform:translateX(-50%);max-width:calc(100vw - 640px);min-width:200px;max-height:20px;padding:1px 8px;font-size:10px;line-height:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:none;animation:dfo-tag-in .3s ease-out both}}
+@media (min-width:801px) and (prefers-reduced-motion:reduce){.quiet-alerts{animation:none}}
+.quiet-alerts button{line-height:16px}
