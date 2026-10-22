@@ -200,3 +200,8 @@ span.dg,.hud .vitals article span.dg,.vitals span.dg{display:inline-block;width:
 .quest .quest-clock{font-size:12px;line-height:16px;margin:8px 0 0}.quest .quest-clock-hint{font-size:10px;margin:2px 0 0}
 .quest.unresolved h3:after{content:' ◇';font-size:12px;color:#b9bca8}
 .journal-note{font-size:10px;color:#b9bca8;margin:4px 0 0}
+
+/* 0.4.13 polish: game cursor rules live here (CSP blocks injected <style>); the frames come in as CSSOM custom properties. */
+html.game-cursor,html.game-cursor *,html.game-cursor *::before,html.game-cursor *::after{cursor:var(--dfo-cursor-point),auto!important}
+html.game-cursor.game-cursor-press,html.game-cursor.game-cursor-press *,html.game-cursor.game-cursor-press *::before,html.game-cursor.game-cursor-press *::after{cursor:var(--dfo-cursor-press),auto!important}
+html.game-cursor input:not([type=range]):not([type=checkbox]):not([type=radio]):not([type=button]):not([type=submit]),html.game-cursor textarea,html.game-cursor [contenteditable=true]{cursor:text!important}
