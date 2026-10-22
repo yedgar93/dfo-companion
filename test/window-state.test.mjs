@@ -76,3 +76,10 @@ test('old formats still load',()=>{
 test('no displays falls back without throwing',()=>{
   assert.ok(restorePlan(null,[],null).bounds);
 });
+
+test('maximizing on another monitor after a restore follows the new monitor',()=>{
+  const prev={bounds:{x:200,y:100,width:1000,height:800},maximized:true,displayId:1,displayBounds:builtin.bounds,savedAt:NOW-1};
+  const s=captureState({normalBounds:{...external.workArea},maximized:true,fullScreen:false,minimized:false,display:external,previous:prev,now:NOW});
+  assert.equal(s.displayId,7);
+  assert.deepEqual(restorePlan(readHandoff(s,NOW),displays,builtin).frame,external.workArea);
+});
