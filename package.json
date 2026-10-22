@@ -1,5 +1,31 @@
 {
-  "name":"dfo-companion","productName":"DFO Companion","version":"0.4.0","description":"Lightweight DFO Companion desktop dashboard","main":"desktop/main.cjs","license":"MIT","author":"Jonathan Yedgarova","repository":{"type":"git","url":"https://github.com/yedgar93/dfo-companion.git"},
-  "scripts":{"build":"node scripts/build-icons.mjs && node scripts/build-bundle.mjs","start":"npm run build && electron .","test":"node scripts/test.mjs","dist:win":"npm run build && electron-builder --config electron-builder.cjs --win --x64 --publish never","dist:mac":"npm run build && electron-builder --config electron-builder.cjs --mac --arm64 --publish never"},
-  "dependencies":{"electron-updater":"6.8.9"},"devDependencies":{"electron":"45.0.0","electron-builder":"26.16.1","esbuild":"0.25.12"},"engines":{"node":">=22.15.0"}
+  "name": "dfo-companion",
+  "productName": "DFO Companion",
+  "version": "0.4.1",
+  "description": "Lightweight DFO Companion desktop dashboard",
+  "main": "desktop/main.cjs",
+  "license": "MIT",
+  "author": "Jonathan Yedgarova",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yedgar93/dfo-companion.git"
+  },
+  "scripts": {
+    "build": "node scripts/build-icons.mjs && node scripts/build-bundle.mjs",
+    "start": "npm run build && electron .",
+    "test": "node scripts/test.mjs",
+    "dist:win": "npm run build && electron-builder --config electron-builder.cjs --win --x64 --publish never",
+    "dist:mac": "npm run build && electron-builder --config electron-builder.cjs --mac --arm64 --publish never"
+  },
+  "dependencies": {
+    "electron-updater": "6.8.9"
+  },
+  "devDependencies": {
+    "electron": "45.0.0",
+    "electron-builder": "26.16.1",
+    "esbuild": "0.25.12"
+  },
+  "engines": {
+    "node": ">=22.15.0"
+  }
 }

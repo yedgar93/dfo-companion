@@ -1,9 +1,10 @@
 import {randomUUID} from 'node:crypto';
-import {replaceLegacyHelper} from './legacy-helper.mjs';
+import {replaceLegacyHelper,replaceLegacyWindowsHelper} from './legacy-helper.mjs';
 process.env.DFO_COMPANION_EMBEDDED='1';
 let service;
 try{
  if(process.platform==='darwin')await replaceLegacyHelper();
+ if(process.platform==='win32')await replaceLegacyWindowsHelper();
  const {startDashboard}=await import('./DFO-Companion.mjs');
  const instanceToken=randomUUID();
  service=await startDashboard({open:false,instanceToken});
