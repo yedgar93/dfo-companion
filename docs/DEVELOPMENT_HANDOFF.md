@@ -176,7 +176,7 @@ This regression occurred twice and has a concrete source-level explanation:
 ## Desktop updates, lifecycle and security
 
 - Startup is Connection by default; first fresh live character automatically switches to Pack **once**. Further manual page choices remain usable. Old UI-reload session data must not put a disconnected startup on Pack.
-- Window normal bounds/maximized state are persisted. Restore monitor/position including negative coordinates; clamp onto a remaining monitor if a display was disconnected.
+- Window normal bounds/maximized state are persisted. Restore monitor/position including negative coordinates; clamp onto a remaining monitor if a display was disconnected. `window-state.json` in userData stores normal bounds, display id, maximized and fullscreen flags (atomic write; saved debounced on move/resize, on close, before-quit and before quitAndInstall). Saves while minimized keep the previous record (Windows reports -32000 coordinates). Bounds intersecting no display fall back to the primary display's centre, never the first listed display. Bounds are re-applied with setBounds after construction (mixed-DPI Windows), maximize happens only if previously maximized/fullscreen, fullscreen itself is never restored, and quiet update restarts use showInactive.
 - Automatic restart uses an inactive reopen, not game focus theft. Do not add always-on-top as a workaround.
 - Automatic update check: about **1 second after launch**, then every **5 minutes**. Development/unpackaged apps do not auto-update.
 - Update UI: Checking, download percentage, a **5-second** explanatory pre-restart notice, then Installing. Use `var(--game-font)` rather than a new system font. No confirmation click required.
