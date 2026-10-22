@@ -231,3 +231,6 @@ html.game-cursor input:not([type=range]):not([type=checkbox]):not([type=radio]):
 footer{min-height:20px;line-height:14px;overflow:visible;align-items:center;box-sizing:border-box}
 
 .stale-data .hud .vitals>.stale-age-tag{position:absolute;margin:-13px 0 0;border:0;background:none;padding:0;line-height:11px}
+
+/* 0.4.13 polish: the ◇ placeholder on the tan selected/upgrade tile sits on its own dark chip (was 1.29:1). */
+.selected .fallback,.upgrade .fallback,.gear.selected>.fallback,.item.selected .fallback,.accessory.selected .fallback{opacity:1!important;color:#efe0ad!important;background:#1d221a;box-shadow:0 0 0 1px #8f7f4e;text-shadow:none}
