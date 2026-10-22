@@ -452,3 +452,4 @@ body.awaiting-data #inventory-items:empty::after{content:'';position:absolute;in
 .first-run-card .first-run-go{background:linear-gradient(#4a4c3e,#2f3428);margin-top:var(--sp-2)}
 .brand-dialog[open]{animation:dfo-fade-in .25s var(--ease) both}
 @media (prefers-reduced-motion:reduce){.splash,.splash-card{transition:none!important}.brand-dialog[open]{animation:none!important}}
+.about-credit{margin:0 0 .5rem}.about-author{color:var(--gold,#d8b25a);text-decoration:underline;cursor:pointer}

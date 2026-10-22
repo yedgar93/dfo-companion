@@ -1,4 +1,4 @@
-const {app,BrowserWindow,utilityProcess,dialog,Menu,nativeImage,screen,ipcMain}=require('electron');
+const {app,BrowserWindow,utilityProcess,dialog,Menu,nativeImage,screen,ipcMain,shell}=require('electron');
 const path=require('node:path');
 const {autoUpdater}=require('electron-updater');
 const {MacReleaseUpdater}=require('./mac-updater.cjs');
@@ -26,7 +26,7 @@ function createWindow(){
  window=new BrowserWindow({...bounds,minWidth:420,minHeight:480,title:'DFO Companion · '+build.label,backgroundColor:'#191e17',show:false,fullscreen:false,webPreferences:{preload:path.join(__dirname,'preload.cjs'),nodeIntegration:false,contextIsolation:true,sandbox:true,backgroundThrottling:true}});
  if(saved)window.setBounds(plan.frame);// update handoff only: re-apply after creation (mixed-DPI / macOS can move constructor bounds onto the primary display)
  window.on('page-title-updated',event=>{event.preventDefault();window.setTitle('DFO Companion · '+build.label);});
- window.webContents.setWindowOpenHandler(()=>({action:'deny'}));
+ window.webContents.setWindowOpenHandler(({url})=>{if(url==='https://www.yedgar.ca/')void shell.openExternal(url);return {action:'deny'};});
  window.webContents.on('will-navigate',(event,url)=>{if(url!==origin+'/')event.preventDefault();});
  window.webContents.session.setPermissionRequestHandler((_contents,_permission,callback)=>callback(false));
  window.once('ready-to-show',()=>{if(saved)window.setBounds(plan.frame);quietRestart?window.showInactive():window.show();showUpdateStatus();});// maximized/fullscreen come back as the saved display's work area; maximize() is never called (it can jump displays on macOS)

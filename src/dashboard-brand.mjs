@@ -31,7 +31,7 @@ function about(){
  for(const t of ['A second-monitor dashboard for your Daggerfall Online character: worn gear, pack, character sheet, map and quests.','Fan-made and unofficial. Not affiliated with, endorsed or sponsored by Bethesda Softworks, ZeniMax Media or the makers of Daggerfall Online. The Elder Scrolls and Daggerfall are trademarks of their respective owners.','Read-only: it never equips, trades, moves or controls anything in the game. Game artwork shown in the dashboard is loaded from your own installed game at runtime and is not bundled with the companion.','Companion code is MIT licensed; bundled third-party components are listed in THIRD-PARTY-NOTICES.txt.'])body.append(make('p',null,t));
  const actions=make('div','brand-actions'),guide=make('button',null,'Show the first-run guide'),close=make('button','primary','Close');guide.type=close.type='button';
  guide.addEventListener('click',()=>{d.close();firstRun(true);});close.addEventListener('click',()=>d.close());actions.append(guide,close);
- d.append(head,body,actions);
+ const credit=make('p','about-credit','Created by '),link=make('a','about-author','Yedgar');link.href='https://www.yedgar.ca/';link.target='_blank';link.rel='noopener noreferrer';credit.append(link);body.prepend(credit);d.append(head,body,actions);
  const open=()=>{version.textContent=document.getElementById('app-version')?.textContent?.trim()||'Development build';d.showModal();};
  const button=document.getElementById('about-button');button?.addEventListener('click',open);
  return open;
