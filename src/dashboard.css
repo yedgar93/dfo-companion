@@ -212,13 +212,6 @@ html.game-cursor input:not([type=range]):not([type=checkbox]):not([type=radio]):
 .accessory small{white-space:nowrap;overflow:hidden;text-overflow:clip}
 .accessory-group .accessory-caption{font-size:9px!important;letter-spacing:0;white-space:nowrap;line-height:11px}
 
-/* 0.4.13 polish: worn shirt/clothing is a small corner icon on the full-size Chest/Legs tile; name in the tooltip. */
-.gear.has-clothing{position:relative}
-.gear .clothing-badge{position:absolute;top:17px;right:4px;width:18px;height:18px;display:grid;place-items:center;border:1px solid #8f7f4e;background:#1d221a;box-sizing:border-box;z-index:2}
-.gear .clothing-badge img{width:16px;height:16px;image-rendering:pixelated;object-fit:contain}
-.gear .clothing-badge .fallback{font-size:10px;line-height:1;color:#d9c98f}
-.gear.has-clothing .gear-name{padding-right:20px;box-sizing:border-box}
-
 /* 0.4.13 polish: equipment names start at the left edge and wrap, then ellipsize on the right; never cut on the left. */
 .gear .gear-name{text-align:left!important;justify-self:stretch;min-width:0;max-width:100%;white-space:normal!important;overflow:hidden;overflow-wrap:break-word;word-break:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;text-overflow:ellipsis;direction:ltr}
 
@@ -242,4 +235,24 @@ footer{min-height:20px;line-height:14px;overflow:visible;align-items:center;box-
 .quiet-alerts button{line-height:16px}
 
 /* 0.4.13 polish: short windows scroll the page instead of squashing panels, tiles and type. */
-@media (min-width:801px){html,body{overflow-y:auto!important;overflow-x:hidden}body{min-height:100vh}main{min-height:840px}}
+@media (min-width:801px){html,body{overflow-y:auto!important;overflow-x:hidden}body{min-height:100vh}main{min-height:800px}}
+
+/* 0.4.13 polish: Chest+Shirt and Legs+Clothing pairs as in 0.4.12 and the in-game Pack screen: armour tile with a narrower clothing tile beside it, each with its own art and name. Names keep the normal tile size and wrap to two lines, cut on the right only. */
+.gear-pair{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:3px;min-height:0}
+.gear-pair .gear{min-width:0;grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr) auto 3px;padding:3px;gap:2px}
+.gear-pair .gear-label{grid-column:1;grid-row:1;line-height:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gear-pair .gear img,.gear-pair .gear>.fallback{grid-column:1;grid-row:2;justify-self:center;align-self:center;max-width:100%;width:29px;height:35px}
+.gear-pair .gear>.fallback{line-height:35px;text-align:center}
+.gear-pair .gear-name{grid-column:1;grid-row:3}
+.gear-pair .track{grid-row:4;grid-column:1}
+.gear-pair .upgrade-indicator.upgrade{width:11px;height:13px}
+.gear-pair .gear-label{padding-right:30px}
+.gear-pair .condition-label{font-size:9px}
+.gear-pair .gear-label{padding-right:0}
+.gear-pair .gear{grid-template-rows:auto minmax(0,1fr) auto 3px;position:relative}
+.gear-pair .condition-label{position:absolute!important;right:3px;bottom:7px;top:auto!important;line-height:10px;background:#252a22;padding:0 1px}
+.gear-pair .gear img,.gear-pair .gear>.fallback{width:26px;height:26px;line-height:26px}
+.gear-pair .gear-name{overflow-wrap:normal!important;word-break:normal!important}
+.gear-pair .gear:has(.condition-label) .gear-name{padding-right:0}
+.gear-pair .condition-label{bottom:auto!important;top:17px!important;background:none}
+.gear-pair .gear img,.gear-pair .gear>.fallback{justify-self:start;margin-left:2px}
