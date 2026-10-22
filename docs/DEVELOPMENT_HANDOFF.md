@@ -1,6 +1,6 @@
 # DFO Companion: development handoff
 
-Last reconciled: 2026-10-22. Current release source: **0.4.9**; the last fully verified packaged baseline was **0.4.8** for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
+Last reconciled: 2026-10-22. Current release source: **0.4.10**; the last fully verified packaged baseline was **0.4.9** for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
 
 Read this file, `AGENTS.md`, `README.md`, and `docs/RELEASING.md` before changing the application. Inspect the current source and latest release: this document records findings at the baseline, not a promise that future game versions have identical internals. Keep this document updated as findings change.
 
@@ -145,7 +145,7 @@ This regression occurred twice and has a concrete source-level explanation:
 ### Artwork
 
 - Use actual game item artwork and real layered paperdoll, not generic replacement icons or a cropped screenshot. Keep accessories in a compact single row.
-- The dashboard uses DFO Enhanced Plus's exact embedded gauntlet cursor frames. The paperdoll backdrop and character are composited separately so the backdrop can cover the full portrait viewport while only the character receives the subtle CSS idle-breath animation. This is presentation-only, respects reduced-motion preferences, and adds no game reads or redraw polling.
+- The dashboard uses DFO Enhanced Plus's exact embedded gauntlet cursor frames. The paperdoll backdrop and character are composited separately so the backdrop covers the full portrait viewport; the subtle idle breath affects only the upper character layer while the legs and feet remain fixed. This is presentation-only, respects reduced-motion preferences, and adds no game reads or redraw polling. The header reads `Daggerfall Online Companion`; its packaged-version button invokes the existing manual update check through a narrow sandboxed preload bridge.
 - Sources include installed game ASAR sprite PNGs and original ARENA2 indexed files (palette + TEXTURE archives). Custom DFO items are not all in the classic template catalogue.
 - Electron virtualizes ASAR filesystem paths. Ordinary fs opening the game `app.asar` can produce EISDIR. `archive-io.mjs` uses Electron `original-fs` when appropriate and normal fs outside Electron. Preserve this abstraction.
 - `item-icon-assets.mjs` maps item template/material/race/gender/dye, decodes/crops transparent indexed pixels and caches PNGs. Use the reviewed template records, not name-based art guesses.

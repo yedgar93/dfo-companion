@@ -1,4 +1,4 @@
-const {app,BrowserWindow,utilityProcess,dialog,Menu,nativeImage,screen}=require('electron');
+const {app,BrowserWindow,utilityProcess,dialog,Menu,nativeImage,screen,ipcMain}=require('electron');
 const path=require('node:path');
 const {autoUpdater}=require('electron-updater');
 const {MacReleaseUpdater}=require('./mac-updater.cjs');
@@ -21,7 +21,7 @@ const origin='http://127.0.0.1:9234';
 function createWindow(){
  let saved;try{saved=JSON.parse(fileSystem.readFileSync(windowStateFile,'utf8'));}catch{}
  const bounds=restoreBounds(saved?.bounds,screen.getAllDisplays());
- window=new BrowserWindow({...bounds,minWidth:420,minHeight:480,title:'DFO Companion · '+build.label,backgroundColor:'#191e17',show:false,webPreferences:{nodeIntegration:false,contextIsolation:true,sandbox:true,backgroundThrottling:true}});
+ window=new BrowserWindow({...bounds,minWidth:420,minHeight:480,title:'DFO Companion · '+build.label,backgroundColor:'#191e17',show:false,webPreferences:{preload:path.join(__dirname,'preload.cjs'),nodeIntegration:false,contextIsolation:true,sandbox:true,backgroundThrottling:true}});
  window.on('page-title-updated',event=>{event.preventDefault();window.setTitle('DFO Companion · '+build.label);});
  window.webContents.setWindowOpenHandler(()=>({action:'deny'}));
  window.webContents.on('will-navigate',(event,url)=>{if(url!==origin+'/')event.preventDefault();});
@@ -35,6 +35,8 @@ if(!app.requestSingleInstanceLock({build:build.id}))app.quit();
 else{
  app.on('second-instance',()=>{if(window){if(window.isMinimized())window.restore();window.show();window.focus();}});
  app.whenReady().then(()=>{
+  ipcMain.handle('dfo:version',event=>event.sender===window?.webContents?app.getVersion():null);
+  ipcMain.handle('dfo:check-for-updates',event=>{if(event.sender!==window?.webContents)return false;void updates?.check(true);return true;});
   if(app.dock)app.dock.setIcon(nativeImage.createFromPath(path.join(__dirname,'icon.png')));
   const updateMenu=()=>{const state=updates?.state;Menu.setApplicationMenu(Menu.buildFromTemplate([{label:'DFO Companion',submenu:[{label:'About DFO Companion',click:()=>dialog.showMessageBox({type:'info',title:'DFO Companion',message:build.label,detail:'Build '+build.id})},{type:'separator'},{label:state==='ready'?'Install downloaded update…':state==='available'?'Download update…':state==='downloading'?'Downloading update…':'Check for updates…',enabled:state!=='checking'&&state!=='downloading',click:()=>state==='ready'?updates.install():state==='available'?void updates.download():void updates.check(true)},{label:'Choose artwork folder manually…',click:()=>void locateArtwork()},{role:'quit'}]},{role:'editMenu'},{label:'View',submenu:[{role:'reload'},{role:'togglefullscreen'}]},{role:'windowMenu'}]));};
   updates=setupUpdates({app,updater:process.platform==='darwin'?new MacReleaseUpdater({app,publicKey}):autoUpdater,beforeRestart:()=>{saveWindow();fileSystem.mkdirSync(path.dirname(restartFlag),{recursive:true});fileSystem.writeFileSync(restartFlag,'1');},dialog,shell:require('electron').shell,build,onStatus:status=>{updateStatus=status;updateMenu();showUpdateStatus();}});updateMenu();
