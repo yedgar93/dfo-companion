@@ -103,3 +103,12 @@
   .phone-brief-toggle{position:fixed;right:10px;bottom:10px;z-index:70;min-height:44px;padding:0 14px;background:#293428;color:#eee5ca;border:1px solid #baaa70;font:inherit}
 }
 @media (min-width:801px){.phone-brief-toggle{display:none}}
+
+/* 0.4.13 polish: narrow Full view keeps the tabs on one scrollable row and leaves room under the floating Brief toggle. */
+@media (max-width:800px){
+  .tabs{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(max-content,1fr);flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:#8f8a68 #1d221a}
+  .tabs button{flex:0 0 auto;white-space:nowrap;padding-left:9px;padding-right:9px}
+  .tabs>span{display:none}
+  body:not(.phone-brief){padding-bottom:64px}
+  body:not(.phone-brief) main{padding-bottom:64px}
+}
