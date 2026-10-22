@@ -261,3 +261,44 @@ footer{min-height:20px;line-height:14px;overflow:visible;align-items:center;box-
 #item-summary,#filter-summary,#equipment-count,#item-summary .dg,#filter-summary .dg,#equipment-count .dg{color:#ecebdc!important}
 .tabs button #inventory-count,.tabs button #quest-count{color:#fff3cc!important;opacity:1!important}
 .tabs button #inventory-count,.tabs button #quest-count{display:inline-block;height:12px;line-height:12px;font-size:10px;vertical-align:-1px}
+
+/* 0.4.15: on desktop the quiet alert sits in the footer's empty middle at the end of the page, not over the viewport, so a scrolled short window never shows it over content. */
+@media (min-width:801px){body{position:relative}.quiet-alerts{position:absolute!important;bottom:12px;max-width:max(160px,calc(100% - 640px))!important;min-width:0!important}}
+
+/* 0.4.15: every tab, active or not, has the same box and baseline. */
+@media (min-width:801px){.tabs{align-items:end}.tabs>button{box-sizing:border-box;height:29px;min-height:29px;margin:0;padding-top:6px;padding-bottom:6px;line-height:15px;border-width:1px;border-style:solid;transform:none;vertical-align:bottom;display:inline-flex;align-items:center;gap:6px}.tabs>button:not(.active){border-color:transparent}.tabs button #inventory-count,.tabs button #quest-count{display:inline;height:auto;line-height:inherit;vertical-align:baseline}}
+@media (max-width:800px){.tabs button #inventory-count,.tabs button #quest-count{display:inline;height:auto;line-height:inherit;vertical-align:baseline}.tabs>button{transform:none;margin-top:0}}
+
+/* 0.4.15: gear tiles never shrink below their contents; paired tiles get a fixed art row. */
+.gear-pair .gear{grid-template-rows:11px 26px minmax(12px,auto) 3px!important;min-height:min-content}
+.gear-pair{min-height:min-content}
+.gear{min-height:min-content}
+.gear-pair .condition-label{top:16px!important}
+.gear-pair .gear{grid-template-rows:11px 26px auto 3px!important}
+#gear-left,#gear-right{grid-template-rows:repeat(5,minmax(82px,1fr))!important}
+.gear .gear-label{justify-self:start;max-width:calc(100% - 30px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gear-pair .gear .gear-label{max-width:100%}
+.gear-pair .gear img,.gear-pair .gear>.fallback{width:22px!important;height:26px!important;line-height:26px!important;font-size:18px}
+@media (min-width:801px){main{min-height:900px}}
+.gear-pair .gear{grid-template-rows:11px 26px auto 10px 3px!important}
+.gear-pair .condition-label{position:static!important;grid-column:1;grid-row:4;justify-self:end;line-height:10px;background:none}
+.gear-pair .track{grid-row:5!important}
+.gear-pair .gear img,.gear-pair .gear>.fallback{justify-self:center;margin-left:0}
+#gear-left,#gear-right{grid-template-rows:repeat(5,minmax(92px,1fr))!important}
+@media (min-width:801px){main{min-height:960px}}
+
+/* 0.4.15: tighter paired tiles so the full-size window fits again (no scrolling at 1050x820). */
+.gear-pair .gear{grid-template-rows:10px 20px auto 10px 3px!important;padding:2px 3px!important;gap:1px!important}
+.gear-pair .gear img,.gear-pair .gear>.fallback{width:20px!important;height:20px!important;line-height:20px!important;font-size:16px}
+.gear-pair .gear-name{line-height:11px!important;font-size:max(9px,1em)}
+.gear-pair .gear-label{line-height:10px}
+#gear-left,#gear-right{grid-template-rows:repeat(5,minmax(74px,1fr))!important}
+@media (min-width:801px){main{min-height:800px}}
+.gear-pair .gear{grid-template-rows:10px 16px auto 10px!important}
+.gear-pair .gear img,.gear-pair .gear>.fallback{width:16px!important;height:16px!important;line-height:16px!important;font-size:13px}
+.gear-pair .condition-label{grid-row:4!important;justify-self:end;align-self:center}
+.gear-pair .track{grid-row:4!important;align-self:center;justify-self:start;width:calc(100% - 26px)!important;margin:0!important}
+#gear-left,#gear-right{gap:3px!important;grid-template-rows:repeat(5,minmax(67px,1fr))!important}
+.gear-pair .gear{padding:1px 3px!important}
+.gear-pair .gear-name{line-height:10px!important}
+#gear-left,#gear-right{grid-template-rows:repeat(5,minmax(63px,1fr))!important}
