@@ -302,3 +302,9 @@ footer{min-height:20px;line-height:14px;overflow:visible;align-items:center;box-
 .gear-pair .gear{padding:1px 3px!important}
 .gear-pair .gear-name{line-height:10px!important}
 #gear-left,#gear-right{grid-template-rows:repeat(5,minmax(63px,1fr))!important}
+/* 0.4.16 polish: paired tiles put the condition bar and % in their own columns with a 4px gap, and names stay on one line with a single trailing ellipsis (full name stays in the tile title). */
+.gear-pair .gear{grid-template-columns:minmax(0,1fr) auto!important;column-gap:4px!important}
+.gear-pair .gear>.gear-label,.gear-pair .gear>img,.gear-pair .gear>.fallback,.gear-pair .gear>.gear-name,.gear-pair .gear>picture{grid-column:1/-1!important}
+.gear-pair .track{grid-column:1!important;width:auto!important;justify-self:stretch!important}
+.gear-pair .condition-label{grid-column:2!important;justify-self:end}
+.gear-pair .gear-name{display:block;min-width:0;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;-webkit-line-clamp:unset!important;line-clamp:none}
