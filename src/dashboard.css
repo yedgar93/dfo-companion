@@ -196,4 +196,7 @@ span.dg,.hud .vitals article span.dg,.vitals span.dg{display:inline-block;width:
 .hud .connection.error .lamp:before,.hud .connection.review .lamp:before,.hud .connection.reconnect .lamp:before{content:'✕'}
 .hud .connection.stopped .lamp{color:#c9c6b0}.hud .connection.stopped .lamp:before{content:'■'}
 .gear.low .condition-label:before{content:'! ';color:#f0b07a}
-.item.magic:after{content:'✦';position:absolute;right:4px;top:2px;font-size:9px;line-height:9px;color:#a9c4e6;pointer-events:none}
+.item.magic:after{content:'✦';position:absolute;left:4px;bottom:3px;font-size:9px;line-height:9px;color:#a9c4e6;pointer-events:none}
+.quest .quest-clock{font-size:12px;line-height:16px;margin:8px 0 0}.quest .quest-clock-hint{font-size:10px;margin:2px 0 0}
+.quest.unresolved h3:after{content:' ◇';font-size:12px;color:#b9bca8}
+.journal-note{font-size:10px;color:#b9bca8;margin:4px 0 0}
