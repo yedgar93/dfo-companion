@@ -84,8 +84,8 @@ main{grid-template-rows:auto auto auto auto 54px minmax(0,1fr) 18px}main>header{
 .attribute-stat[title]{cursor:help}
 
 /* 0.4.13 polish: quest banner fits its content (objective, destination, done steps, both actions). */
-@media(min-width:801px){main{grid-template-rows:76px 32px 68px minmax(0,1fr) 17px}main>#current-quest{height:68px;min-height:68px;overflow:hidden}.current-quest{padding:4px 12px;align-items:center}.current-quest .quest-now{gap:1px;align-content:center}.current-quest .quest-now p{font-size:12px;line-height:16px;-webkit-line-clamp:1;white-space:nowrap;text-overflow:ellipsis;display:block}.current-quest .quest-done{margin:0;padding:0;list-style:none;font-size:10px;line-height:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#c3c7b3}.current-quest .quest-done li{display:inline}.current-quest .quest-done li+li:before{content:' · '}.current-quest .quest-actions{flex-direction:column;align-items:stretch;gap:3px}.current-quest .quest-actions button{padding:2px 9px;line-height:16px;font-size:11px}}
-@media(min-width:801px) and (max-width:950px){main{grid-template-rows:72px 30px 64px minmax(0,1fr) 16px}main>#current-quest{height:64px;min-height:64px}.current-quest .quest-now p{font-size:11px;line-height:15px}}
+@media(min-width:801px) and (min-height:521px){main{grid-template-rows:auto 32px 68px minmax(0,1fr) 17px}main>#current-quest{height:68px;min-height:68px;overflow:hidden}.current-quest{padding:4px 12px;align-items:center}.current-quest .quest-now{gap:1px;align-content:center}.current-quest .quest-now p{font-size:12px;line-height:16px;-webkit-line-clamp:1;white-space:nowrap;text-overflow:ellipsis;display:block}.current-quest .quest-done{margin:0;padding:0;list-style:none;font-size:10px;line-height:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#c3c7b3}.current-quest .quest-done li{display:inline}.current-quest .quest-done li+li:before{content:' · '}.current-quest .quest-actions{flex-direction:column;align-items:stretch;gap:3px}.current-quest .quest-actions button{padding:2px 9px;line-height:16px;font-size:11px}}
+@media(min-width:801px) and (max-width:950px) and (min-height:521px){main{grid-template-rows:auto 30px 64px minmax(0,1fr) 16px}main>#current-quest{height:64px;min-height:64px}.current-quest .quest-now p{font-size:11px;line-height:15px}}
 
 /* 0.4.13 polish: quest timer from the tracker's clockSeconds; urgent = Daggerfall red + the word, no blinking. */
 .quest-clock{font-size:11px;line-height:14px;color:#d8cfae;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -149,3 +149,10 @@ button:disabled,select:disabled,#map-focus:disabled,.quest-actions button:disabl
 .accessory-caption,.accessory-group>small.accessory-caption{color:#c6c8b6}
 .gear .fallback,.gear>.fallback,.item .fallback{color:#bcc0ad}
 .tabs button>span{color:#c2c4b1!important}.tabs button.active>span{color:#efdea5!important}
+
+/* 0.4.13 polish: "Updating after travel" sits on the held-back panels' headings; no grid item, no layout shift, no dimming. */
+.deferred-stale{opacity:1}
+.deferred-stale::after{content:none!important;display:none!important}
+#pack.deferred-stale .panel-heading h2:after,#current-quest.deferred-stale #current-quest-source:after{content:'Updating after travel…';display:inline-block;margin-left:8px;padding:0 4px;font-size:9px;line-height:13px;letter-spacing:.04em;text-transform:none;vertical-align:middle;color:#efe2b4;border:1px solid #8f8558;background:#37352a;text-shadow:none;animation:dfo-tag-in .3s ease-out both}
+@keyframes dfo-tag-in{from{opacity:0;transform:translateY(-2px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){#pack.deferred-stale .panel-heading h2:after,#current-quest.deferred-stale #current-quest-source:after{animation:none}}
