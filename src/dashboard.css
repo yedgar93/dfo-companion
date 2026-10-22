@@ -86,3 +86,12 @@ main{grid-template-rows:auto auto auto auto 54px minmax(0,1fr) 18px}main>header{
 /* 0.4.13 polish: quest banner fits its content (objective, destination, done steps, both actions). */
 @media(min-width:801px){main{grid-template-rows:76px 32px 68px minmax(0,1fr) 17px}main>#current-quest{height:68px;min-height:68px;overflow:hidden}.current-quest{padding:4px 12px;align-items:center}.current-quest .quest-now{gap:1px;align-content:center}.current-quest .quest-now p{font-size:12px;line-height:16px;-webkit-line-clamp:1;white-space:nowrap;text-overflow:ellipsis;display:block}.current-quest .quest-done{margin:0;padding:0;list-style:none;font-size:10px;line-height:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#c3c7b3}.current-quest .quest-done li{display:inline}.current-quest .quest-done li+li:before{content:' · '}.current-quest .quest-actions{flex-direction:column;align-items:stretch;gap:3px}.current-quest .quest-actions button{padding:2px 9px;line-height:16px;font-size:11px}}
 @media(min-width:801px) and (max-width:950px){main{grid-template-rows:72px 30px 64px minmax(0,1fr) 16px}main>#current-quest{height:64px;min-height:64px}.current-quest .quest-now p{font-size:11px;line-height:15px}}
+
+/* 0.4.13 polish: quest timer from the tracker's clockSeconds; urgent = Daggerfall red + the word, no blinking. */
+.quest-clock{font-size:11px;line-height:14px;color:#d8cfae;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.quest-clock.urgent{color:#f08a74}
+.quest-clock-hint{font-size:9px;line-height:11px;color:#b3b69e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.current-quest>div:first-child{gap:1px}
+.current-quest .quest-clock-hint{text-transform:none;letter-spacing:0}
+.map-quest .quest-clock-hint{display:block;margin-top:2px}
+@media(min-width:801px){.current-quest>div:first-child>span{line-height:11px}.current-quest>div:first-child>strong{line-height:18px}.current-quest .quest-clock{line-height:13px}}

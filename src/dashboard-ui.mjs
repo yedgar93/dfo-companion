@@ -5,6 +5,7 @@ import {pairingQrSvg} from './dashboard-qr.mjs';
 import {updateJourney}from'./dashboard-map-ui.mjs';
 import {renderPortrait} from './paperdoll-preview.mjs';
 import {focusQuest} from './dashboard-map-ui.mjs';
+import {showQuestClock} from './dashboard-map-ui.mjs'
 import {livePayloadKey,questNowCard,explainReason,sinceText,deferredPanels,laneSummary,glossaryFor} from './dashboard-extras.mjs';
 import {CATEGORIES,SLOT_NAMES,isEquipped,isMagic,filterItems,matchesCategory,conditionOf,artworkFor,compareEquipment,comparisonIndicator,sortInventory,compatibleSlots} from './dashboard-items.mjs';
 const $=id=>document.getElementById(id),text=(id,s)=>{$(id).textContent=s;};
@@ -79,7 +80,8 @@ function renderTicking(s){text('freshness',!s.lastSuccess?'Waiting for first rea
 
 // Quest "what now" card in the existing banner. Title/objective stay with the map module.
 let lastCardKey='',currentCard=null;
-function renderQuestCard(s){const card=questNowCard(s.details),key=JSON.stringify(card);if(card.available&&card.stepFromJournal)text('current-quest-objective','Latest journal entry: '+card.step);if(key===lastCardKey)return;lastCardKey=key;currentCard=card;const dest=$('current-quest-destination');if(dest){dest.textContent=card.available?card.destinationText:'';dest.classList.toggle('unconfirmed',!card.destination?.confirmed);dest.title=card.destination?.source??'No address is confirmed by the current objective.';}const done=$('current-quest-done');if(done){done.replaceChildren(...card.done.map(line=>el('li',null,line)));}const pin=$('quest-pin');if(pin){pin.disabled=!card.canPin;pin.title=card.canPin?'Show and focus this destination on the map':'Destination unconfirmed, so there is nothing to pin yet.';}}
+function renderQuestCard(s){const card=questNowCard(s.details),clock=s.details?.questTracker?.views?.find(v=>v.id===card.id)?.clockSeconds??null,key=JSON.stringify([card,clock])
+showQuestClock($('current-quest-clock'),$('current-quest-clock-hint'),card.available?clock:null);if(card.available&&card.stepFromJournal)text('current-quest-objective','Latest journal entry: '+card.step);if(key===lastCardKey)return;lastCardKey=key;currentCard=card;const dest=$('current-quest-destination');if(dest){dest.textContent=card.available?card.destinationText:'';dest.classList.toggle('unconfirmed',!card.destination?.confirmed);dest.title=card.destination?.source??'No address is confirmed by the current objective.';}const done=$('current-quest-done');if(done){done.replaceChildren(...card.done.map(line=>el('li',null,line)));}const pin=$('quest-pin');if(pin){pin.disabled=!card.canPin;pin.title=card.canPin?'Show and focus this destination on the map':'Destination unconfirmed, so there is nothing to pin yet.';}}
 $('quest-pin')?.addEventListener('click',()=>{if(!currentCard?.canPin)return;document.querySelector('[data-page=map]')?.click();focusQuest(currentCard.id);});
 
 // Location-change guard: deferred panels are marked as stale until their copy resumes.
