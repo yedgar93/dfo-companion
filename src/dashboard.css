@@ -177,3 +177,10 @@ span.dg,.hud .vitals article span.dg,.vitals span.dg{display:inline-block;width:
 .reason-code code,.connection-health .reason-code code{font-size:10px;color:#c9c3a5;font-family:var(--game-font)}
 .scroll-area{overflow-x:hidden}
 #reason,.reason-code code{font-family:var(--game-font)!important;font-size:10px;color:#c9c3a5;overflow-wrap:anywhere}
+
+/* 0.4.13 polish: Character record cards size to their content; standing (guild, legal, social, faction, class) comes before the long skill lists. */
+#character-record{align-items:start}
+#character-record>.character-card:nth-child(1){order:1}#character-record>.character-card:nth-child(2){order:2}
+#character-record>.character-card:nth-child(9){order:3}#character-record>.character-card:nth-child(12){order:4}#character-record>.character-card:nth-child(10){order:5}#character-record>.character-card:nth-child(11){order:6}
+#character-record>.character-card:nth-child(7){order:7}#character-record>.character-card:nth-child(8){order:8}
+#character-record>.character-card:nth-child(3){order:9}#character-record>.character-card:nth-child(4){order:10}#character-record>.character-card:nth-child(5){order:11}#character-record>.character-card:nth-child(6){order:12}
