@@ -218,3 +218,8 @@ html.game-cursor input:not([type=range]):not([type=checkbox]):not([type=radio]):
 /* 0.4.13 polish: bars fill with transform:scaleX (compositor only) instead of width. */
 .track>i,.track i{width:100%!important;transform-origin:0 50%;transition:transform .35s ease-out;will-change:transform}
 @media (prefers-reduced-motion:reduce){.track>i,.track i{transition:none}}
+
+/* 0.4.13 polish: type floor of 9px for captions and labels (the pixel font is unreadable below it). */
+.accessory small,.condition-label,.gear .condition-label,.gear-pair .condition-label,.gear-label,.gear-pair .gear-label,.categories span,.eyebrow,.detail-note,.item-tooltip .detail-note,.art-note,.map-legend,.portrait-caption,.tabs>span,.header-right small,.local,.hud-place>small,.app-version,.character-stats summary small,.inventory-tools small,.map-quest>span,.current-quest span,.service-finder #nearest-service-status,.map-page .panel-heading>#map-freshness{font-size:9px!important;letter-spacing:0}
+.accessory small{white-space:nowrap;overflow:hidden;text-overflow:clip}
+.accessory-group .accessory-caption{font-size:9px!important;letter-spacing:0;white-space:nowrap;line-height:11px}
