@@ -1,7 +1,7 @@
 {
   "name": "dfo-companion",
   "productName": "DFO Companion",
-  "version": "0.4.21",
+  "version": "0.4.22",
   "description": "Lightweight DFO Companion desktop dashboard",
   "main": "desktop/main.cjs",
   "license": "MIT",
@@ -15,7 +15,8 @@
     "start": "npm run build && electron .",
     "test": "node scripts/test.mjs",
     "dist:win": "npm run build && electron-builder --config electron-builder.cjs --win --x64 --publish never",
-    "dist:mac": "npm run build && electron-builder --config electron-builder.cjs --mac --arm64 --publish never"
+    "dist:mac": "npm run build && electron-builder --config electron-builder.cjs --mac --arm64 --publish never",
+    "test:visual": "electron scripts/test-visual.cjs"
   },
   "dependencies": {
     "electron-updater": "6.8.9"

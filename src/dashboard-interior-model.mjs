@@ -34,3 +34,13 @@ export function objectiveCameraYaw(position,goal,previous=.65){if(!position||!go
 
 // Project a short world-space facing vector through the same camera as the mesh.
 export function dungeonScreenHeading(camera,position,degrees){if(!camera||!position||!Number.isFinite(degrees))return null;const angle=degrees*Math.PI/180,a=camera.project(position),b=camera.project({x:position.x+Math.sin(angle),y:position.y,z:position.z+Math.cos(angle)}),dx=b.x-a.x,dy=b.y-a.y;if(![dx,dy].every(Number.isFinite)||Math.hypot(dx,dy)<1e-8)return null;return (Math.atan2(dx,-dy)*180/Math.PI+360)%360;}
+
+// Fit in projected camera space, including vertical extent. The projection is 2:1.
+export function fittedDungeonFrame(points,position,yaw,pitch){
+ const all=[position,...points].filter(point);if(!all.length)return {center:{x:0,y:0,z:0},span:40};
+ let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity,z0=Infinity,z1=-Infinity;
+ for(const p of all){x0=Math.min(x0,p.x);x1=Math.max(x1,p.x);y0=Math.min(y0,p.y);y1=Math.max(y1,p.y);z0=Math.min(z0,p.z);z1=Math.max(z1,p.z);}
+ const center={x:(x0+x1)/2,y:(y0+y1)/2,z:(z0+z1)/2},c=Math.cos(yaw),s=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+ let halfX=0,halfY=0;for(const p of all){const x=p.x-center.x,y=p.y-center.y,z=p.z-center.z;halfX=Math.max(halfX,Math.abs(c*x-s*z));halfY=Math.max(halfY,Math.abs(-sp*s*x+cp*y-sp*c*z));}
+ return {center,span:Math.max(40,halfX*2,halfY*4)*1.15};
+}

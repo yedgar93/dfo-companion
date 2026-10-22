@@ -70,28 +70,24 @@ if (pack && sourceDetail) {
       (event.shiftKey ? last : first)?.focus();
     }
   });
-  const copyDetail = () => content.replaceChildren(...[...sourceDetail.childNodes].map(node => node.cloneNode(true)));
-  // Existing item handlers render the full comparison first. Delegation survives
-  // their button replacement, and the original desktop interaction is untouched.
+  const detailHome = sourceDetail.parentNode;
   let originLabel = null;
-  pack.addEventListener('click', event => {
-    const item = event.target.closest('.gear,.accessory,.item');
-    if (!mobile.matches || !item || item.disabled) return;
-    originLabel = item.getAttribute('aria-label');
-    queueMicrotask(() => {
-      if (!mobile.matches) return;
-      copyDetail();
-      if (!sheet.open) sheet.showModal();
-      sheet.scrollTop = 0;
-    });
+  // The UI emits after replacing tiles and rendering details; no detached click target.
+  document.addEventListener('dfo-item-selected', () => {
+    if (!mobile.matches) return;
+    originLabel = pack.querySelector('.item.selected,.gear.selected,.accessory.selected')?.getAttribute('aria-label');
+    content.append(sourceDetail);
+    if (!sheet.open) sheet.showModal();
+    sheet.scrollTop = 0;
   });
   sheet.addEventListener('close', () => {
+    detailHome.append(sourceDetail);
     const matching = [...pack.querySelectorAll('.gear,.accessory,.item')].filter(node => node.getAttribute('aria-label') === originLabel);
     const target = matching.find(node => node.getClientRects().length);
     target?.focus({preventScroll:true});
   });
-  // Keep an open inspection current when the existing dashboard updates its data.
-  new MutationObserver(() => { if (sheet.open) copyDetail(); }).observe(sourceDetail, {childList:true, subtree:true, characterData:true});
   mobile.addEventListener('change', () => { updateView(); if (!mobile.matches && sheet.open) sheet.close(); });
+  const hud=document.querySelector('.hud');
+  if(hud)new ResizeObserver(()=>document.documentElement.style.setProperty('--hud-h',hud.getBoundingClientRect().height+'px')).observe(hud);
   updateView();
 }

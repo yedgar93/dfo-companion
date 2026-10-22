@@ -55,6 +55,14 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      - name: Check desktop and phone layouts with isolated fixtures
+        run: npm run test:visual
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visual-${{ matrix.platform }}
+          path: visual-results/*.png
+          if-no-files-found: ignore
       - name: Build Electron app
         run: npm run dist:${{ matrix.platform }}
         env:

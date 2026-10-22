@@ -135,3 +135,40 @@
   .quiet-alerts{bottom:calc(var(--phone-bar) + 8px)!important;top:auto!important;left:8px!important;transform:none!important;max-width:calc(100vw - 16px)!important;white-space:normal!important;max-height:none!important}
   .connection-toast{left:var(--sp-4);right:var(--sp-4);max-width:none;bottom:calc(var(--phone-bar) + 10px)}
 }
+
+/* 0.4.22 mobile presentation: room for content and usable touch controls. */
+@media(max-width:800px){
+ #character-record{display:flex!important;flex-direction:column}.character-column{width:100%}
+ .character-card>summary{min-height:44px;font-size:16px}.character-card h3{font-size:16px}
+ .character-card .character-row{font-size:14px!important}.character-card p{font-size:14px}
+ .character-card summary,.ui-disclosure>summary{min-height:44px;line-height:1.5;padding:10px 0}
+ .connection-overview{grid-template-columns:1fr}.connection-overview #phone-panel[hidden]{display:none}
+ .category-select-label{display:flex;align-items:center;gap:10px;font-size:14px}.category-select-label select{flex:1;min-height:44px;font-size:16px}
+ #categories{display:none}.inventory-tools{display:flex;flex-wrap:wrap;gap:6px}.inventory-tools select{min-height:44px;font-size:14px;max-width:100%}
+ .inventory-tools small{display:none}.inventory-layout-label{font-size:14px}
+ #inventory-items[data-layout=list]{overflow:visible}#inventory-items[data-layout=list]>.item{min-height:100px}
+ #inventory-items[data-layout=list] .item-name{font-size:16px}#inventory-items[data-layout=list] .item-list-meta,#inventory-items[data-layout=list] .item-list-bonus,#inventory-items[data-layout=list] .item-list-verdict{font-size:14px}
+ .mobile-item-sheet #item-detail{display:block;overflow:visible;max-height:none;padding:0;margin:0}
+ .inventory-panel>#item-detail{display:none}
+ .mobile-item-sheet .detail-head h3{font-size:21px}.mobile-item-sheet .gear-comparison p{font-size:15px}.mobile-item-sheet .comparison-gain,.mobile-item-sheet .comparison-loss{display:block}
+ .map-toolbar{gap:6px}.map-camera-controls{display:flex;flex-wrap:wrap;gap:4px}.map-toolbar button{min-height:44px;font-size:14px;padding:7px 10px}
+ .map-floor-controls{gap:4px}.map-floor-controls button{min-height:44px;font-size:13px}
+ .map-stage{aspect-ratio:2/1;min-height:180px}.map-gestures{font-size:13px}
+ .map-quest-disclosure{overflow:visible}.map-quest-disclosure .map-quest{padding:0}.map-quest-disclosure>summary{font-size:16px}
+ .map-area-controls .map-switch{display:flex;width:auto}.map-area-controls .map-switch button{min-height:44px;font-size:14px;padding:8px}
+ .map-legend #map-scope{font-size:12px!important;line-height:1.5}
+ body.map-expanded #map{inset:0;padding:10px;padding-bottom:max(10px,env(safe-area-inset-bottom))}
+ body.map-expanded .map-stage{min-height:0;flex:1}body.map-expanded .map-location,body.map-expanded .map-legend{display:none}
+ .quest-toggle{display:block;min-height:44px;font-size:14px}
+ #current-quest:not(.quest-expanded) .quest-now,#current-quest:not(.quest-expanded) .quest-actions,#current-quest:not(.quest-expanded) #current-quest-clock-hint{display:none}
+ .current-quest{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:8px}
+ .current-quest .quest-now,.current-quest .quest-actions{grid-column:1/-1}
+ .mobile-pack-nav{top:var(--hud-h,110px);scroll-margin-top:var(--hud-h,110px)}
+ .tabs>button{font-size:12px!important}.tabs button #inventory-count,.tabs button #quest-count{font-size:10px!important}
+ .hud .eyebrow .brand-icon,.hud .eyebrow>span{display:none}.hud .eyebrow{position:absolute;right:8px;top:6px}
+ .hud{padding-top:8px;padding-bottom:6px;gap:4px 8px}.hud h1{font-size:18px;max-width:56vw}.hud-place>strong{max-width:33vw;font-size:13px}
+ .hud .connection #freshness{width:auto;display:inline!important;margin-left:5px;font-size:10px}
+ .hud .vitals strong{font-size:11px}.hud .vitals article span{font-size:11px}.hud #character-meta{font-size:11px;margin:0}
+ html{scroll-padding-top:calc(var(--hud-h,110px) + 8px)}
+ .coverage-note{font-size:13px!important}
+}
