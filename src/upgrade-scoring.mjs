@@ -17,6 +17,7 @@ const PLATE_ARMOR_VALUES=[7,9,9,11,13,15,15,17,19,21];
 const SHIELD_VALUES={109:1,110:2,111:3,112:4};
 const SHIELD_PARTS={109:[2,4],110:[2,4,5],111:[2,4,5],112:[0,2,4,5]};
 // Template -> body part (DFU ItemEquipTable / DFO equip.js armorBodyParts): cuirass, gauntlets, greaves, left/right pauldron, helm, boots.
+const FOOTWEAR=new Set([147,148,149,186,187,188]);
 const ARMOR_PART={102:3,103:4,104:5,105:2,106:1,107:0,108:6};
 const CUSTOM_ARMOR_PART={515:3,516:5,517:2,518:1,519:6,520:3,521:5,522:0,523:6,524:4,525:2,526:1};
 // Reference foe for hit chance (an assumption, stated in every reason): a monster with DFU ArmorValue 5 on the
@@ -83,10 +84,17 @@ export function weaponScore(item,context={}){
 /** Armour on each body part, in DFU's doll units scaled to hit-chance points: material/shield value *5 plus armour-affix points
  *  (DFO lootRarity.js affixFold: 'armor' points off the chance to land on the piece's own parts). */
 export function armorParts(item){
- const parts=new Array(7).fill(0);if(item?.group!=='Armor')return {known:true,parts};
+ const parts=new Array(7).fill(0);
+ // DFO equip.js updateEquippedArmorValues: clothing Shoes/Tall boots/Boots (147-149, 186-188) count as leather (3) on the
+ // feet; sandals (150, 189) and all other clothing give nothing.
+ if(FOOTWEAR.has(item?.templateIndex)&&(item.group==='MensClothing'||item.group==='WomensClothing')){parts[6]=3*5;return {known:true,parts};}
+ if(item?.group!=='Armor')return {known:true,parts};
  const t=item.templateIndex,shield=SHIELD_VALUES[t];let value=null,covered=null;
  if(shield){value=shield;covered=SHIELD_PARTS[t];}
  else{covered=fin(ARMOR_PART[t])?[ARMOR_PART[t]]:fin(CUSTOM_ARMOR_PART[t])?[CUSTOM_ARMOR_PART[t]]:null;
+  // Non-shield armour artifacts are halved (armorMaterials.js itemArmorValue, DFU :1054-1056). The snapshot only says
+  // "special" (artifact, legendary, aetheric or sigil), so a special non-shield piece is unknown rather than guessed.
+  if(item.special)return {known:false,parts,missing:['special armour rating (artifacts are halved)']};
   if(fin(item.displayStats?.baseArmour))value=item.displayStats.baseArmour;
   else if(t<512&&fin(item.material)&&!item.special){const m=item.material;value=m===0?3:m===0x100||m===0x103?6:m>=0x200&&m<=0x209?PLATE_ARMOR_VALUES[m-0x200]:null;}}
  if(!covered||value===null)return {known:false,parts,missing:['armour value or body part']};
@@ -119,3 +127,25 @@ export function enchantmentValue(items,profile){
  }
  return {value,unknown};
 }
+
+// MAGIC.DEF enchantment types (DFO formats/magicDef.js:23-28) that phase 1 scores; any other type is "?".
+export const ENCHANT={IncreasedWeightAllowance:7,StrengthensArmor:12,WeakensArmor:24};
+const HANDLED=new Set(Object.values(ENCHANT));
+const has=(i,type)=>(i?.enchantmentTypes??[]).some(e=>e.type===type);
+/** Set-level enchantment effects of swapping `incoming` for `removed` within `worn`.
+ *  StrengthensArmor: -5 on every body part's armour value, which does not stack (enchantments.js:131-133 keeps the
+ *  lowest), so it is worth 5 hit-chance points on every blow only when nothing else worn already has it.
+ *  WeakensArmor: inert - its setter (enchantments.js:134-136) only accepts amounts below the zeroed channel, matching
+ *  DFU, so it never applies. IncreasedWeightAllowance: +25% (param 0) or +50% (param 1), highest only. */
+export function setEnchantments(incoming,removed,worn){
+ const rest=worn.filter(i=>!removed.includes(i)),unknown=[],notes=[];
+ for(const i of [incoming,...removed]){const list=i?.enchantmentTypes;if(!list)continue;for(const e of list)if(!fin(e.type)||!HANDLED.has(e.type))unknown.push('an enchantment type that is not scored yet');}
+ const before=[...rest,...removed].some(i=>has(i,ENCHANT.StrengthensArmor)),after=[...rest,incoming].some(i=>has(i,ENCHANT.StrengthensArmor));
+ const armor=(after?5:0)-(before?5:0);
+ if(has(incoming,ENCHANT.StrengthensArmor)&&before&&after)notes.push('Strengthens Armor does not stack with the one you already wear.');
+ if(has(incoming,ENCHANT.WeakensArmor))notes.push('Weakens Armor has no effect in the game (bug kept from Daggerfall Unity).');
+ const allowance=set=>Math.max(0,...set.flatMap(i=>(i?.enchantmentTypes??[]).filter(e=>e.type===ENCHANT.IncreasedWeightAllowance).map(e=>e.param===1?50:25)));
+ const carry=allowance([...rest,incoming])-allowance([...rest,...removed]);
+ return {armor,carry,unknown,notes};
+}
+export const isArmourPiece=i=>i?.group==='Armor'||(FOOTWEAR.has(i?.templateIndex)&&(i.group==='MensClothing'||i.group==='WomensClothing'));

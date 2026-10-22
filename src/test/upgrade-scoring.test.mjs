@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {inferProfile,weaponScore,armorParts,armorProtection,damageModifier,enchantmentValue} from '../upgrade-scoring.mjs';
+import {inferProfile,weaponScore,armorParts,armorProtection,damageModifier,enchantmentValue,setEnchantments,ENCHANT} from '../upgrade-scoring.mjs';
 import {compareEquipment,comparisonIndicator,bestInPack} from '../dashboard-items.mjs';
 const SKILLS=['Medical','Etiquette','Streetwise','Jumping','Orcish','Harpy','Giantish','Dragonish','Nymph','Daedric','Spriggan','Centaurian','Impish','Lockpicking','Mercantile','Pickpocket','Stealth','Swimming','Climbing','Backstabbing','Dodging','Running','Destruction','Restoration','Illusion','Alteration','Thaumaturgy','Mysticism','Short Blade','Long Blade','Hand-to-Hand','Axe','Blunt Weapon','Archery','Critical Strike'];
 const skills=(over={})=>SKILLS.map(name=>({name,display:over[name]??10}));
@@ -32,3 +32,18 @@ test('minor enchantment losses for this build do not block green; unknown enchan
  const odd=armour({index:8,material:0x201,displayStats:{baseArmour:9},affixes:[{id:'mystery',value:3}]}),u=compareEquipment(odd,[old,odd],context());assert.equal(comparisonIndicator(u).kind,'unknown');assert.match(u.reason,/^Can't judge yet/);
  assert.equal(enchantmentValue([{affixes:[{id:'stat',param:'strength',value:-4}]}],inferProfile(context())).value,-4);});
 test('best in pack picks the largest gain per slot',()=>{const old=weapon({index:0,equipSlot:19,name:'Old'}),a=weapon({index:1,name:'Good',displayStats:{damage:{min:4,max:18},hands:'One-handed'}}),b=weapon({index:2,name:'Best',displayStats:{damage:{min:6,max:20},hands:'One-handed'}}),all=[old,a,b],ctx=context(),best=bestInPack([a,b].map(item=>({item,comparison:compareEquipment(item,all,ctx,19)})));assert.equal(best.get(19).item.name,'Best');});
+
+test('material adds its flat modifier once per hit: the shown range is base plus material, never doubled or dropped',()=>{// Iron longsword: template base 2..16, Iron -1, shown 1..15 (item-details: storedStats + modifier, like DFO weaponDamageRange).
+ const iron=weaponScore(weapon({material:0,displayStats:{damage:{min:1,max:15},hands:'One-handed'}}),context()),steel=weaponScore(weapon(),context());
+ assert.equal(steel.expectedDamage-iron.expectedDamage,1);// exactly one Iron->Steel step of damage
+ assert.equal(Math.round((steel.hitChance-iron.hitChance)*100),10);// and material*10 to hit
+});
+test('Critical Strike raises hit chance only, never damage',()=>{const a=weaponScore(weapon(),context()),b=weaponScore(weapon(),context({skills:skills({'Long Blade':50,'Axe':30,'Short Blade':15,'Critical Strike':40})}));assert.equal(a.expectedDamage,b.expectedDamage);assert(b.hitChance>a.hitChance);});
+test('clothing boots count as leather on the feet; sandals and special non-shield armour do not get a guessed value',()=>{assert.equal(armorParts({group:'MensClothing',templateIndex:148}).parts[6],15);assert.equal(armorParts({group:'WomensClothing',templateIndex:186}).parts[6],15);assert.deepEqual(armorParts({group:'MensClothing',templateIndex:150}).parts,[0,0,0,0,0,0,0]);assert.equal(armorParts(armour({special:true})).known,false);assert.equal(armorParts(armour({special:true,templateIndex:111,material:0})).known,true);});
+test('Strengthens Armor is worth 5 points on every blow and does not stack; Weakens Armor is inert',()=>{const ring=(t,extra={})=>({index:20,name:'Ring',group:'Jewellery',templateIndex:135,equipSlot:null,identified:true,magicKnown:true,enchantmentCount:1,enchantmentTypes:[{type:t,param:0}],special:false,condition:{current:100,max:100},affixes:[],...extra});
+ assert.equal(setEnchantments(ring(ENCHANT.StrengthensArmor),[],[]).armor,5);
+ const wornRing=ring(ENCHANT.StrengthensArmor,{index:21,equipSlot:4});assert.equal(setEnchantments(ring(ENCHANT.StrengthensArmor),[],[wornRing]).armor,0);
+ assert.equal(setEnchantments(ring(ENCHANT.WeakensArmor),[],[]).armor,0);
+ const c=compareEquipment(ring(ENCHANT.StrengthensArmor),[ring(ENCHANT.StrengthensArmor)],context());assert(c.gains.some(g=>g.includes('Strengthens Armor')));
+ assert.equal(setEnchantments(ring(ENCHANT.IncreasedWeightAllowance,{enchantmentTypes:[{type:7,param:1}]}),[],[ring(7,{index:22,equipSlot:5})]).carry,25);// 50% replaces 25%, highest only
+ assert.deepEqual(setEnchantments(ring(99),[],[]).unknown.length,1);});
