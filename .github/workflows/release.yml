@@ -2,6 +2,7 @@ name: Build and release desktop apps
 on:
   push:
     branches: [main]
+    tags: ['v*']
   pull_request:
   workflow_dispatch:
 permissions:
@@ -76,11 +77,15 @@ jobs:
             dist/latest*.yml
   release:
     needs: [plan, build]
-    if: needs.plan.outputs.release == 'true' && github.ref == 'refs/heads/main'
+    if: needs.plan.outputs.release == 'true' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - uses: actions/download-artifact@v4
         with:
           pattern: desktop-*
@@ -90,11 +95,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ needs.plan.outputs.version }}
+          UPDATE_SIGNING_KEY: ${{ secrets.UPDATE_SIGNING_KEY }}
         shell: bash
         run: |
           test -n "$(find release -maxdepth 1 -name '*.exe' -print -quit)"
           test -n "$(find release -maxdepth 1 -name '*.dmg' -print -quit)"
           test -n "$(find release -maxdepth 1 -name '*.zip' -print -quit)"
+          node scripts/sign-release.mjs release
           cd release
           sha256sum ./* > SHA256SUMS.txt
           gh release create "v$VERSION" ./* --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "DFO Companion $VERSION" --notes "Windows and Apple Silicon Mac Electron apps. Mac builds use local ad-hoc signing until Developer ID credentials are configured. Automatic Mac installation of updates requires Developer ID signing."

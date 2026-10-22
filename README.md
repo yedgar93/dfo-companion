@@ -8,7 +8,7 @@ The dashboard reuses bounded idle-time snapshots. UI actions, maps, service sear
 
 Get the latest Windows installer or Mac app from [Releases](https://github.com/yedgar93/dfo-companion/releases). Both include Electron and the Daggerfall app icon; a separate Node installation is not needed.
 
-Mac builds are ad-hoc signed until Apple Developer signing credentials are configured. Use macOS's normal Open Anyway flow if prompted. Automatic Mac installation of updates is unavailable until a consistent Developer ID signature is configured; update checks can still link to downloads.
+Mac builds use free ad-hoc signing in GitHub Actions. No paid Apple account is required. The first installation may need macOS's normal Open Anyway confirmation.
 
 ## Development
 
@@ -23,7 +23,7 @@ Install Node 22.15 or newer, clone the repository, then run `npm ci` and `npm st
 
 Every push to main runs tests and packages both platforms in GitHub Actions. Increment `version` in `package.json` for a new release. When both platform jobs pass, the workflow publishes that version and its update metadata. A push with the same version only creates workflow artifacts; it never overwrites an existing release.
 
-The app checks GitHub Releases after startup and every six hours. Checks and downloads never read the game. Choose **Download update** in the app menu when convenient; a downloaded supported update installs when you quit the companion. The game stays running. See [release setup](docs/RELEASING.md) for signing secrets and limitations.
+The app checks GitHub Releases after startup and every five minutes. New versions download automatically, replace the installed app, remove the old copy, and reopen the companion without taking game focus. Checks and downloads never read or restart DFO. Mac releases are verified against an Ed25519 public key embedded in the app; the private release-signing key is encrypted in GitHub Actions secrets. Windows uses the NSIS updater. Closing the companion normally stops its reader and leaves it closed. See [release setup](docs/RELEASING.md).
 
 ## Scope
 

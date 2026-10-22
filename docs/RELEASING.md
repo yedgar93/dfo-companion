@@ -1,17 +1,13 @@
 # Release setup
 
-The public release feed is `yedgar93/dfo-companion` on GitHub. The Actions workflow requires only its scoped `GITHUB_TOKEN` for ordinary build artifacts and releases. No GitHub token is embedded in the app.
+GitHub Actions builds Windows and Apple Silicon Mac apps on every push to main. Increase package.json version for a new release. Both jobs must pass before a complete release and its update metadata are published. Existing releases are never overwritten.
 
-For signed, notarized Mac builds add these repository Actions secrets:
+No paid Apple account is required. The Mac runner applies a free ad-hoc signature. Every release also includes an Ed25519-signed manifest containing artifact names, sizes and SHA-256 hashes. The app pins the public verification key in `assets/update-public-key.json`; `UPDATE_SIGNING_KEY` is encrypted in repository Actions secrets. Never rotate that key without a migration release trusted by the old key.
 
-- `MAC_CSC_LINK`: base64 Apple Developer ID Application certificate (.p12)
-- `MAC_CSC_KEY_PASSWORD`: certificate password
-- `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`: notarization account
+Mac updates verify the release signature and ZIP hash, download in the background, stop only the companion, verify the unpacked app identity/version and macOS signature, replace the installed app atomically, delete the old app, and reopen the new one without taking game focus. Install into a writable Applications folder such as ~/Applications. Windows uses electron-updater with the NSIS installer. DFO is never restarted.
 
-For Windows signing optionally add `WIN_CSC_LINK` and `WIN_CSC_KEY_PASSWORD`.
+The companion checks once after startup and every five minutes. A normal window close quits its reader too. During an automatic update a short-lived installer may run after the window closes; it exits after replacement and relaunch.
 
-Without Apple credentials, Mac builds are ad-hoc signed and distributed for manual installation; the app checks for releases and opens their download page, but never attempts an unsupported automatic Mac installation. Windows NSIS updates support download and install-on-companion-quit. No update restarts or sends commands to DFO.
+For a release, increment `version` in package.json, commit and push main (or push its matching vX.Y.Z tag). Download one repository release once to replace the earlier manually assembled test app. Subsequent versions update themselves.
 
-Change package.json version (for example 0.4.0 to 0.4.1), commit, and push main. The first successful push of a version publishes a release only after Windows and Mac builds both pass. Ordinary commits on that version upload workflow artifacts without altering its published release. Release metadata is published with the complete set of installers, ZIPs, DMGs, hashes and blockmaps.
-
-The local manually assembled Mac package used before this repository is not an automatic-update-capable installation. Install one repository release once to switch to the managed update channel.
+Optional Apple Developer/Windows signing credentials are supported by the build config, but are not required for the free update path. Do not embed repository tokens, private keys, game archives or character caches in the app.
