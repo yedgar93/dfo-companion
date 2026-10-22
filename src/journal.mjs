@@ -1,7 +1,20 @@
 // Reads only notebook entries and messages already entered in the quest log.
 // Never enumerates future task/message text or unrelated quest resources.
-export function copyKnownJournal(manager){
+// cache (optional, owned by the caller's snapshot container): a cheap signature built from
+// fields this copy already reads (quest count, log sizes, notebook lengths). An unchanged
+// signature reuses the last copy; cache.force, or every 20th call, copies anyway.
+export function copyKnownJournal(manager,cache){
  const own=(o,k)=>{const d=o&&typeof o==='object'?Object.getOwnPropertyDescriptor(o,k):null;return d&&'value'in d?d.value:undefined;};
+ if(cache&&typeof cache==='object'){
+  const nb=own(manager,'notebook'),qs=own(own(manager,'machine'),'quests'),parts=[qs instanceof Map?qs.size:-1];
+  if(qs instanceof Map){let n=0;for(const q of qs.values()){if(++n>64)break;const l=own(q,'activeLogMessages');parts.push(String(own(q,'uid')??'')+':'+(l instanceof Map?l.size:-1)+(own(q,'questComplete')===true?'c':''));}}
+  for(const k of ['notes','finishedQuests']){const v=own(nb,k);parts.push(Array.isArray(v)?v.length:-1);}
+  const signature=parts.join('|');cache.calls=(cache.calls??0)+1;
+  if(cache.value&&!cache.force&&cache.signature===signature&&cache.calls<20){cache.reused=(cache.reused??0)+1;cache.lastReused=true;return cache.value;}
+  const value=copyNow.call(this,manager);cache.value=value;cache.signature=signature;cache.calls=0;cache.force=false;cache.lastReused=false;return value;
+ }
+ return copyNow.call(this,manager);
+ function copyNow(manager){
  const clean=v=>typeof v==='string'?v.slice(0,16000):null;
  const rows=tokens=>(Array.isArray(tokens)?tokens:[]).slice(0,1024).map(t=>typeof t==='string'?t:own(t,'text')||(['nothing','center','newline',0].includes(own(t,'formatting'))?'\n':'')).join('');
  const notebook=own(manager,'notebook'),quests=own(own(manager,'machine'),'quests'),active=[];
@@ -26,6 +39,7 @@ export function copyKnownJournal(manager){
  const copyList=key=>(own(notebook,key)??[]).slice(0,128).map(tokens=>clean(rows(tokens)));
  const truncated=(quests instanceof Map&&quests.size>64)||active.some(q=>q.entries.length>=32)||['notes','finishedQuests'].some(k=>Array.isArray(own(notebook,k))&&own(notebook,k).length>128);
  return {available:!!notebook||quests instanceof Map,truncated,active,notes:copyList('notes'),finished:copyList('finishedQuests'),scope:'Recorded quest-log messages, notebook and completed journal entries only. Locations come only from macros in those messages; no hidden objectives or future quest scripts.'};
+ }
 }
 
 // Same public clock eligibility predicate used by the reviewed quest-log UI.

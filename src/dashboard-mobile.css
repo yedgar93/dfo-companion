@@ -96,3 +96,10 @@
   .accessories{grid-template-columns:repeat(8,minmax(0,1fr))}
   .categories{grid-template-columns:repeat(5,minmax(0,1fr))}
 }
+/* Slim phone view: the brief (name, status, vitals) plus the quest card only. */
+@media (max-width:800px){
+  body.phone-brief .tabs,body.phone-brief .page,body.phone-brief footer,body.phone-brief .quiet-alerts:not(.since-feed){display:none!important}
+  body.phone-brief main>#current-quest{display:grid}
+  .phone-brief-toggle{position:fixed;right:10px;bottom:10px;z-index:70;min-height:44px;padding:0 14px;background:#293428;color:#eee5ca;border:1px solid #baaa70;font:inherit}
+}
+@media (min-width:801px){.phone-brief-toggle{display:none}}

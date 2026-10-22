@@ -31,3 +31,8 @@ identified above. Reviewed installed-source fingerprints are recorded separately
 Original game assets and extracted bundles are not redistributed in this package.
 
 Local pairing QR encoding uses qrcode-generator1.4.4, Copyright (c) 2009 Kazuhiko Arase, MIT License. The complete notice is embedded as dashboard-qr-LICENSE.txt. No external QR service is used.
+
+
+Jacquard 12 font (desktop/fonts/Jacquard12-Regular.ttf)
+Copyright 2023 The Soft Type Project Authors (https://github.com/scfried/soft-type-jacquard)
+Licensed under the SIL Open Font License, Version 1.1. Full text: desktop/fonts/OFL.txt

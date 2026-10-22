@@ -6,6 +6,7 @@ const {publicKey}=require('./update-public-key.json');
 const fileSystem=require('node:fs');
 const {setupUpdates}=require('./updates.cjs');
 const build=require('./build.json');
+const {showAbout}=require('./about.cjs');
 app.setName('DFO Companion');
 let window,helper,updates,quitting=false,shutdownStarted=false,shutdownDone=false;
 const restartFlag=path.join(app.getPath('userData'),'restart-in-background');
@@ -38,7 +39,7 @@ else{
   ipcMain.handle('dfo:version',event=>event.sender===window?.webContents?app.getVersion():null);
   ipcMain.handle('dfo:check-for-updates',event=>{if(event.sender!==window?.webContents)return false;void updates?.check(true);return true;});
   if(app.dock)app.dock.setIcon(nativeImage.createFromPath(path.join(__dirname,'icon.png')));
-  const updateMenu=()=>{const state=updates?.state;Menu.setApplicationMenu(Menu.buildFromTemplate([{label:'DFO Companion',submenu:[{label:'About DFO Companion',click:()=>dialog.showMessageBox({type:'info',title:'DFO Companion',message:build.label,detail:'Build '+build.id})},{type:'separator'},{label:state==='ready'?'Install downloaded update…':state==='available'?'Download update…':state==='downloading'?'Downloading update…':'Check for updates…',enabled:state!=='checking'&&state!=='downloading',click:()=>state==='ready'?updates.install():state==='available'?void updates.download():void updates.check(true)},{label:'Choose artwork folder manually…',click:()=>void locateArtwork()},{role:'quit'}]},{role:'editMenu'},{label:'View',submenu:[{role:'reload'},{role:'togglefullscreen'}]},{role:'windowMenu'}]));};
+  const updateMenu=()=>{const state=updates?.state;Menu.setApplicationMenu(Menu.buildFromTemplate([{label:'DFO Companion',submenu:[{label:'About DFO Companion',click:()=>showAbout(BrowserWindow,build,window&&!window.isDestroyed()?window:null)},{type:'separator'},{label:state==='ready'?'Install downloaded update…':state==='available'?'Download update…':state==='downloading'?'Downloading update…':'Check for updates…',enabled:state!=='checking'&&state!=='downloading',click:()=>state==='ready'?updates.install():state==='available'?void updates.download():void updates.check(true)},{label:'Choose artwork folder manually…',click:()=>void locateArtwork()},{role:'quit'}]},{role:'editMenu'},{label:'View',submenu:[{role:'reload'},{role:'togglefullscreen'}]},{role:'windowMenu'}]));};
   updates=setupUpdates({app,updater:process.platform==='darwin'?new MacReleaseUpdater({app,publicKey}):autoUpdater,beforeRestart:()=>{saveWindow();fileSystem.mkdirSync(path.dirname(restartFlag),{recursive:true});fileSystem.writeFileSync(restartFlag,'1');},dialog,shell:require('electron').shell,build,onStatus:status=>{updateStatus=status;updateMenu();showUpdateStatus();}});updateMenu();
   helper=utilityProcess.fork(path.join(__dirname,'service.mjs'),[],{serviceName:'DFO Companion data service',stdio:'pipe',env:{...process.env,DFO_COMPANION_ART_CONFIG:artworkConfig}});
   let ready=false;const deadline=setTimeout(()=>fail('The companion helper took too long to start.'),20000);

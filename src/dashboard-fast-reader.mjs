@@ -11,16 +11,20 @@ import {readNavigationScope} from './navigation.mjs';
 export function copyFastDashboard(readOwn,readTracker,readJournal,readPose,coreOnly=false){
  if(location.protocol!=='dagger:'||location.host!=='game'||location.pathname!=='/play/index.html')return {available:false,reason:'PAGE_CHANGED'};
  if(!this.canvas?.isConnected||document.querySelector('#c')!==this.canvas)return {available:false,reason:'GAME_CANVAS_UNAVAILABLE'};
+ // Location-change guard: for a few seconds after a scene change only pose and vitals are copied.
+ const deferred=!coreOnly&&!!this.lastFullPlayer&&this.deferUntil>performance.now();if(deferred)coreOnly=true;const lanes={};let laneAt=performance.now();const lane=k=>{const t=performance.now();lanes[k]=t-laneAt;laneAt=t;};
  const started=performance.now(),p=coreOnly&&this.lastFullPlayer?this.copyLightPlayer(this.player,this.lastFullPlayer):readOwn(this.player,true);
- if(!p?.available)return p;
- if(!coreOnly&&this.tracker)p.questTracker=readTracker.call(this.tracker);
- if(!coreOnly&&this.manager)p.journal=readJournal.call(this.player,this.manager);if(!coreOnly)this.lastFullPlayer=p;p.dashboardCoreOnly=coreOnly;
+ if(!p?.available)return p;lane(coreOnly?'core':'own');
+ if(!coreOnly&&this.tracker){p.questTracker=readTracker.call(this.tracker);lane('tracker');}
+ if(!coreOnly&&this.manager){p.journal=readJournal.call(this.player,this.manager,this.journalCache??={});p.dashboardJournalReused=this.journalCache.lastReused===true;lane('journal');}if(!coreOnly)this.lastFullPlayer=p;p.dashboardCoreOnly=coreOnly;
  if(this.motor&&this.camera&&this.world&&this.modes){
   let loc=readPose.call({W:this.motor,U:this.camera,H:this.world,$:this.modes,gb:this.place});if(loc?.mode==='exterior'&&this.exteriorMotor)loc=readPose.call({W:this.exteriorMotor,U:this.exteriorCamera,H:this.world,$:this.modes,gb:this.place});
   const changed=loc?.mode!==this.mode||(loc?.mode!=='exterior'&&(loc?.mapPixel?.x!==this.pixelX||loc?.mapPixel?.y!==this.pixelY))||loc?.place?.buildingKey!==this.buildingKey||loc?.place?.dungeonName!==this.dungeonName;
+  if(loc?.available){const scene=[loc.mode,loc.mapPixel?.x,loc.mapPixel?.y,loc.place?.buildingKey,loc.place?.dungeonName].join('|');if(this.sceneKey!==undefined&&scene!==this.sceneKey){this.deferUntil=performance.now()+3000;if(this.journalCache)this.journalCache.force=true;}this.sceneKey=scene;}
   if(loc?.available){if(loc.mode==='exterior'&&(loc.mapPixel?.x!==this.pixelX||loc.mapPixel?.y!==this.pixelY))loc.place={...loc.place,name:null,regionName:null,locationIndex:null};this.currentLocation=loc;p.dashboardPose={capturedAt:new Date().toISOString(),location:loc,town:this.tiles?this.copyTownPose.call(this.tiles,loc):null};}
   else {p.dashboardPose=null;}
  }
+ lane('pose');const waitMs=(this.deferUntil??0)-performance.now();p.dashboardDeferred=waitMs>0?{until:new Date(Date.now()+waitMs).toISOString(),panels:['details','quests']}:null;p.dashboardLaneMs=lanes;
  p.dashboardDungeonNeedsReference=this.dungeonNeedsReference===true;p.dashboardDungeonCost=this.dungeonDiagnostics?.copyMs??null;this.lastCorePose=p.dashboardPose??null;p.dashboardCopyMs=performance.now()-started;
  return p;
 }
@@ -65,7 +69,7 @@ export function startIdleSnapshots(state,read,bindingName){
  let stopped=false,interval=500,average=0,slow=0,healthy=0,lastDetails=state.incrementalDetails?performance.now():null,lastDetailsAt=state.detailsAt??null,lastCost=null;
  const alive=()=>!stopped&&globalThis[bindingName]===emit&&state.canvas?.isConnected;
  const schedule=(delay=interval)=>{if(alive())setTimeout(()=>{if(alive())requestIdleCallback(run);},delay);};
- function run(deadline){if(!alive())return;state.idleDiagnostics.runs++;state.idleDiagnostics.budget=deadline.timeRemaining();const now=performance.now(),detailsDue=lastDetails===null||now-lastDetails>=4000,canDetail=!state.incrementalDetails&&detailsDue&&deadline.timeRemaining()>=2;
+ function run(deadline){if(!alive())return;state.idleDiagnostics.runs++;state.idleDiagnostics.budget=deadline.timeRemaining();const now=performance.now(),detailsDue=lastDetails===null||now-lastDetails>=4000,canDetail=!state.incrementalDetails&&detailsDue&&!(state.deferUntil>now)&&deadline.timeRemaining()>=2;
   if(deadline.timeRemaining()<.5||(lastDetails===null&&!canDetail)){schedule(100);return;}
   try{const start=performance.now(),value=read(!canDetail);if(!value.available&&!['PAGE_CHANGED','GAME_CANVAS_UNAVAILABLE'].includes(value.reason))value.reason='IDLE_READER_WAITING';if(canDetail&&value.available){lastDetails=now;lastDetailsAt=new Date().toISOString();}value.dashboardCoreOnly=!canDetail;value.dashboardDetailsAt=state.detailsAt??lastDetailsAt;value.dashboardCapturedAt=new Date().toISOString();value.dashboardPerformance={mode:interval>500?'protecting':'normal',intervalMs:interval,detailsIntervalMs:4000,copyMs:lastCost,averageCopyMs:average,slowSamples:slow,lane:canDetail?'details':'position and vitals'};const payload=JSON.stringify(value);emit(payload);const cost=performance.now()-start;lastCost=cost;average=average?average*.8+cost*.2:cost;if(cost>2){slow++;healthy=0;interval=Math.min(4000,interval*2);}else if(cost<.5&&++healthy>=8){interval=Math.max(500,Math.round(interval*.75));healthy=0;}if(!value.available&&['PAGE_CHANGED','GAME_CANVAS_UNAVAILABLE'].includes(value.reason))stopped=true;state.idleDiagnostics.error=null;
   }catch(error){state.idleDiagnostics.error=String(error?.message??error).slice(0,160);emit(JSON.stringify({available:false,reason:'IDLE_READER_WAITING'}));}schedule();
@@ -117,12 +121,12 @@ export function startIdleDetailUpdates(state,readOwn,readTracker,readJournal,bin
  if(typeof emit!=='function'||typeof requestIdleCallback!=='function')return;
  let phase=0,detail=null,index=0,batch=8,lastCost=0;
  const schedule=delay=>{if(alive())setTimeout(()=>{if(alive())requestIdleCallback(run);},delay);};
- function run(deadline){if(!alive())return;if(deadline.timeRemaining()<.75){schedule(50);return;}
+ function run(deadline){if(!alive())return;if(deadline.timeRemaining()<.75){schedule(50);return;}if(state.deferUntil>performance.now()){schedule(500);return;}
   try{const start=performance.now();
    if(phase===0){detail=readOwn(state.player,true,{section:'base'});if(!detail?.available){schedule(250);return;}detail.inventory.items=[];index=0;phase=1;}
    else if(phase===1){const part=readOwn(state.player,true,{section:'items',start:index,end:index+batch});if(!part.available)throw Error('Player unavailable');detail.inventory.available=part.inventory.available;detail.inventory.truncated=part.inventory.truncated;detail.inventory.items.push(...part.inventory.items);index+=batch;if(index>=part.total)phase=2;}
    else if(phase===2){if(state.tracker)detail.questTracker=readTracker.call(state.tracker);phase=3;}
-   else if(phase===3){if(state.manager)detail.journal=readJournal.call(state.player,state.manager);phase=4;}
+   else if(phase===3){if(state.manager)detail.journal=readJournal.call(state.player,state.manager,state.journalCache??={});phase=4;}
    else {state.detailsAt=new Date().toISOString();state.lastFullPlayer=detail;detail.dashboardDetailsAt=state.detailsAt;detail.dashboardCapturedAt=state.detailsAt;detail.dashboardCoreOnly=false;detail.dashboardPose=state.lastCorePose??null;detail.dashboardPerformance={mode:'idle slices',intervalMs:500,detailsIntervalMs:4000,copyMs:lastCost,lane:'details'};emit(JSON.stringify(detail));phase=0;}
    lastCost=performance.now()-start;if(lastCost>1&&batch>1)batch=Math.max(1,Math.floor(batch/2));state.detailDiagnostics={phase,lastCost,batch};
   }catch(error){phase=0;state.detailDiagnostics={error:String(error?.message??error).slice(0,120)};}
