@@ -1,15 +1,78 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {createRequire} from 'node:module';
-const {restoreBounds,captureState,normalizeState}=createRequire(import.meta.url)('../desktop/window-state.cjs');
-const primary={id:1,workArea:{x:0,y:0,width:1920,height:1040}},second={id:2,workArea:{x:-1600,y:0,width:1600,height:900}},displays=[second,primary];
-test('window returns to a second monitor, including negative coordinates',()=>{const b={x:-1500,y:40,width:1000,height:800};assert.deepEqual(restoreBounds({bounds:b,displayId:2},displays,primary),b);});
-test('legacy bare bounds still restore',()=>{const b={x:-1500,y:40,width:1000,height:800};assert.deepEqual(restoreBounds(b,displays,primary),b);});
-test('bounds partly off a display are clamped onto it',()=>{assert.deepEqual(restoreBounds({bounds:{x:1500,y:200,width:1050,height:820}},displays,primary),{x:870,y:200,width:1050,height:820});});
-test('bounds on no display fall back to primary centre, not the first listed display',()=>{assert.deepEqual(restoreBounds({bounds:{x:5000,y:200,width:1000,height:800}},displays,primary),{x:460,y:120,width:1000,height:800});});
-test('minimized -32000 coordinates fall back to primary centre',()=>{assert.equal(restoreBounds({bounds:{x:-32000,y:-32000,width:160,height:28}},displays,primary).x>=0,true);});
-test('malformed or missing state centres default size on primary',()=>{assert.deepEqual(restoreBounds({x:null},displays,primary),{x:435,y:110,width:1050,height:820});assert.deepEqual(restoreBounds(null,displays,primary),{x:435,y:110,width:1050,height:820});});
-test('no displays leaves default size',()=>{assert.deepEqual(restoreBounds(null,[],null),{width:1050,height:820});});
-test('oversized bounds shrink to the work area',()=>{assert.deepEqual(restoreBounds({bounds:{x:-1600,y:0,width:3000,height:2000}},displays,primary),{x:-1600,y:0,width:1600,height:900});});
-test('normalizeState keeps flags and rejects junk',()=>{assert.deepEqual(normalizeState({bounds:{x:1,y:2,width:500,height:600},maximized:true,fullScreen:'yes',displayId:2}),{bounds:{x:1,y:2,width:500,height:600},maximized:true,fullScreen:false,displayId:2});assert.equal(normalizeState('x'),null);assert.equal(normalizeState({bounds:{x:0,y:0,width:0,height:5}}),null);});
-test('captureState records bounds, display and maximized',()=>{assert.deepEqual(captureState({normalBounds:{x:-1500,y:40,width:1000,height:800},maximized:true,fullScreen:false,minimized:false,display:second}),{bounds:{x:-1500,y:40,width:1000,height:800},maximized:true,fullScreen:false,displayId:2});});
-test('captureState while minimized keeps previous state',()=>{const prev={bounds:{x:-1500,y:40,width:1000,height:800},maximized:true,fullScreen:false,displayId:2};assert.deepEqual(captureState({normalBounds:{x:-32000,y:-32000,width:160,height:28},maximized:false,minimized:true,display:primary,previous:prev}),prev);});
-test('captureState ignores -32000 bounds without previous state',()=>{assert.equal(captureState({normalBounds:{x:-32000,y:-32000,width:160,height:28},minimized:true}),null);});
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+const require=createRequire(import.meta.url);
+const {restorePlan,restoreBounds,captureState,readHandoff,normalizeState,findDisplay,HANDOFF_MAX_AGE_MS}=require('../desktop/window-state.cjs');
+
+const builtin={id:1,bounds:{x:0,y:0,width:1800,height:1169},workArea:{x:0,y:39,width:1800,height:1130}};
+const external={id:7,bounds:{x:1800,y:-200,width:2560,height:1440},workArea:{x:1800,y:-175,width:2560,height:1415}};
+const displays=[builtin,external];
+const NOW=1_800_000_000_000;
+
+test('normal launch with no handoff uses default placement on primary',()=>{
+  const p=restorePlan(null,displays,builtin);
+  assert.equal(p.maximized,false);
+  assert.ok(p.bounds.x>=0&&p.bounds.x+p.bounds.width<=1800);
+  assert.deepEqual(p.frame,p.bounds);
+});
+
+test('stale or undated handoff is ignored',()=>{
+  const s={bounds:{x:2000,y:0,width:900,height:700},displayId:7,savedAt:NOW-HANDOFF_MAX_AGE_MS-1};
+  assert.equal(readHandoff(s,NOW),null);
+  assert.equal(readHandoff({bounds:s.bounds},NOW),null);
+  assert.equal(readHandoff({...s,savedAt:NOW+120000},NOW),null);
+  assert.ok(readHandoff({...s,savedAt:NOW-1000},NOW));
+});
+
+test('update handoff on external monitor restores there',()=>{
+  const state=captureState({normalBounds:{x:2100,y:0,width:1000,height:800},maximized:false,fullScreen:false,minimized:false,display:external,previous:null,now:NOW});
+  const p=restorePlan(readHandoff(state,NOW+5000),displays,builtin);
+  assert.deepEqual(p.bounds,{x:2100,y:0,width:1000,height:800});
+  assert.equal(findDisplay(normalizeState(state),displays,builtin).id,7);
+});
+
+test('maximized on external restores as external work area, never primary',()=>{
+  const state=captureState({normalBounds:{...external.workArea},maximized:true,fullScreen:false,minimized:false,display:external,previous:null,now:NOW});
+  const p=restorePlan(readHandoff(state,NOW),displays,builtin);
+  assert.equal(p.maximized,true);
+  assert.deepEqual(p.frame,external.workArea);
+});
+
+test('fullscreen keeps previous bounds and display',()=>{
+  const prev={bounds:{x:2100,y:0,width:1000,height:800},displayId:7,displayBounds:external.bounds,savedAt:NOW-1};
+  const s=captureState({normalBounds:{...external.bounds},maximized:false,fullScreen:true,minimized:false,display:external,previous:prev,now:NOW});
+  assert.deepEqual(s.bounds,prev.bounds);assert.equal(s.displayId,7);
+});
+
+test('minimized and -32000 positions keep previous',()=>{
+  const prev={bounds:{x:2100,y:0,width:1000,height:800},displayId:7,savedAt:1};
+  assert.deepEqual(captureState({normalBounds:{x:-32000,y:-32000,width:160,height:28},maximized:false,fullScreen:false,minimized:true,display:builtin,previous:prev,now:NOW}).bounds,prev.bounds);
+  assert.deepEqual(captureState({normalBounds:{x:-32000,y:-32000,width:160,height:28},maximized:false,fullScreen:false,minimized:false,display:builtin,previous:prev,now:NOW}).bounds,prev.bounds);
+});
+
+test('display id changed but bounds match',()=>{
+  const s={bounds:{x:2100,y:0,width:1000,height:800},displayId:99,displayBounds:external.bounds,savedAt:NOW};
+  assert.equal(findDisplay(normalizeState(s),displays,builtin).id,7);
+});
+
+test('display moved keeps relative position',()=>{
+  const moved={...external,bounds:{...external.bounds,x:-2560},workArea:{...external.workArea,x:-2560}};
+  const s={bounds:{x:2100,y:0,width:1000,height:800},displayId:7,displayBounds:external.bounds,savedAt:NOW};
+  assert.equal(restorePlan(s,[builtin,moved],builtin).bounds.x,-2560+300);
+});
+
+test('real user file replays onto display 1 work area',()=>{
+  const real={bounds:{x:511,y:39,width:1289,height:1089},maximized:true,fullScreen:false,displayId:1,savedAt:NOW};
+  const p=restorePlan(readHandoff(real,NOW),displays,builtin);
+  assert.deepEqual(p.frame,builtin.workArea);
+});
+
+test('old formats still load',()=>{
+  assert.deepEqual(normalizeState({x:1,y:2,width:900,height:700}).bounds,{x:1,y:2,width:900,height:700});
+  assert.equal(normalizeState('nope'),null);
+  assert.ok(restoreBounds({x:2100,y:0,width:1000,height:800},displays,builtin));
+});
+
+test('no displays falls back without throwing',()=>{
+  assert.ok(restorePlan(null,[],null).bounds);
+});

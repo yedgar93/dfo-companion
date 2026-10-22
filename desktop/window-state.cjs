@@ -1,14 +1,31 @@
 'use strict';
 // Pure window-state logic (no Electron imports) so it can be unit tested.
-const DEFAULT_SIZE={width:1050,height:820},MIN_WIDTH=420,MIN_HEIGHT=480;
+// Position is carried ONLY across update restarts: beforeRestart writes a one-shot handoff file, the next launch consumes it.
+const DEFAULT_SIZE={width:1050,height:820},MIN_WIDTH=420,MIN_HEIGHT=480,HANDOFF_MAX_AGE_MS=10*60*1000,SETTLE_MS=1000;
 const isRect=r=>!!r&&['x','y','width','height'].every(k=>Number.isFinite(r[k]))&&r.width>0&&r.height>0;
-const intersects=(a,b)=>a.x<b.x+b.width&&a.x+a.width>b.x&&a.y<b.y+b.height&&a.y+a.height>b.y;
-const areaOf=d=>isRect(d?.workArea)?d.workArea:isRect(d?.bounds)?d.bounds:null;
+const rect=r=>({x:Math.round(r.x),y:Math.round(r.y),width:Math.round(r.width),height:Math.round(r.height)});
+const sameRect=(a,b)=>isRect(a)&&isRect(b)&&a.x===b.x&&a.y===b.y&&a.width===b.width&&a.height===b.height;
+const overlap=(a,b)=>Math.max(0,Math.min(a.x+a.width,b.x+b.width)-Math.max(a.x,b.x))*Math.max(0,Math.min(a.y+a.height,b.y+b.height)-Math.max(a.y,b.y));
+const boundsOf=d=>isRect(d?.bounds)?d.bounds:isRect(d?.workArea)?d.workArea:null;
+const areaOf=d=>isRect(d?.workArea)?d.workArea:boundsOf(d);
+// Fills the area within a few px tolerance (Mac reports a zoomed window as its whole frame).
+const fills=(b,area,t=8)=>isRect(b)&&isRect(area)&&Math.abs(b.x-area.x)<=t&&Math.abs(b.y-area.y)<=t&&Math.abs(b.width-area.width)<=t&&Math.abs(b.height-area.height)<=t;
 function centreIn(area,size=DEFAULT_SIZE){const width=Math.min(size.width,area.width),height=Math.min(size.height,area.height);return {x:Math.round(area.x+(area.width-width)/2),y:Math.round(area.y+(area.height-height)/2),width,height};}
-// Accepts the current {bounds,maximized,fullScreen,displayId} file or the legacy bare bounds object.
-function normalizeState(raw){if(!raw||typeof raw!=='object')return null;const bounds=isRect(raw.bounds)?raw.bounds:isRect(raw)?raw:null;if(!bounds)return null;return {bounds:{x:Math.round(bounds.x),y:Math.round(bounds.y),width:Math.round(bounds.width),height:Math.round(bounds.height)},maximized:raw.maximized===true,fullScreen:raw.fullScreen===true,displayId:raw.displayId??null};}
-// Returns bounds that land on a connected display. Saved bounds that intersect no display fall back to the primary display's centre.
-function restoreBounds(saved,displays,primary){const state=normalizeState(saved&&saved.bounds?saved:{bounds:saved});const list=(displays||[]).filter(areaOf);const primaryArea=areaOf(primary)??areaOf(list[0]);if(!primaryArea)return state?{...state.bounds}:{...DEFAULT_SIZE};if(!state)return centreIn(primaryArea);const b=state.bounds;const hit=list.find(d=>intersects(b,areaOf(d))&&(state.displayId==null||d.id===state.displayId))??list.find(d=>intersects(b,areaOf(d)));if(!hit)return centreIn(primaryArea,b);const area=areaOf(hit);const width=Math.min(Math.max(MIN_WIDTH,b.width),area.width),height=Math.min(Math.max(MIN_HEIGHT,b.height),area.height);return {x:Math.max(area.x,Math.min(b.x,area.x+area.width-width)),y:Math.max(area.y,Math.min(b.y,area.y+area.height-height)),width,height};}
-// Builds the record to persist. Returns null when the window is minimized and no normal bounds are trustworthy (Windows reports -32000 coordinates).
-function captureState({normalBounds,maximized,fullScreen,minimized,display,previous}){const prev=normalizeState(previous);let bounds=isRect(normalBounds)?normalBounds:null;if(bounds&&(bounds.x<=-30000||bounds.y<=-30000))bounds=null;if((minimized||fullScreen)&&prev)bounds=bounds&&!minimized?bounds:prev.bounds;if(!bounds)return prev;return {bounds:{x:bounds.x,y:bounds.y,width:bounds.width,height:bounds.height},maximized:minimized&&prev?prev.maximized:!!maximized,fullScreen:!!fullScreen,displayId:(minimized&&prev?prev.displayId:display?.id)??prev?.displayId??null};}
-module.exports={restoreBounds,captureState,normalizeState,DEFAULT_SIZE};
+// Accepts {bounds,maximized,fullScreen,displayId,displayBounds,savedAt} or the legacy bare bounds object.
+function normalizeState(raw){if(!raw||typeof raw!=='object')return null;const bounds=isRect(raw.bounds)?raw.bounds:isRect(raw)?raw:null;if(!bounds)return null;return {bounds:rect(bounds),maximized:raw.maximized===true,fullScreen:raw.fullScreen===true,displayId:raw.displayId??null,displayBounds:isRect(raw.displayBounds)?rect(raw.displayBounds):null,savedAt:Number.isFinite(raw.savedAt)?raw.savedAt:null};}
+// Same id with unchanged bounds, else a display with the same bounds, else most overlap, else primary.
+function findDisplay(state,displays,primary){const list=(displays||[]).filter(boundsOf);const fallback=primary&&boundsOf(primary)?primary:list[0]??null;if(!state)return fallback;const db=state.displayBounds;if(db){const byId=list.find(d=>d.id===state.displayId&&sameRect(boundsOf(d),db));if(byId)return byId;const byBounds=list.find(d=>sameRect(boundsOf(d),db));if(byBounds)return byBounds;const moved=list.find(d=>d.id===state.displayId&&boundsOf(d).width===db.width&&boundsOf(d).height===db.height);if(moved)return moved;}else if(state.displayId!=null){const byId=list.find(d=>d.id===state.displayId&&overlap(state.bounds,boundsOf(d))>0);if(byId)return byId;}let best=null,bestArea=0;for(const d of list){const a=overlap(state.bounds,boundsOf(d));if(a>bestArea){best=d;bestArea=a;}}return best??fallback;}
+// Returns {bounds (normal), frame (what to setBounds before show), display, maximized}. Never relies on maximize().
+function restorePlan(saved,displays,primary){const state=normalizeState(saved);const display=findDisplay(state,displays,primary);const area=areaOf(display);if(!area){const b=state?state.bounds:{...DEFAULT_SIZE};return {bounds:b,frame:b,display:null,maximized:!!state?.maximized};}if(!state){const b=centreIn(area);return {bounds:b,frame:b,display,maximized:false};}let {x,y,width,height}=state.bounds;const db=state.displayBounds,now=boundsOf(display);if(db&&now&&!sameRect(db,now)){x+=now.x-db.x;y+=now.y-db.y;}// display moved: keep the same relative position
+ if(overlap({x,y,width,height},area)===0&&!db){const c=centreIn(area,{width,height});x=c.x;y=c.y;}
+ width=Math.min(Math.max(MIN_WIDTH,width),area.width);height=Math.min(Math.max(MIN_HEIGHT,height),area.height);x=Math.max(area.x,Math.min(x,area.x+area.width-width));y=Math.max(area.y,Math.min(y,area.y+area.height-height));const bounds={x,y,width,height};const maximized=state.maximized||state.fullScreen;return {bounds,frame:maximized?{...area}:bounds,display,maximized};}
+// Legacy helper kept for callers that only need bounds.
+const restoreBounds=(saved,displays,primary)=>restorePlan(saved&&saved.bounds?saved:{bounds:saved},displays,primary).bounds;
+// Builds the record to persist. null = keep what you have.
+function captureState({normalBounds,maximized,fullScreen,minimized,display,previous,now=Date.now()}){const prev=normalizeState(previous);const stamp=s=>s&&{...s,savedAt:now};if(minimized)return stamp(prev);let bounds=isRect(normalBounds)?rect(normalBounds):null;if(bounds&&(bounds.x<=-30000||bounds.y<=-30000))bounds=null;if(fullScreen){if(prev)return stamp({...prev,fullScreen:false,maximized:prev.maximized});if(!bounds)return null;}
+ const area=areaOf(display),dispBounds=boundsOf(display);const zoomed=!fullScreen&&(maximized||fills(bounds,area)||fills(bounds,dispBounds));if(zoomed&&prev)return stamp({...prev,maximized:true,fullScreen:false});if(!bounds)return stamp(prev);return {bounds,maximized:!!zoomed,fullScreen:false,displayId:display?.id??prev?.displayId??null,displayBounds:dispBounds?rect(dispBounds):prev?.displayBounds??null,savedAt:now};}
+// One-shot handoff: valid only if recent (and not from the future).
+function readHandoff(raw,now=Date.now(),maxAge=HANDOFF_MAX_AGE_MS){const s=normalizeState(raw);if(!s||s.savedAt==null)return null;const age=now-s.savedAt;return age>=-60000&&age<=maxAge?s:null;}
+// Saves stay closed until show() and a settle period, so startup setBounds/move/resize never overwrite good state.
+function createSaveGate({settleMs=SETTLE_MS,setTimer=setTimeout}={}){let open=false,shown=false;return {shown(){if(shown)return;shown=true;setTimer(()=>{open=true;},settleMs);},isOpen:()=>open};}
+module.exports={restoreBounds,restorePlan,findDisplay,captureState,normalizeState,readHandoff,createSaveGate,DEFAULT_SIZE,HANDOFF_MAX_AGE_MS};
