@@ -1,0 +1,4 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {itemIconPlan} from '../item-icon-assets.mjs';
+// Source-matched to daggerfall-js-source: survival/items.js:52 (Campfire wears the Torch's 210/6) and rest/restItemRows.js:32-38.
+test('DFO-only campfire and rest items resolve to their source world artwork',()=>{const cases=[[541,210,6],[1700,204,8],[1701,218,0],[1702,254,9],[1703,205,11],[1704,210,3],[1705,205,3],[1706,211,49]];for(const [templateIndex,archive,record] of cases)assert.deepEqual(itemIconPlan({group:'UselessItems2',templateIndex,name:'x'},{race:'Breton',gender:'male'}),{archive,record,dye:null,target:null},String(templateIndex));});
+test('custom rows draw their world art whatever group the snapshot reports',()=>{assert.deepEqual(itemIconPlan({group:'Jewellery',templateIndex:1700},{}),{archive:204,record:8,dye:null,target:null});});

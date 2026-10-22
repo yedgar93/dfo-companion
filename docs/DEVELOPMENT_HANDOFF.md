@@ -155,7 +155,7 @@ This regression occurred twice and has a concrete source-level explanation:
 - `DFO_COMPANION_ART_CONFIG` passes the companion's selected config path to its own helper. `local-art.mjs` checks that before the game profile, handles filename case, bounds reads, and does not recursively scan disks.
 - Current item icon loader is **local-only** (`rawFiles(..., {cacheOnly:true})`, which still permits configured disk originals). Do not reintroduce inspector/IndexedDB reads for inventory icons.
 - A missing raw texture/palette must not discard available vendor icons. A missing ASAR sprite index must not prevent local-original fallback. Handle each source independently.
-- Icon cache namespace is `item-icons-v3-*`. Only complete results for supported plans are persisted; partial in-memory results retry after ~30 seconds. Changes to decoder/mappings may require cache namespace invalidation. A null unsupported plan is different from a failed supported plan.
+- Icon cache namespace is `item-icons-v4-*` (v3 → v4 when Campfire 541 and the rest items 1700-1706 were mapped). Only complete results for supported plans are persisted; partial in-memory results retry after ~30 seconds. Changes to decoder/mappings may require cache namespace invalidation. A null unsupported plan is different from a failed supported plan.
 - Some older paperdoll/map raw-asset code still contains a bounded IndexedDB fallback; do not mistake that for authorization to call it from new UI features. Audit call sites when investigating frame stalls.
 
 ### Character tab (0.4.5+, usable after 0.4.6 route fix)
