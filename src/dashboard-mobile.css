@@ -111,7 +111,7 @@
 @media (max-width:560px){
   :root{--phone-bar:60px}
   main{gap:var(--sp-5);padding:0 var(--sp-4) calc(var(--phone-bar) + var(--sp-6) + env(safe-area-inset-bottom))}
-  .hud{position:sticky;top:0;z-index:12;margin:0 calc(-1 * var(--sp-4));padding:calc(var(--sp-3) + env(safe-area-inset-top)) var(--sp-5) var(--sp-4);background:linear-gradient(#1d221bf7,#181c16f2);border-bottom:2px groove var(--edge-mid);box-shadow:0 4px 10px #0006;grid-template-columns:minmax(0,1fr) auto;gap:var(--sp-3) var(--sp-4)}
+  .hud{position:sticky;top:0;z-index:12;margin:0 calc(-1 * var(--sp-4));padding:calc(var(--sp-3) + env(safe-area-inset-top)) var(--sp-5) var(--sp-4);background:linear-gradient(#1d221b,#181c16);border-bottom:2px groove var(--edge-mid);box-shadow:0 4px 10px #0006;grid-template-columns:minmax(0,1fr) auto;gap:var(--sp-3) var(--sp-4)}
   .hud .eyebrow{display:flex;align-items:center;gap:var(--sp-2);font-size:var(--fs-2xs);margin:0}
   h1{font-size:var(--fs-2xl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   #character-meta{font-size:var(--fs-sm);margin:var(--sp-1) 0}
