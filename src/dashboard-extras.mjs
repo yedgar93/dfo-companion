@@ -118,3 +118,11 @@ export function problemPlaque(s){const code=s?.reason;if(!code||code==='LIVE_PLA
 // shift as they change. Each digit gets a 1ch box (CSS .dg); text content is unchanged.
 export function digitBoxes(node,value){if(!node)return;const s=String(value??'');if(node.dataset.dg===s)return;node.dataset.dg=s;if(typeof document==='undefined'||!/\d/.test(s)){node.textContent=s;return;}
  const parts=[];let run='';for(const ch of s){if(ch>='0'&&ch<='9'){if(run){parts.push(document.createTextNode(run));run='';}const d=document.createElement('span');d.className='dg';d.textContent=ch;parts.push(d);}else run+=ch;}if(run)parts.push(document.createTextNode(run));node.replaceChildren(...parts);}
+
+// Quiet connection toast: one message per real transition. Nothing on first load, a
+// "lost" message only after the game was connected, a "back" message only after a loss.
+export function connectionToast(state,online){
+ const next={online,wasOnline:state?.wasOnline||online,lost:state?.lost||false};let toast=null;
+ if(state&&state.online!==online){if(!online&&state.wasOnline){toast={kind:'lost',title:'Game connection lost',message:'Showing last known data until DFO is back.'};next.lost=true;}else if(online&&state.lost){toast={kind:'restored',title:'Game connection back',message:'Live readings resumed.'};next.lost=false;}}
+ return {state:next,toast};
+}

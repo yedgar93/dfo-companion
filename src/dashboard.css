@@ -380,7 +380,40 @@ footer{color:var(--parchment-400)}
 /* inventory: square, bevelled slots */
 .item-grid .item{border-color:var(--panel-raised-border);box-shadow:inset 1px 1px #c4c5a71f,inset -1px -1px #0006}
 .item-grid .item:hover{border-color:var(--gold-500) var(--gold-900) var(--gold-900) var(--gold-500)}
-.item-grid{background:#0000001f;padding:var(--sp-2);border:1px solid var(--edge-dark);box-shadow:inset 1px 1px #0008}
+.item-grid{background:#0000001f;border:1px solid var(--edge-dark);box-shadow:inset 1px 1px #0008}
 .categories button{background:var(--panel-raised-bg);border:1px solid;border-color:#6d6f5e #1a1f17 #1a1f17 #6d6f5e}
 .categories button.active{background:linear-gradient(#56553b,#3e3f2c);border-color:var(--gold-500) var(--gold-900) var(--gold-900) var(--gold-500);color:var(--gold-400)}
 .equipment-panel .panel-heading h2,.inventory-panel .panel-heading h2{letter-spacing:.1em}
+
+/* ==== Quiet state changes ====
+   Opacity/transform only, CSS-driven (new panel content fades in when inserted; no per-frame JS).
+   Everything here is off under prefers-reduced-motion. */
+@keyframes dfo-fade-in{from{opacity:0;transform:translateY(2px)}to{opacity:1;transform:none}}
+@keyframes dfo-skeleton{0%,100%{opacity:.45}50%{opacity:.9}}
+#character-record>*,#inventory-items>*,#gear-left>*,#gear-right>*,#accessories>*,#quest-items>*,#item-detail>*,#categories>*{animation:dfo-fade-in var(--dur-fade) var(--ease) both}
+.hud .track i{transform-origin:left center;transition:transform .4s var(--ease)}
+/* skeleton placeholders while no character has been read yet */
+body.awaiting-data :is(#character-name,#character-meta,#place-name,#place-detail,#gold-value,#health-value,#magicka-value,#fatigue-value,#current-quest-title,#current-quest-objective,#current-quest-destination,#equipment-count,#character-record-age){color:transparent!important;text-shadow:none!important;position:relative}
+body.awaiting-data :is(#character-name,#character-meta,#place-name,#place-detail,#gold-value,#health-value,#magicka-value,#fatigue-value,#current-quest-title,#current-quest-objective,#current-quest-destination,#equipment-count,#character-record-age)::after{content:'';position:absolute;left:0;right:auto;top:20%;bottom:20%;width:min(100%,var(--sk-w,9em));background:linear-gradient(90deg,#55584a,#45483c);border-radius:1px;animation:dfo-skeleton 1.6s ease-in-out infinite}
+body.awaiting-data #character-name{--sk-w:9em;display:block;min-height:1em}body.awaiting-data #character-meta{--sk-w:13em;display:block}body.awaiting-data #current-quest-objective{--sk-w:22em;display:block}
+body.awaiting-data :is(#place-name,#place-detail)::after{left:auto;right:0}
+body.awaiting-data :is(#health-value,#magicka-value,#fatigue-value,#gold-value){--sk-w:4em;min-width:4em;display:inline-block}
+body.awaiting-data :is(#quest-items,#inventory-items,#character-record)>.empty,body.awaiting-data #portrait-placeholder p{color:transparent!important;position:relative;min-height:3.2em}
+body.awaiting-data :is(#quest-items,#inventory-items,#character-record)>.empty::after{content:'';position:absolute;inset:4px auto 4px 0;width:60%;background:repeating-linear-gradient(#4d5043 0 10px,transparent 10px 18px);animation:dfo-skeleton 1.6s ease-in-out infinite}
+/* connection toast (parchment) */
+.connection-toast{position:fixed;right:var(--sp-6);bottom:34px;z-index:60;display:flex;gap:var(--sp-4);align-items:center;max-width:min(330px,calc(100vw - 32px));padding:var(--sp-4) var(--sp-5);background:var(--panel-parchment-bg);color:var(--parchment-ink);border:3px double var(--gold-900);box-shadow:inset 0 0 0 1px #f4e7c288,3px 4px 0 #0008;opacity:0;transform:translateY(8px);transition:opacity .3s var(--ease),transform .3s var(--ease);pointer-events:none}
+.connection-toast.show{opacity:1;transform:none}
+.connection-toast[hidden]{display:none}
+.connection-toast strong{display:block;font-size:var(--fs-md);color:var(--parchment-ink)}
+.connection-toast span{display:block;font-size:var(--fs-sm);color:var(--parchment-ink-2);margin-top:2px}
+.connection-toast i{width:9px;height:9px;flex:none;border-radius:50%;background:#7c3a26;box-shadow:0 0 0 2px #f1e3bd}
+.connection-toast[data-kind=restored] i{background:#3b6b2c}
+@media (prefers-reduced-motion:reduce){
+ #character-record>*,#inventory-items>*,#gear-left>*,#gear-right>*,#accessories>*,#quest-items>*,#item-detail>*,#categories>*{animation:none!important}
+ body.awaiting-data *::after{animation:none!important;opacity:.7}
+ .hud .track i,.connection-toast{transition:none!important}
+}
+body.awaiting-data .gear .gear-name{color:transparent!important;position:relative;min-width:4em}
+body.awaiting-data .gear .gear-name::after{content:'';position:absolute;inset:25% 0;background:#4d5043;animation:dfo-skeleton 1.6s ease-in-out infinite}
+body.awaiting-data #inventory-items:empty{position:relative}
+body.awaiting-data #inventory-items:empty::after{content:'';position:absolute;inset:4px;background:repeating-linear-gradient(#0000 0 80px,#1d221a 80px 86px),repeating-linear-gradient(90deg,#45483c 0 64px,transparent 64px 70px);-webkit-mask:linear-gradient(#000 0 172px,transparent 172px);mask:linear-gradient(#000 0 172px,transparent 172px);animation:dfo-skeleton 1.6s ease-in-out infinite}
