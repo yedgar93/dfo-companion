@@ -61,4 +61,4 @@ function renderQuietAlerts(s){const panel=$('quiet-alerts'),rows=preferences.ale
 $('manual-refresh')?.addEventListener('click',async()=>{const button=$('manual-refresh');button.disabled=true;button.textContent='Refreshing…';try{const response=await fetch('/api/refresh',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',signal:AbortSignal.timeout(5000)});if(!response.ok)throw Error();button.textContent='Refresh queued';}catch{button.textContent='Refresh failed · retry';}setTimeout(()=>{button.disabled=false;button.textContent='↻ Refresh all';},10000);});
 
 document.querySelector('[data-page="connection-page"]')?.click();
-try{const resume=sessionStorage.getItem('dfo-resume-page');if(resume&&['pack','map','quests','character','connection-page'].includes(resume)){sessionStorage.removeItem('dfo-resume-page');autoOpenPack=false;document.querySelector('[data-page="'+resume+'"]')?.click();}}catch{}
+try{sessionStorage.removeItem('dfo-resume-page');}catch{}
