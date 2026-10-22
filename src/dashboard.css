@@ -264,3 +264,7 @@ footer{min-height:20px;line-height:14px;overflow:visible;align-items:center;box-
 
 /* 0.4.15: on desktop the quiet alert sits in the footer's empty middle at the end of the page, not over the viewport, so a scrolled short window never shows it over content. */
 @media (min-width:801px){body{position:relative}.quiet-alerts{position:absolute!important;bottom:12px;max-width:max(160px,calc(100% - 640px))!important;min-width:0!important}}
+
+/* 0.4.15: every tab, active or not, has the same box and baseline. */
+@media (min-width:801px){.tabs{align-items:end}.tabs>button{box-sizing:border-box;height:29px;min-height:29px;margin:0;padding-top:6px;padding-bottom:6px;line-height:15px;border-width:1px;border-style:solid;transform:none;vertical-align:bottom;display:inline-flex;align-items:center;gap:6px}.tabs>button:not(.active){border-color:transparent}.tabs button #inventory-count,.tabs button #quest-count{display:inline;height:auto;line-height:inherit;vertical-align:baseline}}
+@media (max-width:800px){.tabs button #inventory-count,.tabs button #quest-count{display:inline;height:auto;line-height:inherit;vertical-align:baseline}.tabs>button{transform:none;margin-top:0}}
