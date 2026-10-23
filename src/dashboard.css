@@ -389,7 +389,8 @@ footer{color:var(--parchment-400)}
    Everything here is off under prefers-reduced-motion. */
 @keyframes dfo-fade-in{from{opacity:0;transform:translateY(2px)}to{opacity:1;transform:none}}
 @keyframes dfo-skeleton{0%,100%{opacity:.45}50%{opacity:.9}}
-#character-record>*,#inventory-items>*,#gear-left>*,#gear-right>*,#accessories>*,#quest-items>*,#item-detail>*,#categories>*{animation:dfo-fade-in var(--dur-fade) var(--ease) both}
+/* Snapshot refreshes replace these children; entry fades would replay on every update. */
+#character-record>*,#inventory-items>*,#gear-left>*,#gear-right>*,#accessories>*,#quest-items>*,#item-detail>*,#categories>*{animation:none}
 .hud .track i{transform-origin:left center;transition:transform .4s var(--ease)}
 /* skeleton placeholders while no character has been read yet */
 body.awaiting-data :is(#character-name,#character-meta,#place-name,#place-detail,#gold-value,#health-value,#magicka-value,#fatigue-value,#current-quest-title,#current-quest-objective,#current-quest-destination,#equipment-count,#character-record-age){color:transparent!important;text-shadow:none!important;position:relative}

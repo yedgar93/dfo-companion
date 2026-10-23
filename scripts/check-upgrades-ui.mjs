@@ -64,8 +64,12 @@ try{
   if(await sheet.isVisible())await sheet.getByRole('button',{name:'Done',exact:true}).click();
   await page.locator('#inventory-items .item').filter({hasText:'Identified bow'}).click();
   assert.match(await detail.innerText(),/timing|reload/);assert.doesNotMatch(await detail.innerText(),/Can't judge yet/);
+  // A new snapshot rebuilt the content above. Its nodes must appear immediately,
+  // rather than replaying entry fades on every normal reader update.
+  const refreshAnimations=await page.evaluate(()=>[...document.querySelectorAll('#inventory-items>*,#gear-left>*,#gear-right>*,#accessories>*,#item-detail>*,#categories>*')].map(e=>getComputedStyle(e).animationName).filter(name=>name!=='none'));
+  assert.deepEqual(refreshAnimations,[]);
   assert.deepEqual(errors,[]);await page.close();
   fixture.details=structuredClone(ringDetails);version++;
  }
- console.log(JSON.stringify({passed:true,viewports:2,gameReads:0,checks:['score sorting','recommendation reason','explicit ring target','snapshot invalidation','raw equipment without template cache','provisional unidentified weapon estimates','ranged timing explanation','no browser script errors']}));
+ console.log(JSON.stringify({passed:true,viewports:2,gameReads:0,checks:['score sorting','recommendation reason','explicit ring target','snapshot invalidation','raw equipment without template cache','provisional unidentified weapon estimates','ranged timing explanation','no repeated refresh fades','no browser script errors']}));
 }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}

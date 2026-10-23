@@ -1,6 +1,6 @@
 # DFO Companion: development handoff
 
-Last reconciled: 2026-10-23. Current release candidate source: **0.4.33**, based on main `26d7590` (0.4.32); the latest verified published baseline is **0.4.32** for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
+Last reconciled: 2026-10-23. Current release candidate source: **0.4.34**, based on main `e0ef4f1` (0.4.33); the latest verified published baseline is **0.4.33** for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
 
 Read this file, `AGENTS.md`, `README.md`, and `docs/RELEASING.md` before changing the application. Inspect the current source and latest release: this document records findings at the baseline, not a promise that future game versions have identical internals. Keep this document updated as findings change.
 
@@ -239,6 +239,21 @@ Public workflow/release status can be read through GitHub's API or normal GitHub
 - Keep README, this handoff and tests aligned with actual implementation. A future AI should distinguish requests, code, tests, synthetic previews, user confirmation and release evidence.
 
 ## Upgrade scoring (phase 1, inventory only)
+
+### Refresh flicker (0.4.34 release source)
+
+Post-update browser testing of the installed 0.4.33 verified four provisional
+weapon estimates and three known tradeoffs with no weapon question-mark markers.
+All sixteen served UI resources matched the committed source after normalizing
+line endings. The live phone/browser address can differ from the loopback desktop
+address; use the current user-provided URL without changing pairing/settings.
+
+The same browser test exposed a 240 ms `dfo-fade-in` animation on every child of
+the inventory, equipment, character record, details, categories and quest lists.
+Normal snapshot renders replace those children, replaying the fade and causing
+visible flicker. These refreshed children now use `animation: none`; snapshot
+acquisition, render cadence and game sampling remain unchanged. The desktop/phone
+browser regression replaces its snapshot and checks computed animation names.
 
 ### Provisional markers (0.4.33 release source)
 
