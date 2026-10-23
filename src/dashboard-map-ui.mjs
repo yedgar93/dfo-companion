@@ -49,7 +49,7 @@ $('map-quest-select')?.addEventListener('change',e=>{selection=e.target.value||n
 
 $('map-town')?.addEventListener('click',()=>{view='town';lastDraw='';void renderMap();});
 
-let mapSize='';new ResizeObserver(()=>{const r=$('map-markers').getBoundingClientRect(),key=r.width+'x'+r.height;if(r.width>0&&r.height>0&&key!==mapSize){mapSize=key;lastDraw='';if(state)void renderMap();}}).observe($('map-stage'));
+let mapSize='',mapResizeQueued=false;new ResizeObserver(()=>{if(mapResizeQueued)return;mapResizeQueued=true;requestAnimationFrame(()=>{mapResizeQueued=false;const r=$('map-markers').getBoundingClientRect(),key=r.width+'x'+r.height;if(r.width>0&&r.height>0&&key!==mapSize){mapSize=key;lastDraw='';if(state)void renderMap();}});}).observe($('map-stage'));
 
 $('map-interior')?.addEventListener('click',()=>{view='interior';lastDraw='';void renderMap();});$('map-height')?.addEventListener('click',()=>{interiorNear=!interiorNear;$('map-height').textContent=interiorNear?'Height: nearby':'Height: all explored';lastDraw='';void renderMap();});
 
