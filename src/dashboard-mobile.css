@@ -287,3 +287,33 @@
 }
 @media(max-width:800px){.pack{gap:5px!important}.equipment-panel{gap:3px!important}}
 @media(max-width:800px) and (max-height:740px){.equipment-panel>#upgrade-summary{display:none}}
+
+/* Give every worn slot the same usable row, including paired clothing slots. */
+@media(max-width:800px){
+ .equipment-stage{height:clamp(289px,43dvh,360px)!important;gap:6px!important;grid-template-columns:minmax(0,1fr) minmax(76px,.95fr) minmax(0,1fr)!important}
+ #gear-left,#gear-right{display:grid!important;grid-template-rows:repeat(5,minmax(44px,1fr))!important;gap:5px!important}
+ #gear-left:has(>.gear-pair),#gear-right:has(>.gear-pair){grid-template-rows:repeat(6,minmax(44px,1fr))!important}
+ .gear-column>.gear-pair{display:contents!important}
+ .gear-column .gear{grid-template-columns:24px minmax(0,1fr)!important;grid-template-rows:12px minmax(12px,1fr) 3px!important;padding:4px!important;gap:2px 4px!important;align-content:stretch;justify-content:stretch}
+ .gear-column .gear>.gear-label{grid-column:2!important;grid-row:1!important;text-align:left;line-height:12px!important;min-width:0;align-self:center}
+ .gear-column .gear>img,.gear-column .gear>.fallback{grid-column:1!important;grid-row:1/3!important;width:24px!important;height:24px!important;max-height:24px;align-self:center}
+ .gear-column .gear>.condition-label{grid-column:2!important;grid-row:2!important;text-align:left;justify-self:start;align-self:center}
+ .gear-column .gear>.track{grid-column:1/-1!important;grid-row:3!important}
+ .equipment-panel{gap:4px!important}
+}
+
+@media(max-width:800px){
+ .pack[data-mobile-view=character]>.equipment-panel{min-height:var(--phone-equipment-height,0px)}
+ .pack[data-mobile-view=character] .equipment-stage{flex:1 0 289px!important;height:auto!important}
+}
+
+/* Keep Safari's root viewport stationary; only actual page content scrolls. */
+@media(max-width:800px){
+ html,body{height:100%!important;overflow:hidden!important;overscroll-behavior:none}
+ main{position:fixed;inset:0 0 auto;height:var(--phone-visible-height,100dvh)!important;max-height:none!important;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;scroll-padding-top:calc(var(--hud-h,140px) + 8px);scroll-padding-bottom:calc(var(--phone-bar) + 8px + env(safe-area-inset-bottom))}
+ body.map-expanded main{overflow:hidden}
+}
+@media(max-width:800px){
+ main>#current-quest{flex:none!important}
+ main>.page{flex:0 0 auto!important;height:auto!important;max-height:none!important;overflow:visible!important}
+}

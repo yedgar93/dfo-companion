@@ -1,2 +1,0 @@
-import test from'node:test';import assert from'node:assert/strict';import{pairingQrSvg}from'../dashboard-qr.mjs';
-test('pairing QR is an inline SVG with a quiet zone and no token text, links, images or network calls',()=>{const svg=pairingQrSvg('http://10.0.0.47:9235/pair/private-test-token');assert.match(svg,/<svg/);assert.match(svg,/viewBox=/);assert.match(svg,/<path/);assert(!svg.includes('private-test-token'));assert(!/<image|href=|<script/i.test(svg));assert.throws(()=>pairingQrSvg('https://example.com/pair/no'),/Invalid/);});

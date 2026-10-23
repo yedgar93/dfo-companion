@@ -1,8 +1,10 @@
+const phoneScroll=()=>document.querySelector('main');
+const phoneScrollY=()=>phoneScroll()?.scrollTop??0;
 let phoneRevealUntil=0,phoneRevealCompact=true;
 function phoneHasContentOverflow(){
  const main=document.querySelector('main'),space=document.querySelector('.mobile-hud-space'),hud=document.querySelector('.hud');if(!main||!space||!hud)return false;
  const full=Number(space.dataset.fullHeight)||hud.getBoundingClientRect().height;
- return main.getBoundingClientRect().height-space.getBoundingClientRect().height+full>innerHeight+2;
+ return main.scrollHeight-space.getBoundingClientRect().height+full>main.clientHeight+2;
 }
 function revealPhoneSection(target){
  if(!target)return;
@@ -11,11 +13,11 @@ function revealPhoneSection(target){
   const align=()=>{
    const hud=document.querySelector('.hud'),space=document.querySelector('.mobile-hud-space');let top=hud?.getBoundingClientRect().bottom??0;
    if(space)space.style.height=top+'px';
-   let at=Math.max(0,scrollY+target.getBoundingClientRect().top-top-8);
+   let at=Math.max(0,phoneScrollY()+target.getBoundingClientRect().top-top-8);
    // A short page may have no scroll range. Keep its full header rather than
    // leaving an expanded-height hole beneath a compact bar.
-   if(at<=1){phoneRevealCompact=false;document.body.classList.remove('mobile-hud-compact');top=hud?.getBoundingClientRect().bottom??0;if(space)space.style.height=top+'px';at=Math.max(0,scrollY+target.getBoundingClientRect().top-top-8);}
-   document.documentElement.style.setProperty('--hud-h',top+'px');window.scrollTo({top:at,behavior:'instant'});
+   if(at<=1){phoneRevealCompact=false;document.body.classList.remove('mobile-hud-compact');top=hud?.getBoundingClientRect().bottom??0;if(space)space.style.height=top+'px';at=Math.max(0,phoneScrollY()+target.getBoundingClientRect().top-top-8);}
+   document.documentElement.style.setProperty('--hud-h',top+'px');phoneScroll()?.scrollTo({top:at,behavior:'instant'});
   };
   requestAnimationFrame(()=>{align();requestAnimationFrame(align);});
  }
@@ -134,9 +136,9 @@ if(phoneHud){
  const about=document.getElementById('about-button'),aboutHome=document.createComment('About action');if(about)about.before(aboutHome);
  const home=document.createComment('Character top bar'),space=document.createElement('div');
  space.className='mobile-hud-space';space.setAttribute('aria-hidden','true');phoneHud.before(home,space);
- let queued=false,lastY=scrollY,travel=0;
+ let queued=false,lastY=phoneScrollY(),travel=0;
  function density(){
-  queued=false;const y=Math.max(0,scrollY),delta=y-lastY;lastY=y;
+  queued=false;const y=Math.max(0,phoneScrollY()),delta=y-lastY;lastY=y;
   if(!mobile.matches){document.body.classList.remove('mobile-hud-compact');return;}
   if(!phoneHasContentOverflow()){travel=0;phoneRevealCompact=false;document.body.classList.remove('mobile-hud-compact');space.style.height=(space.dataset.fullHeight||phoneHud.getBoundingClientRect().height)+'px';return;}
   if(Date.now()<phoneRevealUntil){travel=0;document.body.classList.toggle('mobile-hud-compact',phoneRevealCompact);return;}
@@ -147,9 +149,9 @@ if(phoneHud){
  }
 
  function place(){if(mobile.matches){document.body.append(phoneHud);const tools=document.querySelector('#connection-page>.panel-heading');if(about&&tools)tools.append(about);document.body.classList.remove('mobile-hud-compact');space.dataset.fullHeight=phoneHud.getBoundingClientRect().height;space.style.height=space.dataset.fullHeight+'px';density();}else{document.body.classList.remove('mobile-hud-compact');home.after(phoneHud);if(about)aboutHome.after(about);}}
- function measure(){const height=phoneHud.getBoundingClientRect().height,value=height+'px';if(mobile.matches&&!document.body.classList.contains('mobile-hud-compact')){space.dataset.fullHeight=height;if(space.style.height!==value)space.style.height=value;}if(document.documentElement.style.getPropertyValue('--hud-h')!==value)document.documentElement.style.setProperty('--hud-h',value);}
+ function measure(){const visibleHeight=(visualViewport?.height??innerHeight)+'px';if(document.documentElement.style.getPropertyValue('--phone-visible-height')!==visibleHeight)document.documentElement.style.setProperty('--phone-visible-height',visibleHeight);const panel=document.querySelector('.equipment-panel');if(mobile.matches&&panel?.getClientRects().length&&pageTabs){const top=panel.getBoundingClientRect().top+phoneScrollY(),available=Math.floor((visualViewport?.height??innerHeight)-top-pageTabs.getBoundingClientRect().height-8);const value=Math.max(0,available)+'px';if(document.documentElement.style.getPropertyValue('--phone-equipment-height')!==value)document.documentElement.style.setProperty('--phone-equipment-height',value);}const height=phoneHud.getBoundingClientRect().height,value=height+'px';if(mobile.matches&&!document.body.classList.contains('mobile-hud-compact')){space.dataset.fullHeight=height;if(space.style.height!==value)space.style.height=value;}if(document.documentElement.style.getPropertyValue('--hud-h')!==value)document.documentElement.style.setProperty('--hud-h',value);}
  let measureQueued=false;
- new ResizeObserver(()=>{if(!measureQueued){measureQueued=true;requestAnimationFrame(()=>{measureQueued=false;measure();});}}).observe(phoneHud);new ResizeObserver(()=>{if(!queued){queued=true;requestAnimationFrame(density);}}).observe(document.querySelector('main'));window.addEventListener('resize',()=>{place();measure();});mobile.addEventListener('change',()=>{place();measure();});
- window.addEventListener('scroll',()=>{if(!queued){queued=true;requestAnimationFrame(density);}},{passive:true});
+ new ResizeObserver(()=>{if(!measureQueued){measureQueued=true;requestAnimationFrame(()=>{measureQueued=false;measure();});}}).observe(phoneHud);const contentObserver=new ResizeObserver(()=>{if(!queued){queued=true;requestAnimationFrame(()=>{measure();density();});}});for(const node of document.querySelectorAll('main,main>.page,.mobile-hud-space'))contentObserver.observe(node);visualViewport?.addEventListener('resize',()=>requestAnimationFrame(measure));window.addEventListener('resize',()=>{place();measure();});mobile.addEventListener('change',()=>{place();measure();});
+ phoneScroll()?.addEventListener('scroll',()=>{if(!queued){queued=true;requestAnimationFrame(density);}},{passive:true});
  place();measure();
 }

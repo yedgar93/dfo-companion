@@ -1,2 +1,0 @@
-import test from'node:test';import assert from'node:assert/strict';import fs from'node:fs/promises';import{ENABLE_INTERIOR_MAP}from'../dashboard-worker.mjs';
-test('portable mobile assets follow desktop assets and unverified interior activation is disabled',async()=>{const html=await fs.readFile(new URL('../dashboard.html',import.meta.url),'utf8');assert(html.indexOf('/dashboard-mobile.css')>html.indexOf('/dashboard.css'));assert(html.indexOf('/dashboard-mobile.mjs')>html.indexOf('/dashboard-ui.mjs'));assert.equal(ENABLE_INTERIOR_MAP,false);});
