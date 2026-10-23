@@ -67,7 +67,7 @@ async function runCase(engine,profile){
  page.on('pageerror',error=>errors.push(error.message));
  const prefix=engine+'-'+profile.name;
  const capture=async name=>{await page.screenshot({path:path.join(output,prefix+'-'+name+'.png'),animations:'disabled'});};
- const tab=async id=>{await page.locator('[data-page="'+id+'"]').tap();await page.locator('#'+id).waitFor({state:'visible'});};
+ const tab=async id=>{await page.locator('[data-page="'+id+'"]').tap();await page.locator('#'+id).waitFor({state:'visible'});await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));};
  try{
   let target;
   if(live){target=await pairing();origin=target.origin;}
@@ -86,7 +86,7 @@ async function runCase(engine,profile){
   await page.locator('#inventory-items .item').first().waitFor({state:'attached',timeout:20000});
   entry.capabilities=await page.evaluate(()=>({maxTouchPoints:navigator.maxTouchPoints,coarsePointer:matchMedia('(pointer:coarse)').matches,touchStart:'ontouchstart' in window}));
   await page.evaluate(()=>{window.__mobileTestTouch=false;document.addEventListener('touchstart',event=>{if(event.isTrusted)window.__mobileTestTouch=true;},{once:true});});
-  await tab('pack');assert(await page.evaluate(()=>window.__mobileTestTouch),'Phone tap did not deliver a trusted touch event');entry.checks.push('trusted touch interaction');
+  await tab('pack');assert(await page.locator('.gear').evaluateAll(ns=>ns.every(n=>{const r=n.getBoundingClientRect();return r.top>=document.querySelector('.hud').getBoundingClientRect().bottom-1&&r.bottom<=document.querySelector('.tabs').getBoundingClientRect().top+1;})),'Main gear must be visible with the portrait');assert(await page.evaluate(()=>window.__mobileTestTouch),'Phone tap did not deliver a trusted touch event');entry.checks.push('trusted touch interaction');
   await page.locator('[data-mobile-view="inventory"]').tap();
   assert.equal(await page.locator('.equipment-panel').isVisible(),false,'Inventory must replace Equipment');
   for(const fraction of [0,.5,1]){await page.evaluate(f=>scrollTo(0,f*(document.documentElement.scrollHeight-innerHeight)),fraction);await page.waitForTimeout(80);assert(await page.locator('.tabs').evaluate(n=>Math.abs(n.getBoundingClientRect().bottom-innerHeight)<2),'Navigation detached from viewport bottom');}entry.checks.push('bottom navigation at all scroll positions');
@@ -98,12 +98,15 @@ async function runCase(engine,profile){
   await page.locator('.mobile-item-sheet[open]').waitFor();await noClipping(page,'.mobile-item-sheet h3');
   await capture('item-sheet');await page.locator('.mobile-item-sheet-close').tap();
   assert.equal(await page.locator('.mobile-item-sheet').isVisible(),false);entry.checks.push('search; touch item sheet; close');
-  await tab('character');await noClipping(page,'h1,.character-row');
-  await page.getByRole('button',{name:'Skills',exact:true}).tap();
-  assert(await page.evaluate(()=>{const t=document.querySelector('.character-skills').getBoundingClientRect().top;return Math.abs(t-8)<4||Math.abs(scrollY-(document.documentElement.scrollHeight-innerHeight))<4;}),'Skills shortcut uses obsolete header offset');
+  await tab('character');await noClipping(page,'.character-row');
+  await page.getByRole('button',{name:'Skills',exact:true}).tap();await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  assert(await page.evaluate(()=>{const t=document.querySelector('.character-skills').getBoundingClientRect().top;const expected=document.querySelector('.hud').getBoundingClientRect().bottom+8;return Math.abs(t-expected)<4||Math.abs(scrollY-(document.documentElement.scrollHeight-innerHeight))<4;}),'Skills shortcut must clear the compact top bar');
   await capture('skills');entry.checks.push('Character names; section jump');
+  await page.getByRole('button',{name:'Overview',exact:true}).tap();await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));await tab('pack');
+  assert(await page.locator('.mobile-pack-nav').evaluate(n=>n.getBoundingClientRect().top>=document.querySelector('.hud').getBoundingClientRect().bottom-1),'Pack navigation must not hide under the top bar after a section jump');entry.checks.push('persistent compact header; page landing');
   if(!live){fixture=dungeon;await page.reload();await page.locator('#inventory-items .item').first().waitFor({state:'attached'});}
   await tab('map');
+  assert(await page.locator('#dungeon-map').evaluate(c=>{if(c.hidden)return true;const r=c.getBoundingClientRect(),v=document.querySelector('#map-markers').viewBox.baseVal;return Math.abs(c.width/c.height-r.width/r.height)<.01&&Math.abs(v.width/v.height-r.width/r.height)<.01;}),'Dungeon canvas/markers must fill the frame aspect');
   assert(await page.locator('#map-stage').evaluate(n=>n.getBoundingClientRect().height>=295),'Map too short');await capture('map');
   await page.locator('#map-expand').tap();assert(await page.locator('body').evaluate(n=>n.classList.contains('map-expanded')));
   if(!await page.locator('#map-dungeon-plan').evaluate(n=>n.hidden)){

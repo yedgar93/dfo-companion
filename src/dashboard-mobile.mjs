@@ -1,3 +1,14 @@
+let phoneRevealUntil=0;
+function revealPhoneSection(target){
+ if(!target)return;
+ if(matchMedia('(max-width:800px)').matches){
+  phoneRevealUntil=Date.now()+250;document.body.classList.add('mobile-hud-compact');
+  const align=()=>{const top=document.querySelector('.hud')?.getBoundingClientRect().bottom??0;document.documentElement.style.setProperty('--hud-h',top+'px');window.scrollTo({top:Math.max(0,scrollY+target.getBoundingClientRect().top-top-8),behavior:'instant'});};
+  requestAnimationFrame(()=>{align();requestAnimationFrame(align);});
+ }
+ else target.scrollIntoView({block:'start'});
+}
+document.addEventListener('dfo-reveal-section',event=>revealPhoneSection(event.detail?.target));
 // Presentation-only enhancement: no network, game, reader, or settings access.
 const pack = document.getElementById('pack');
 const sourceDetail = document.getElementById('item-detail');
@@ -31,7 +42,7 @@ if (pack && sourceDetail) {
     button.addEventListener('click', () => {
       view = value;
       updateView();
-      nav.scrollIntoView({block:'start'});
+      revealPhoneSection(nav);
     });
     nav.append(button);
   }
@@ -41,7 +52,7 @@ if (pack && sourceDetail) {
   document.querySelector('.tabs')?.addEventListener('click', event => {
     const button = event.target.closest('[data-page]');
     if (!mobile.matches || !button) return;
-    queueMicrotask(() => document.getElementById(button.dataset.page)?.scrollIntoView({block:'start'}));
+    queueMicrotask(() => revealPhoneSection(document.getElementById(button.dataset.page)));
   });
   document.getElementById('map')?.addEventListener('click', event => {
     const service = event.target.closest('.service-key-row');
@@ -103,4 +114,29 @@ if (pack && sourceDetail) {
   const hud=document.querySelector('.hud');
   if(hud)new ResizeObserver(()=>document.documentElement.style.setProperty('--hud-h',hud.getBoundingClientRect().height+'px')).observe(hud);
   updateView();
+}
+
+// The phone HUD is a separate top bar. Reserve its expanded height so changing
+// density never shifts the page or oscillates around the scroll threshold.
+const phoneHud=document.querySelector('.hud');
+if(phoneHud){
+ const about=document.getElementById('about-button'),aboutHome=document.createComment('About action');if(about)about.before(aboutHome);
+ const home=document.createComment('Character top bar'),space=document.createElement('div');
+ space.className='mobile-hud-space';space.setAttribute('aria-hidden','true');phoneHud.before(home,space);
+ let queued=false,lastY=scrollY,travel=0;
+ function density(){
+  queued=false;const y=Math.max(0,scrollY),delta=y-lastY;lastY=y;
+  if(!mobile.matches){document.body.classList.remove('mobile-hud-compact');return;}
+  if(Date.now()<phoneRevealUntil){travel=0;document.body.classList.add('mobile-hud-compact');return;}
+  if(y<=1){travel=0;document.body.classList.remove('mobile-hud-compact');return;}
+  if(delta>0)travel=Math.max(0,travel)+delta;else if(delta<0)travel=Math.min(0,travel)+delta;
+  if(travel>=24)document.body.classList.add('mobile-hud-compact');
+  else if(travel<=-48)document.body.classList.remove('mobile-hud-compact');
+ }
+
+ function place(){if(mobile.matches){document.body.append(phoneHud);const tools=document.querySelector('#connection-page>.panel-heading');if(about&&tools)tools.append(about);document.body.classList.remove('mobile-hud-compact');space.style.height=phoneHud.getBoundingClientRect().height+'px';density();}else{document.body.classList.remove('mobile-hud-compact');home.after(phoneHud);if(about)aboutHome.after(about);}}
+ function measure(){if(mobile.matches&&!document.body.classList.contains('mobile-hud-compact'))space.style.height=phoneHud.getBoundingClientRect().height+'px';document.documentElement.style.setProperty('--hud-h',phoneHud.getBoundingClientRect().height+'px');}
+ new ResizeObserver(measure).observe(phoneHud);mobile.addEventListener('change',()=>{place();measure();});
+ window.addEventListener('scroll',()=>{if(!queued){queued=true;requestAnimationFrame(density);}},{passive:true});
+ place();measure();
 }

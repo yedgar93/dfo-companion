@@ -204,3 +204,63 @@
  .tabs{position:fixed!important;inset:auto 0 0!important;z-index:20;display:grid!important;grid-auto-flow:row!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;overflow:visible!important;margin:0!important;padding:4px 4px env(safe-area-inset-bottom)!important;background:linear-gradient(#262b22,#171b15);border:0;border-top:2px groove var(--edge-mid);box-shadow:0 -4px 12px #0007}
  .tabs>button{min-width:0;min-height:56px;white-space:nowrap!important;overflow-wrap:normal!important;font-size:clamp(9px,2.6vw,12px)!important;letter-spacing:0!important;padding:6px 1px!important}
 }
+
+.mobile-hud-space{display:none}
+@media(max-width:800px){
+ .mobile-hud-space{display:block;flex:none}
+ body>.hud{position:fixed!important;inset:0 0 auto!important;z-index:30;margin:0!important;width:100%;padding:calc(8px + env(safe-area-inset-top)) 12px 8px!important;background:#1b2119;border-bottom:1px solid #797451;box-shadow:0 3px 10px #0007;gap:5px 10px!important}
+ html{scroll-padding-top:calc(var(--hud-h,140px) + 8px)!important}
+ body.mobile-hud-compact>.hud{grid-template-columns:minmax(0,1fr) auto!important;gap:3px 8px!important;padding-bottom:6px!important}
+ body.mobile-hud-compact>.hud .eyebrow,body.mobile-hud-compact>.hud #character-meta,body.mobile-hud-compact>.hud .hud-place>small,body.mobile-hud-compact>.hud .hud-gold,body.mobile-hud-compact>.hud .connection{display:none!important}
+ body.mobile-hud-compact>.hud h1{font-size:14px!important;line-height:1.2;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+ body.mobile-hud-compact>.hud .hud-place>strong{font-size:11px!important;line-height:1.2;max-width:40vw!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+ body.mobile-hud-compact>.hud .vitals{gap:8px!important}.hud .vitals article{min-width:0}
+ body.mobile-hud-compact>.hud .vitals article{gap:2px!important}body.mobile-hud-compact>.hud .vitals article span{font-size:9px!important}body.mobile-hud-compact>.hud .vitals strong{font-size:10px!important}body.mobile-hud-compact>.hud .track{height:4px}
+ body.map-expanded>.hud{display:none!important}
+ /* A phone overview keeps the portrait and every main slot together. Full
+    item names and comparisons open in the existing touch detail sheet. */
+ .equipment-panel{gap:6px!important;padding:8px!important}.equipment-panel>.character-stats{display:none}.equipment-panel>.panel-heading{min-height:26px;padding-bottom:4px}.equipment-panel>.panel-heading h2{font-size:14px}
+ .equipment-stage{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(70px,.9fr) minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr)!important;height:clamp(265px,43dvh,360px)!important;min-height:0!important;gap:5px!important;align-items:stretch!important}
+ .equipment-stage>.portrait-wrap{grid-column:2!important;grid-row:1!important;height:100%!important;min-height:0;max-width:none;width:100%}
+ .equipment-stage>.portrait-wrap .portrait{width:100%;max-width:none;height:100%;min-height:0}.portrait-caption{display:none}
+ #gear-left{grid-column:1;grid-row:1}#gear-right{grid-column:3;grid-row:1}
+ .equipment-stage>.gear-column{display:flex!important;flex-direction:column!important;min-height:0;gap:4px!important}
+ .gear-column>.gear{flex:1 1 0!important;min-height:0!important}.gear-column>.gear-pair{display:flex!important;flex-direction:column!important;flex:2 1 0!important;min-height:0;gap:4px!important}
+ .gear,.gear-pair>.gear{display:grid!important;grid-template-columns:22px minmax(0,1fr)!important;grid-template-rows:11px minmax(0,1fr) 3px!important;min-height:0!important;height:auto!important;flex:1 1 0!important;padding:3px!important;gap:1px 3px!important;overflow:hidden}
+ .gear .gear-label,.gear-pair .gear>.gear-label{grid-column:1/-1!important;grid-row:1!important;font-size:10px!important;line-height:11px!important;padding:0;white-space:nowrap!important;overflow:hidden!important}
+ .gear>.gear-name,.gear-pair .gear>.gear-name{display:none!important}
+ .gear>img,.gear>.fallback,.gear-pair .gear>img,.gear-pair .gear>.fallback{grid-column:1!important;grid-row:2!important;align-self:center;width:22px!important;height:22px!important;max-height:100%;font-size:20px;line-height:1}
+ .gear>.condition-label,.gear-pair .gear>.condition-label{position:static!important;grid-column:2!important;grid-row:2!important;align-self:center;font-size:10px!important;line-height:12px!important;white-space:nowrap}
+ .gear>.track,.gear-pair .gear>.track{grid-column:1/-1!important;grid-row:3!important;width:100%!important;height:3px;margin:0}
+ .equipment-panel>.accessories{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important}.accessory-pair{gap:3px!important}.accessory{min-height:44px!important;height:44px!important;padding:4px!important;justify-content:center!important;gap:0!important}.accessory img,.accessory>.fallback{height:24px!important;width:24px!important;font-size:22px;line-height:24px}.accessory .accessory-name{display:none}.accessory-group .accessory-caption{font-size:10px!important;line-height:12px!important;white-space:nowrap!important}
+ .equipment-panel>#upgrade-summary{font-size:10px!important;line-height:1.3!important}
+ .mobile-pack-nav button{min-height:40px!important;font-size:14px!important}.mobile-pack-nav{padding:0;gap:5px}
+ body[data-active-page=pack] #current-quest{display:none!important}
+}
+.is-dungeon #dungeon-map{object-fit:fill!important}
+
+/* Compact navigation reads as a tab strip, with a full touch target. */
+@media(max-width:800px){
+ .character-jump{gap:0;padding:2px 0!important;border-bottom:1px solid #78755d}
+ .character-jump button{border:0;border-radius:0;background:transparent;box-shadow:none;min-height:40px!important;padding:5px 8px!important;font-size:13px!important}
+ .character-jump button:hover,.character-jump button:focus-visible{background:#343d2d;color:#ecd390}
+ .mobile-pack-nav{gap:0;border-bottom:1px solid #827853;background:transparent}
+ .mobile-pack-nav button{border:0!important;background:transparent!important;box-shadow:none!important;border-radius:0;min-height:40px!important;padding:5px 8px!important}
+ .mobile-pack-nav button[aria-pressed=true]{box-shadow:inset 0 -2px #d0b669!important;color:#f0d187!important}
+ .map-page>.panel-heading{padding-bottom:5px;gap:3px}.map-page>.panel-heading h2{font-size:15px;line-height:1.25}.map-page>.panel-heading>#map-freshness{font-size:10px!important}
+ .map-toolbar{min-height:40px}.map-camera-controls button,.map-camera-controls #map-expand,.map-floor-menu>summary{min-height:40px!important}
+ .map-objective-status{font-size:11px!important;padding:2px 5px;line-height:1.25!important}
+}
+@media(max-width:800px) and (max-height:740px){
+ .equipment-stage{height:clamp(230px,36dvh,270px)!important}
+ .equipment-panel>.accessories .accessory{min-height:40px!important;height:40px!important}
+ .equipment-panel>.accessories{gap:3px!important}
+}
+
+@media(max-width:800px){body>.hud .eyebrow{display:none!important}#connection-page>.panel-heading .about-button{min-height:36px;padding:5px 10px;font-size:13px}}
+
+@media(max-width:800px){
+ .mobile-pack-nav button{min-height:36px!important;font-size:13px!important;padding:4px 8px!important}
+ #current-quest .quest-toggle{min-height:32px!important;justify-self:end;padding:4px 8px!important;font-size:12px!important;line-height:1.25;border:1px solid #79765c;border-radius:4px;background:#30382a;box-shadow:none}
+ .current-quest{padding:7px 9px!important;gap:4px!important}.current-quest strong{font-size:14px!important}.current-quest>div>span,.current-quest .quest-clock{font-size:10px!important}
+}

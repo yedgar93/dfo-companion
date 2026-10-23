@@ -1,6 +1,6 @@
 # DFO Companion: development handoff
 
-Last reconciled: 2026-10-23. Current release candidate source: **0.4.27**, based on main `ca08567` (0.4.24); the historical fully verified packaged baseline was **0.4.9** for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
+Last reconciled: 2026-10-23. Current release candidate source: **0.4.28**, based on main `ca08567` (0.4.24); the historical fully verified packaged baseline was **0.4.9** for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
 
 Read this file, `AGENTS.md`, `README.md`, and `docs/RELEASING.md` before changing the application. Inspect the current source and latest release: this document records findings at the baseline, not a promise that future game versions have identical internals. Keep this document updated as findings change.
 
@@ -318,3 +318,9 @@ Independent testing: `npm run test:mobile` uses Playwright WebKit/Chromium touch
 Desktop equipment overview now uses the available viewport instead of fixed 560px portrait/104px gear/100px accessory minimums and an 800px page minimum. Attributes and inventory options start collapsed. Compact desktop names use two lines with full hover/focus inspection and accessible names; mobile keeps full text. Inventory and detail content scroll within the dashboard. Map gestures track pointer IDs independently, support two-finger centroid pan and pinch zoom, rebase after finger removal, and clear on cancellation/visibility changes. No new game reads.
 
 The map toolbar now keeps Fit, Follow, zoom and expand in one row; More contains plan/floors/orientation, area/service selection and help. Province/Bay maps now support bounded local pan/zoom with markers using the same cropped view coordinates. These are presentation-only operations on cached artwork.
+
+## iPhone layout follow-up (0.4.28)
+
+Real iPhone screenshots established that the 3D map was clipped to a fixed 2:1 drawing strip inside a tall frame. Dungeon camera projection, fitted bounds, backing canvas resolution, SVG marker viewport, labels and panning now share the actual frame aspect. Pixel density is capped at 2; no extra game reads. Priority markers reserve space during label placement.
+
+Phone equipment is an overview with the full portrait between compact slot buttons and accessory groups below. Full names/comparisons are available by tapping into the existing item sheet. Equipment has no duplicate quest banner or attributes section; attributes remain on Character. The character/vitals HUD stays above all phone pages and compacts on downward scrolling and expands on upward scrolling (24px/48px direction thresholds, always full at the top); a reserved expanded-height spacer prevents density changes from shifting content. Section jumps compact first and measure the actual bar, with a short programmatic-scroll guard to prevent expansion from hiding the destination. Equipment/Inventory use 36px tabs and Quest details uses a compact 32px action. About lives in Connection on phone and returns to its desktop location when widened. Character/pack navigation uses compact tab strips rather than pill buttons.

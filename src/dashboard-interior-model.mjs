@@ -11,11 +11,12 @@ export function interiorFrame(mesh,position){const points=mesh.points.filter(poi
 export function pointOnInterior(p,frame){return point(p)&&frame?{x:(p.x-frame.x0)/frame.width*320,y:160-(p.z-frame.z0)/frame.height*160}:null;}
 export function trianglesAtHeight(mesh,y,near=true){if(!near||!finite(y))return mesh.triangles;return mesh.triangles.filter(t=>Math.min(...t.map(p=>p.y))<=y+3&&Math.max(...t.map(p=>p.y))>=y-3);}
 
-export function dungeonCamera(center,span,yaw,pitch){
- const c=Math.cos(yaw),s=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch),hx=span/2,hy=span/4,depth=Math.max(1000,span*4);
+export function dungeonCamera(center,span,yaw,pitch,aspect=2){
+ aspect=Number.isFinite(aspect)&&aspect>0?aspect:2;const viewHeight=320/aspect;
+ const c=Math.cos(yaw),s=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch),hx=span/2,hy=span/(2*aspect),depth=Math.max(1000,span*4);
  const matrix=[c/hx,-sp*s/hy,-cp*s/depth,0,0,cp/hy,-sp/depth,0,-s/hx,-sp*c/hy,-cp*c/depth,0,0,0,0,1];
  matrix[12]=-(matrix[0]*center.x+matrix[4]*center.y+matrix[8]*center.z);matrix[13]=-(matrix[1]*center.x+matrix[5]*center.y+matrix[9]*center.z);matrix[14]=-(matrix[2]*center.x+matrix[6]*center.y+matrix[10]*center.z);
- return {matrix,project(p){return {x:(matrix[0]*p.x+matrix[4]*p.y+matrix[8]*p.z+matrix[12]+1)*160,y:(1-matrix[1]*p.x-matrix[5]*p.y-matrix[9]*p.z-matrix[13])*80};}};
+ return {matrix,viewHeight,project(p){return {x:(matrix[0]*p.x+matrix[4]*p.y+matrix[8]*p.z+matrix[12]+1)*160,y:(1-matrix[1]*p.x-matrix[5]*p.y-matrix[9]*p.z-matrix[13])*viewHeight/2};}};
 }
 
 // Remove coplanar triangle diagonals; retain corners and open boundaries.
@@ -36,11 +37,11 @@ export function objectiveCameraYaw(position,goal,previous=.65){if(!position||!go
 export function dungeonScreenHeading(camera,position,degrees){if(!camera||!position||!Number.isFinite(degrees))return null;const angle=degrees*Math.PI/180,a=camera.project(position),b=camera.project({x:position.x+Math.sin(angle),y:position.y,z:position.z+Math.cos(angle)}),dx=b.x-a.x,dy=b.y-a.y;if(![dx,dy].every(Number.isFinite)||Math.hypot(dx,dy)<1e-8)return null;return (Math.atan2(dx,-dy)*180/Math.PI+360)%360;}
 
 // Fit in projected camera space, including vertical extent. The projection is 2:1.
-export function fittedDungeonFrame(points,position,yaw,pitch){
+export function fittedDungeonFrame(points,position,yaw,pitch,aspect=2){
  const all=[position,...points].filter(point);if(!all.length)return {center:{x:0,y:0,z:0},span:40};
  let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity,z0=Infinity,z1=-Infinity;
  for(const p of all){x0=Math.min(x0,p.x);x1=Math.max(x1,p.x);y0=Math.min(y0,p.y);y1=Math.max(y1,p.y);z0=Math.min(z0,p.z);z1=Math.max(z1,p.z);}
  const center={x:(x0+x1)/2,y:(y0+y1)/2,z:(z0+z1)/2},c=Math.cos(yaw),s=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
  let halfX=0,halfY=0;for(const p of all){const x=p.x-center.x,y=p.y-center.y,z=p.z-center.z;halfX=Math.max(halfX,Math.abs(c*x-s*z));halfY=Math.max(halfY,Math.abs(-sp*s*x+cp*y-sp*c*z));}
- return {center,span:Math.max(40,halfX*2,halfY*4)*1.15};
+ return {center,span:Math.max(40,halfX*2,halfY*2*aspect)*1.15};
 }
