@@ -1,10 +1,10 @@
 # DFO Companion: development handoff
 
-Last reconciled: 2026-10-23. Latest verified published baseline: **0.4.34**, release source `569b4b7`, for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
+Last reconciled: 2026-10-23. Latest verified published baseline: **0.4.35**, release source `a36bf1e`, for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
 
 Read this file, `AGENTS.md`, `README.md`, and `docs/RELEASING.md` before changing the application. Inspect the current source and latest release: this document records findings at the baseline, not a promise that future game versions have identical internals. Keep this document updated as findings change.
 
-## Upgrade scoring and unidentified labels (0.4.35 candidate)
+## Upgrade scoring and unidentified labels (0.4.35)
 
 Unidentified items must never use their stored magical name: projectDetails/normalizeItemName exposes only a bundled base-template label (or Unidentified item). Identified %it names resolve from copied template metadata or the bundled template cache. Hidden affixes, enchantments, description and rarity remain redacted. This changes copied presentation only.
 
@@ -14,7 +14,7 @@ For RRI leather/fur armor (520–526, material0) missing only the appearance var
 
 Pawn reference: https://github.com/VgerMods/Pawn. Reusable ideas are consistent character-specific scales, eligibility, compatible-slot baselines and cached comparison. This implementation is independent; no Pawn code or WoW class weights are copied. Automatic priorities remain heuristic, and this is a compatible single-item swap evaluator rather than a complete multi-item loadout optimizer.
 
-All computation reuses bounded cached snapshots (500 items maximum); no polling changes, game reads, debugger attachment or game control were added. Validation: 393/393 tests, production build, and synthetic browser checks at desktop/phone sizes passed. A frozen cached 131-item inventory replay produced longsword/claymore switch-back and helm recommendations in about 8 ms locally. Installed-release verification remains a separate step.
+All computation reuses bounded cached snapshots (500 items maximum); no polling changes, game reads, debugger attachment or game control were added. Validation: 393/393 tests, production build, and synthetic browser checks at desktop/phone sizes passed. A frozen cached 131-item inventory replay produced longsword/claymore switch-back and helm recommendations in about 8 ms locally. Published native Windows/Mac and mobile CI passed. Signed release manifest/tag/artifact hashes verified. After automatic installation, all 16 served UI resources matched release source (normalized line endings), UI fingerprint 1319448eeb77f247. Refreshed and re-paired browser verification showed green longsword/claymore recommendations, amber unidentified estimates with generic names, worn-slot better-in-pack detail, and no active tile fade animations. No manual reader refresh or DFO control was used. Private captures stay outside Git.
 
 ## Repository and portable setup
 
