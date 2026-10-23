@@ -1,6 +1,6 @@
 # Portable companion feasibility and validation
 
-The portable deliverable is one `DFO-Companion.mjs` file, run with Node.js22.15 or newer. It combines the reader, dashboard server, dashboard code, styles, fonts, reference pictures, licenses, and reviewed-version metadata. It does not require npm packages on the user's machine. It does not contain the DFO executable or original game data.
+The portable deliverable is one `DFO-Companion.mjs` file, run with Node.js 22.15 or newer. It combines the reader, dashboard server, dashboard code, styles, fonts, reference pictures, licenses, and reviewed-version metadata. It does not require npm packages on the user's machine. It does not contain the DFO executable or original game data.
 
 Runtime artwork decoded from the user's own game is cached per user: `%LOCALAPPDATA%/DFOCompanion/paperdoll` on Windows, `~/Library/Caches/DFOCompanion/paperdoll` on macOS, and `$XDG_CACHE_HOME/DFOCompanion/paperdoll` (or `~/.cache/DFOCompanion/paperdoll`) on Linux. `DFO_COMPANION_CACHE` can override the parent cache directory. This cache is disposable and is not a second executable or feeder process.
 
@@ -10,7 +10,7 @@ Run `node DFO-Companion.mjs` to start only the companion, or add `--open` to ope
 
 ## Connection requirement
 
-An ordinary launch of the current official game does not expose a supported external live-character API. The installed0.1.10435 Electron main and preload sources were inspected without launching or changing the game. Main source supports Chromium's explicitly supplied remote-debugging flag; it does not start a read-only companion listener automatically. The isolated preload exposes local storage, update notification and pointer-lock functions, not an external live-character service.
+An ordinary launch of the current official game does not expose a supported external live-character API. The installed 0.1.10435 Electron main and preload sources were inspected without launching or changing the game. Main source supports Chromium's explicitly supplied remote-debugging flag; it does not start a read-only companion listener automatically. The isolated preload exposes local storage, update notification and pointer-lock functions, not an external live-character service.
 
 Therefore the portable companion can connect to a game already started with the local diagnostic endpoint. It cannot safely add startup flags to an existing process. A true normal-launch, no-flags connection requires a supported game API or a developer-provided integration. The companion must explain this state and wait; it must not silently restart or modify the game.
 
