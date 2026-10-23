@@ -106,8 +106,12 @@ async function runCase(engine,profile){
   await tab('map');
   assert(await page.locator('#map-stage').evaluate(n=>n.getBoundingClientRect().height>=295),'Map too short');await capture('map');
   await page.locator('#map-expand').tap();assert(await page.locator('body').evaluate(n=>n.classList.contains('map-expanded')));
-  if(await page.locator('#map-dungeon-plan').isVisible())await page.locator('#map-dungeon-plan').tap();
-  await capture('expanded-map');await page.locator('#map-expand').tap();entry.checks.push('map; expanded mode; plan control');
+  if(!await page.locator('#map-dungeon-plan').evaluate(n=>n.hidden)){
+   await page.locator('.map-floor-menu>summary').tap();await page.locator('#map-dungeon-plan').tap();
+   assert.equal(await page.locator('#map-dungeon-plan').innerText(),'3D view','Plan toggle did not enter plan view');
+   await page.locator('.map-floor-menu>summary').tap();entry.checks.push('Plan control through More menu');
+  }
+  await capture('expanded-map');await page.locator('#map-expand').tap();entry.checks.push('map; expanded mode');
   if(!live){fixture={...structuredClone(dungeon),stale:true,lastSuccess:'2000-01-01T00:00:00Z',detailsAt:'2000-01-01T00:00:00Z',detailsVersion:201};await page.reload();await page.locator('#inventory-items .item').first().waitFor({state:'attached'});await tab('map');
    assert.match(await page.locator('#map-callouts').innerText(),/Last known position/);assert.equal(await page.locator('.hud .vitals>.stale-age-tag').count(),0);await capture('stale-map');entry.checks.push('single freshness label; stale map marker');}
   await tab('connection-page');assert.equal(await page.locator('#game-start-panel').isVisible(),false,'Phone must not offer computer launch');await capture('connection');entry.checks.push('computer actions hidden');
