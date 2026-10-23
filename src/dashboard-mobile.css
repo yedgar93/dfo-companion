@@ -195,3 +195,12 @@
 
 /* The mobile header scrolls normally; section jumps need no header-sized gap. */
 @media(max-width:800px){html{scroll-padding-top:8px}.character-column{scroll-margin-top:0}}
+
+/* Keep navigation attached to the viewport throughout the mobile layout,
+   including landscape phones and browsers using a wider layout viewport. */
+@media(max-width:800px){
+ :root{--phone-bar:64px}
+ main{padding-bottom:calc(var(--phone-bar) + 24px + env(safe-area-inset-bottom))!important}
+ .tabs{position:fixed!important;inset:auto 0 0!important;z-index:20;display:grid!important;grid-auto-flow:row!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;overflow:visible!important;margin:0!important;padding:4px 4px env(safe-area-inset-bottom)!important;background:linear-gradient(#262b22,#171b15);border:0;border-top:2px groove var(--edge-mid);box-shadow:0 -4px 12px #0007}
+ .tabs>button{min-width:0;min-height:56px;white-space:nowrap!important;overflow-wrap:normal!important;font-size:clamp(9px,2.6vw,12px)!important;letter-spacing:0!important;padding:6px 1px!important}
+}

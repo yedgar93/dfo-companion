@@ -2,6 +2,19 @@
 const pack = document.getElementById('pack');
 const sourceDetail = document.getElementById('item-detail');
 const mobile = matchMedia('(max-width:800px)');
+// Keep fixed phone navigation outside the scrolling page's containing block.
+// Restore its original position when a desktop window becomes wide again.
+const pageTabs = document.querySelector('.tabs');
+if (pageTabs) {
+  const home = document.createComment('Companion page navigation');
+  pageTabs.before(home);
+  const placeTabs = () => {
+    if (mobile.matches) document.body.append(pageTabs);
+    else home.after(pageTabs);
+  };
+  mobile.addEventListener('change', placeTabs);
+  placeTabs();
+}
 if (pack && sourceDetail) {
   const nav = document.createElement('nav');
   nav.className = 'mobile-pack-nav';

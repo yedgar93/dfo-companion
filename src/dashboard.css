@@ -530,3 +530,5 @@ h1,#character-meta,.hud-place>strong,.hud-place>small,#map-title,.quest h3,.curr
 @media(max-width:800px){.accessories{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 /* The QR quiet zone is part of the SVG; its container must match the square. */
 .connection-overview #phone-qr{width:180px;max-width:100%;aspect-ratio:1;line-height:0;align-self:start}.connection-overview #phone-qr svg{display:block;width:100%;max-width:none;height:auto;aspect-ratio:1}
+
+.inventory-status{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:none;font-size:12px;overflow-wrap:anywhere}.inventory-status button{flex:none;padding:6px 8px;background:#30382b;border:1px solid #8b8863}.inventory-status button[hidden]{display:none}

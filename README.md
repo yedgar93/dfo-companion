@@ -18,6 +18,8 @@ Install Node 22.15 or newer, clone the repository, then run `npm ci` and `npm st
 
 - `npm test` runs isolated tests with mocked game data and temporary local servers.
 - `npm run test:visual` checks desktop/phone interactions using synthetic fixtures in offscreen Electron and writes reviewable captures to `visual-results/`. It never connects to the game.
+- `npm run test:mobile` runs touch-enabled WebKit and Chromium fixture checks at three phone sizes; install engines first with `npx playwright install webkit chromium`. Captures and JSON results go to `visual-results/mobile/`. These are emulation checks, not physical iPhone verification.
+- `npm run test:mobile:live` checks the installed Companion’s paired, cached phone view without game controls or full refreshes. Keep live captures private.
 - `npm run dist:win` builds a Windows Electron installer on Windows.
 - `npm run dist:mac` builds an Apple Silicon Electron app, ZIP and DMG on macOS.
 - Runtime locations are discovered from the current OS and user account; assets are resolved relative to the app. No developer machine paths are required.

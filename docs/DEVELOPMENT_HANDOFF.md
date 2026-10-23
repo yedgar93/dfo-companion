@@ -1,6 +1,6 @@
 # DFO Companion: development handoff
 
-Last reconciled: 2026-10-22. Current release candidate source: **0.4.25**, based on main `ca08567` (0.4.24); the historical fully verified packaged baseline was **0.4.9** for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
+Last reconciled: 2026-10-23. Current release candidate source: **0.4.26**, based on main `ca08567` (0.4.24); the historical fully verified packaged baseline was **0.4.9** for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
 
 Read this file, `AGENTS.md`, `README.md`, and `docs/RELEASING.md` before changing the application. Inspect the current source and latest release: this document records findings at the baseline, not a promise that future game versions have identical internals. Keep this document updated as findings change.
 
@@ -306,3 +306,9 @@ Public workflow/release status can be read through GitHub's API or normal GitHub
 - User explicitly authorized publishing the launcher fix and pending usability batch. Candidate browser checks through the real allowlisted fixture server confirm Start DFO is visible during a healthy connection and the 393px Skills shortcut lands at 8.23px with 8px scroll padding. No launch against DFO was performed. Version 0.4.25 requires both native CI jobs before publication.
 
 - Native CI text-bound checks caught the patched pixel-font 5 glyph extending outside the old 1ch digit box (10.5px ink in an 8.2px box at 14px text). Fixed boxes now use 0.8em so figures remain stable without clipping. This was a real text-bound defect, not a waived check.
+
+## Mobile navigation follow-up (2026-10-23)
+
+A real iPhone report showed bottom navigation floating above empty space; desktop phone emulation did not reproduce it. Candidate moves mobile navigation directly under body, uses fixed bottom placement throughout the <=800px layout, reserves safe-area space, and prevents single-letter tab wrapping. Physical iPhone verification remains required after release. Inventory result counts, active filters and Clear filters now remain outside the collapsed options. Successful live reads replace stale startup messages.
+
+Independent testing: `npm run test:mobile` uses Playwright WebKit/Chromium touch contexts and synthetic data through the real allowlisted server. The mobile CI workflow saves synthetic captures; no game connection. `--live` uses paired cached endpoints only, never publish its captures. Local macOS sandbox can block browser process startup; report this separately from assertion failures.
