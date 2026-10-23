@@ -304,3 +304,5 @@ Public workflow/release status can be read through GitHub's API or normal GitHub
 - Latest validation supersedes the earlier sandbox-limited run: all **347 tests passed** after the environment changed. Bundle build and diff checks passed. The visual harness still aborts at native Electron startup (SIGABRT), before fixture assertions; do not report those new visual assertions as passed. Independent source review found no blocking launcher issue.
 
 - User explicitly authorized publishing the launcher fix and pending usability batch. Candidate browser checks through the real allowlisted fixture server confirm Start DFO is visible during a healthy connection and the 393px Skills shortcut lands at 8.23px with 8px scroll padding. No launch against DFO was performed. Version 0.4.25 requires both native CI jobs before publication.
+
+- Native CI text-bound checks caught the patched pixel-font 5 glyph extending outside the old 1ch digit box (10.5px ink in an 8.2px box at 14px text). Fixed boxes now use 0.8em so figures remain stable without clipping. This was a real text-bound defect, not a waived check.

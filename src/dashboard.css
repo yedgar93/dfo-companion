@@ -145,8 +145,8 @@ button:disabled,select:disabled,#map-focus:disabled,.quest-actions button:disabl
 @keyframes dfo-tag-in{from{opacity:0;transform:translateY(-2px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){#pack.deferred-stale .panel-heading h2:after,#current-quest.deferred-stale #current-quest-source:after{animation:none}}
 
-/* 0.4.13 polish: each digit in a live number gets a 1ch box so values do not shift as they tick. */
-span.dg,.hud .vitals article span.dg,.vitals span.dg{display:inline-block;width:1ch!important;min-width:0;flex:none;margin:0;padding:0;text-align:center;font-size:inherit;color:inherit;letter-spacing:0}
+/* 0.4.13 polish: each digit in a live number gets a fixed box so values do not shift as they tick. */
+span.dg,.hud .vitals article span.dg,.vitals span.dg{display:inline-block;width:.8em!important;min-width:0;flex:none;margin:0;padding:0;text-align:center;font-size:inherit;color:inherit;letter-spacing:0}
 
 /* 0.4.13 polish: stale pages carry their age in words. */
 
