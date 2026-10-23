@@ -77,12 +77,32 @@ RRI armor uses its own chain/light ladders; leather/fur requires the copied
 appearance message. Resistance respects the 45-point rolled-gear cap beside
 non-rolled gear. Strengthens Armor and Increased Weight Allowance retain their
 non-stacking/highest-only behavior. Unknown enchantments, special effects,
-unavailable ranged-hand/draw behavior and missing required stats remain explicit.
+missing required stats remain explicit. When either weapon clock is unavailable,
+both sides use output per attack, with a timing caveat; per-second and per-attack
+units are never mixed. Changing to, from, or between ranged weapon types is an
+amber loadout choice rather than a green recommendation or blanket question mark.
 Matching bows can be compared in the currently observed worn hand: the same
-bow type's reference draw behavior cancels. A new ranged configuration is not
-assumed equip-compatible from an unknown setting.
+bow type's reference draw behavior cancels. Bow hand settings remain a caveat
+when changing loadouts.
 Sixteen copied affixes are preserved; reaching an existing copy limit marks
 coverage uncertain rather than requesting more game data.
+
+### Missing optional template enrichment (0.4.32)
+
+The optional live template cache can be empty after a game bundle change, and
+its copied JSON does not own the computed `weaponSkillUsed` property. Previously
+this left even identified weapons without comparison stats. `projectDetails()`
+now calls `completeEquipmentData()` to fill missing weapon skill, damage, weight
+and hand data using the reviewed DFO template IDs; armor uses the verified
+material/RRI/shield tables. Copied item damage overrides and weight take priority,
+and existing display data is preserved. Material damage is added exactly once.
+Unknown template IDs remain unknown; display names are never used to infer stats.
+These are offline fallbacks, so later game balance changes may require updating
+them. They do not read getters, import game modules, or add observer work.
+
+Genuinely unidentified effects still prevent a green recommendation. Missing
+unidentified effect arrays are distinct from actual snapshot overflow; their
+marker explains identification rather than falsely reporting a coverage limit.
 
 ## Performance and verification
 

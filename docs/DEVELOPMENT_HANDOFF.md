@@ -1,6 +1,6 @@
 # DFO Companion: development handoff
 
-Last reconciled: 2026-10-23. Current release candidate source: **0.4.29**, based on main `ca08567` (0.4.24); the historical fully verified packaged baseline was **0.4.9** for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
+Last reconciled: 2026-10-23. Current release candidate source: **0.4.32**, based on main `96d8c75` (0.4.31); the latest verified published baseline is **0.4.31** for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
 
 Read this file, `AGENTS.md`, `README.md`, and `docs/RELEASING.md` before changing the application. Inspect the current source and latest release: this document records findings at the baseline, not a promise that future game versions have identical internals. Keep this document updated as findings change.
 
@@ -239,6 +239,28 @@ Public workflow/release status can be read through GitHub's API or normal GitHub
 - Keep README, this handoff and tests aligned with actual implementation. A future AI should distinguish requests, code, tests, synthetic previews, user confirmation and release evidence.
 
 ## Upgrade scoring (phase 1, inventory only)
+
+### Missing-template fix (0.4.32 release source)
+
+After 0.4.31 publication, the cached dashboard state showed identified weapons
+with `displayStats: null` and no copied weapon skill. The optional template-cache
+binding can be unavailable, and template JSON lacks computed skill getters.
+The tests had relied too heavily on enriched input. Projection now fills missing
+known-template equipment data from reviewed offline DFO mappings, preserving
+copied damage/weight overrides. This changes no reader, game polling or refresh.
+Unknown magical properties still require identification; missing unidentified
+effect arrays no longer falsely claim the snapshot copy limit was reached.
+
+Ranged timing is an explained loadout tradeoff in either direction. If a weapon
+clock is unavailable, both sides compare per-attack output instead of mixing
+units. Raw reader-shaped regression tests and the desktop/phone browser check
+cover an empty optional template cache. See EQUIPMENT_SCORING.md for details.
+Release 0.4.32 was explicitly requested. Publication requires successful Windows,
+Mac and mobile CI; a source version bump alone does not establish release status.
+Local validation: all 372 tests pass, the application bundle builds, and the
+synthetic browser check passes at 1440×900 and 393×852 with zero game reads.
+The 500-item synthetic benchmark yielded around 4 ms per calculation batch;
+cached comparisons took about 0.5 ms total. This does not measure game FPS.
 
 ### Automatic-build recommendations (0.4.31 release source, 2026-10-23)
 

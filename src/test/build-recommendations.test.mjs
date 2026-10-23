@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {compareEquipment,comparisonIndicator,createComparisonSession,prepareComparisons,bestInPack,sortInventory} from '../dashboard-items.mjs';
-import {SKILL_NAMES,buildProfile,contextAfterSwap,customArmorValue,weaponScore,weaponTempo} from '../upgrade-scoring.mjs';
+import {SKILL_NAMES,buildProfile,contextAfterSwap,customArmorValue,weaponScore,weaponTempo,completeEquipmentData} from '../upgrade-scoring.mjs';
 import {projectDetails} from '../dashboard-model.mjs';
 
 const context=(extra={})=>({inventoryComplete:true,restrictionEvidenceKnown:true,careerFlags:0,forbiddenMaterials:0,
@@ -129,6 +129,35 @@ test('archers compare a matching bow in its observed hand without guessing the b
 test('projection reuses copied effective skills, all sixteen affixes, minor skills and coverage flags',()=>{
  const raw={identity:{},skills:[{name:'Long Blade',display:140,effectiveCasting:115,permanent:140}],characterSheet:{career:{weaponArmorShieldsBitfield:0,forbiddenMaterialsFlags:0,minorSkills:[29]}},inventory:{available:true,items:[{identified:true,artifact:false,affixes:Array.from({length:16},()=>({id:'weight',value:1})),enchantments:[],customEnchantments:[]}]}};
  const details=projectDetails(raw,null);assert.equal(details.comparisonContext.skills[0].effective,115);assert.deepEqual(details.comparisonContext.skillGroups.minorSkills,[29]);assert.equal(details.items[0].affixes.length,16);assert.equal(details.items[0].effectsComplete,false);
+});
+
+test('raw equipment without the optional live template cache still produces usable comparisons',()=>{
+ const raw=(extra={})=>({name:'Synthetic equipment',group:'Weapons',templateIndex:120,material:1,count:1,identified:true,affixes:[],enchantments:[],customEnchantments:[],condition:{current:100,max:100},storedStats:{minDamage:2,maxDamage:15},...extra});
+ const career={weaponArmorShieldsBitfield:0,forbiddenMaterialsFlags:0,primarySkills:[29],majorSkills:[31],minorSkills:[28]},ctx=context();
+ const input={identity:{level:5,race:'Breton'},attributes:{live:ctx.attributes},skills:ctx.skills,characterSheet:{career},inventory:{available:true,items:[raw({equipSlot:19}),raw({name:'Shield',group:'Armor',templateIndex:110,equipSlot:21,storedStats:{}}),raw({name:'Claymore',templateIndex:122,storedStats:{minDamage:2,maxDamage:19}}),raw({name:'Bow',templateIndex:129,storedStats:{minDamage:4,maxDamage:16}}),raw({name:'Gun',templateIndex:560,material:4,storedStats:{}})]}};
+ const original=JSON.stringify(input),details=projectDetails(input,null),session=createComparisonSession(details.items,details.comparisonContext);
+ assert.deepEqual(details.items[0].displayStats.damage,{min:2,max:15});assert.equal(details.items[0].template.weaponSkillUsed,'LongBlade');assert.equal(details.items[1].displayStats.baseArmour,2);
+ for(const item of details.items.slice(2)){const c=session.compare(item);assert.notEqual(comparisonIndicator(c)?.kind,'unknown',JSON.stringify(c.unknowns));assert.equal(c.unknowns.length,0);}
+ assert.equal(session.compare(details.items[3]).requiresChoice,true);assert.equal(session.compare(details.items[4]).requiresChoice,true);
+ assert.equal(JSON.stringify(input),original);
+});
+
+test('fallback respects copied overrides and template IDs, not enchanted display names',()=>{
+ const known=sword({templateIndex:120,name:'%it of Friendship',storedStats:{minDamage:8,maxDamage:21},displayStats:null,perUnitWeightKg:1});completeEquipmentData(known);
+ assert.deepEqual(known.displayStats.damage,{min:8,max:21});assert.equal(known.displayStats.perUnitWeightKg,1);assert.equal(known.template.weaponSkillUsed,'LongBlade');
+ const authoritative=sword({templateIndex:120,displayStats:{damage:{min:4,max:18},hands:'One-handed',perUnitWeightKg:2}});completeEquipmentData(authoritative);assert.equal(authoritative.displayStats.damage.max,18);
+ const unknown=sword({templateIndex:99999,template:{weaponSkillUsed:null},displayStats:null});completeEquipmentData(unknown);assert.equal(unknown.displayStats,null);assert.equal(unknown.template.weaponSkillUsed,null);
+});
+
+test('changing ranged timing is a loadout tradeoff in either direction',()=>{
+ const bow=sword({templateIndex:129,template:{weaponSkillUsed:'Archery'},equipSlot:19}),melee=sword({templateIndex:120,index:2}),gun=sword({templateIndex:560,template:{weaponSkillUsed:'Archery'},index:3});
+ for(const next of [melee,gun]){const c=compareEquipment(next,[bow,next],context(),19);assert.equal(c.requiresChoice,true);assert.equal(comparisonIndicator(c).kind,'tradeoff');assert.match(c.reason,/loadout choice/);}
+});
+
+test('missing unidentified effect arrays are not misreported as a snapshot overflow',()=>{
+ const projected=projectDetails({inventory:{available:true,items:[{group:'Weapons',templateIndex:120,material:1,identified:false,affixes:null,enchantments:null,customEnchantments:null}]}},null).items[0];
+ assert.equal(projected.effectsComplete,null);assert.equal(projected.magicKnown,false);assert.deepEqual(projected.affixes,[]);
+ const c=compareEquipment(projected,[oldSword,projected],context());assert.notEqual(c.kind,'upgrade');assert(!c.unknowns.some(s=>s.includes('coverage limit')));assert(c.unknowns.some(s=>s.includes('Unidentified')));
 });
 
 test('comparison preparation yields, cancels stale work and caches every target',async()=>{

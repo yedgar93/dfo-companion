@@ -162,6 +162,41 @@ export const isArmourPiece=i=>i?.group==='Armor'||(FOOTWEAR.has(i?.templateIndex
 // guessed. Scores describe an estimated build fit, never guaranteed live DPS.
 export const SKILL_NAMES=['Medical','Etiquette','Streetwise','Jumping','Orcish','Harpy','Giantish','Dragonish','Nymph','Daedric','Spriggan','Centaurian','Impish','Lockpicking','Mercantile','Pickpocket','Stealth','Swimming','Climbing','Backstabbing','Dodging','Running','Destruction','Restoration','Illusion','Alteration','Thaumaturgy','Mysticism','Short Blade','Long Blade','Hand-to-Hand','Axe','Blunt Weapon','Archery','Critical Strike'];
 
+// The live template cache is optional, and template JSON does not own computed
+// weaponSkillUsed getters. Static ID mappings must therefore exist independently.
+// DFO b0765ab2 characters/{itemTemplates.json,weapons.js,equipRules.js},
+// systems/roleplayRealismItems/rriItems.js and systems/{thunderlock,pistolet}.js.
+const WEAPON_ROWS=[
+ ['ShortBlade',.5,1,6,false],['ShortBlade',.75,1,8,false],['BluntWeapon',2,1,8,true],
+ ['ShortBlade',2.5,1,8,false],['ShortBlade',2,1,10,false],['LongBlade',5,1,12,false],
+ ['LongBlade',3.75,3,12,false],['LongBlade',4.5,2,16,false],['LongBlade',2.5,3,16,false],
+ ['LongBlade',7.5,2,18,true],['LongBlade',3.5,3,21,true],['BluntWeapon',4.5,1,12,false],
+ ['BluntWeapon',7,2,14,true],['BluntWeapon',7,3,18,true],['Axe',6,2,12,false],
+ ['Axe',7.5,2,16,true],['Archery',1,4,16,true],['Archery',1.5,4,18,true]
+];
+const EXTRA_WEAPON_ROWS={513:['Axe',3,2,10,false],514:['BluntWeapon',4,3,10,false],560:['Archery',6,7,26,true],562:['Archery',2.5,4,15,false]};
+const evenRound=v=>{const f=Math.floor(v);return v-f===.5?(f%2===0?f:f+1):Math.round(v);};
+
+/** Fill only missing display data on a newly projected item, never on DFO data. */
+export function completeEquipmentData(item){
+ const stats=item.displayStats??{},m=item.material,t=item.templateIndex;
+ if(item.group==='Weapons'){
+  const row=WEAPON_ROWS[t-113]??EXTRA_WEAPON_ROWS[t];if(!row)return item;
+  const [skill,weight,min,max,both]=row,modifier=WEAPON_MATERIAL_MODIFIER[m];
+  item.template={...item.template,weaponSkillUsed:item.template?.weaponSkillUsed??skill};
+  let damage=stats.damage;
+  if((!fin(damage?.min)||!fin(damage?.max))&&fin(modifier))damage={
+   min:(fin(item.storedStats?.minDamage)?item.storedStats.minDamage:min)+modifier,
+   max:(fin(item.storedStats?.maxDamage)?item.storedStats.maxDamage:max)+modifier};
+  const fallbackWeight=fin(modifier)?evenRound(Math.trunc(weight*4)*([4,5,4,4,3,4,4,2,4,5][m])/4)/4:null;
+  item.displayStats={...stats,damage,hands:stats.hands??(both?'Two-handed':'One-handed'),perUnitWeightKg:fin(stats.perUnitWeightKg)?stats.perUnitWeightKg:fin(item.perUnitWeightKg)?item.perUnitWeightKg:fallbackWeight};
+ }else if(item.group==='Armor'){
+  const armor=SHIELD_VALUES[t]??(t>=515&&t<=526?customArmorValue(item):t>=102&&t<=108?(m===0?3:m===256||m===259?6:PLATE_ARMOR_VALUES[m-512]??null):null);
+  item.displayStats={...stats,baseArmour:fin(stats.baseArmour)?stats.baseArmour:armor,perUnitWeightKg:stats.perUnitWeightKg??item.perUnitWeightKg??null};
+ }
+ return item;
+}
+
 export function customArmorValue(item){
  const t=item?.templateIndex,m=item?.material;
  if(!Number.isInteger(t)||t<515||t>526||!Number.isInteger(m))return null;
@@ -231,18 +266,18 @@ export function createBuildEvaluator(context,worn,profile=buildProfile(context,w
   const weapons=items.filter(i=>i.group==='Weapons'&&[19,21].includes(i.equipSlot));
   if(!weapons.length){
    const row=ctx.skills?.find(s=>s.name==='Hand-to-Hand'),skill=row?.effective??row?.display;
-   if(!fin(skill))return {value:0,known:false,tempoKnown:false};
+   if(!fin(skill))return {value:0,perSwing:0,known:false,tempoKnown:false};
    const fists={group:'Weapons',templateIndex:113,material:1,template:{weaponSkillUsed:'HandToHand'},affixes:[],displayStats:{damage:{min:Math.floor(skill/10)+1,max:Math.floor(skill/5)+1},hands:'One-handed',perUnitWeightKg:0}};
    const score=weaponScore(fists,ctx),tempo=weaponTempo(fists,ctx);
-   return {value:score.known?score.perSwing/(tempo??1):0,known:score.known,tempoKnown:tempo!==null};
+   return {value:score.known?score.perSwing/(tempo??1):0,perSwing:score.perSwing??0,known:score.known,tempoKnown:tempo!==null};
   }
-  const scores=weapons.map(i=>{const s=weaponScore(i,ctx),tempo=weaponTempo(i,ctx);return {known:s.known,value:s.known?s.perSwing/(tempo??1):0,tempoKnown:tempo!==null};});
-  return {known:scores.every(s=>s.known),value:scores.reduce((n,s)=>n+s.value,0)/scores.length,tempoKnown:scores.every(s=>s.tempoKnown)};
+  const scores=weapons.map(i=>{const s=weaponScore(i,ctx),tempo=weaponTempo(i,ctx);return {known:s.known,value:s.known?s.perSwing/(tempo??1):0,perSwing:s.perSwing??0,tempoKnown:tempo!==null};});
+  return {known:scores.every(s=>s.known),value:scores.reduce((n,s)=>n+s.value,0)/scores.length,perSwing:scores.reduce((n,s)=>n+s.perSwing,0)/scores.length,tempoKnown:scores.every(s=>s.tempoKnown)};
  };
  const baselineOffense=offense(worn,context);
  return (candidate,removed,slot)=>{
   const after=worn.filter(i=>!removed.includes(i));after.push({...candidate,equipSlot:slot});
-  const afterContext=contextAfterSwap(context,worn,after),afterTotals=totalsFor(after),unknown=[],components=[];
+  const afterContext=contextAfterSwap(context,worn,after),afterTotals=totalsFor(after),unknown=[],components=[],notes=[];
   let delta=0;const add=(label,value)=>{if(Math.abs(value)>1e-8){components.push({label,delta:value});delta+=value;}};
   const keys=new Set([...beforeTotals.keys(),...afterTotals.keys()]);
   for(const key of keys){const a=afterTotals.get(key),b=beforeTotals.get(key),row=a??b,change=(a?.value??0)-(b?.value??0);if(!change||['armor','damage'].includes(row.id))continue;
@@ -257,9 +292,9 @@ export function createBuildEvaluator(context,worn,profile=buildProfile(context,w
   const changesCombatStats=[...keys].some(k=>{const r=afterTotals.get(k)??beforeTotals.get(k);return ['stat','skill'].includes(r.id)&&(afterTotals.get(k)?.value??0)!==(beforeTotals.get(k)?.value??0);});
   let offensiveChange=null;
   if(changesWeapon||changesCombatStats){const next=offense(after,afterContext);if(baselineOffense.known&&next.known){
-    offensiveChange=next.value-baselineOffense.value;
+    const clocksKnown=baselineOffense.tempoKnown&&next.tempoKnown;offensiveChange=clocksKnown?next.value-baselineOffense.value:next.perSwing-baselineOffense.perSwing;
     const sameWeaponBasis=!changesWeapon||removed.some(i=>i.group==='Weapons'&&i.templateIndex===candidate.templateIndex);
-    if(!sameWeaponBasis&&(!baselineOffense.tempoKnown||!next.tempoKnown))unknown.push('Weapon speed, reach or ranged behavior is unavailable for this swap.');
+    if(!sameWeaponBasis&&!clocksKnown)notes.push('Draw, reload and swing timing are not included: weapon output is compared per attack, not per second.');
     add('reference weapon output',offensiveChange*(1+profile.mix.combat));
    }else if(changesWeapon&&!(removed.length===1&&removed[0].group==='Weapons'&&candidate.templateIndex===removed[0].templateIndex&&candidate.material===removed[0].material))unknown.push('Weapon output cannot be estimated from these item and character stats.');}
   // Compare only changed protection. Unknown retained effects cancel; unknown
@@ -275,6 +310,6 @@ export function createBuildEvaluator(context,worn,profile=buildProfile(context,w
   if((changesResist||ench.armor||ench.carry)&&worn.some(i=>!removed.includes(i)&&(i.identified!==true||i.magicKnown===false||i.effectsComplete===false)))unknown.push('Stacking and caps are uncertain while other worn magical properties are unknown.');
   unknown.push(...ench.unknown);
   const neededOutput=!(changesWeapon||changesCombatStats)||offensiveChange!==null;
-  return {known:unknown.length===0&&profile.known&&neededOutput,delta,components,unknowns:[...new Set(unknown)],offensiveChange,profile:profile.label,model:'Estimated build fit; reference combat and inferred priorities. Enemy, combat mods and tactics can change results.'};
+  return {known:unknown.length===0&&profile.known&&neededOutput,delta,components,unknowns:[...new Set(unknown)],notes,offensiveChange,profile:profile.label,model:'Estimated build fit; reference combat and inferred priorities. Enemy, combat mods and tactics can change results.'};
  };
 }

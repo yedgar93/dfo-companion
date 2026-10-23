@@ -5,11 +5,18 @@ import {readFile} from 'node:fs/promises';
 import {chromium} from 'playwright';
 import {createDashboardServer} from '../src/dashboard-server.mjs';
 import {SKILL_NAMES} from '../src/upgrade-scoring.mjs';
+import {projectDetails} from '../src/dashboard-model.mjs';
 
 const fixture=JSON.parse(await readFile(new URL('../src/test/fixtures/snapshots/town-full.json',import.meta.url),'utf8'));
 const item=(index,name,value,equipSlot=null)=>({index,name,equipSlot,group:'Jewellery',templateIndex:135,material:1,identified:true,magicKnown:true,enchantmentCount:0,special:false,effectsComplete:true,condition:{current:100,max:100},affixes:[{id:'stat',param:'intelligence',value}]});
 fixture.details.items=[item(0,'Worn strong ring',8,4),item(1,'Worn weak ring',1,5),item(2,'Small improvement',3),item(3,'Best intelligence ring',9)];
 fixture.details.comparisonContext={inventoryComplete:true,restrictionEvidenceKnown:true,careerFlags:0,forbiddenMaterials:0,skills:SKILL_NAMES.map(name=>({name,permanent:30,display:30,effective:30})),skillGroups:{primarySkills:[22,23,24],majorSkills:[25,26,27]},attributes:{strength:50,intelligence:50,willpower:50,agility:50,endurance:50,personality:50,speed:50,luck:50},level:5,race:'Breton'};
+const ringDetails=structuredClone(fixture.details);
+const rawItem=(name,templateIndex,extra={})=>({name,templateIndex,group:'Weapons',material:1,identified:true,affixes:[],enchantments:[],customEnchantments:[],condition:{current:100,max:100},...extra});
+const rawDetails=projectDetails({identity:{level:5,race:'Breton'},attributes:{live:ringDetails.comparisonContext.attributes},skills:ringDetails.comparisonContext.skills,characterSheet:{career:{weaponArmorShieldsBitfield:0,forbiddenMaterialsFlags:0,primarySkills:[29],majorSkills:[31],minorSkills:[28]}},inventory:{available:true,items:[
+ rawItem('Worn longsword',120,{equipSlot:19,storedStats:{minDamage:2,maxDamage:15}}),rawItem('Worn shield',110,{group:'Armor',equipSlot:21}),
+ rawItem('Identified claymore',122,{storedStats:{minDamage:2,maxDamage:19}}),rawItem('Identified bow',129),rawItem('Identified Thunderlock',560,{material:4}),
+ rawItem('Unidentified staff',115,{identified:false,affixes:null,enchantments:null,customEnchantments:null})]}},null);
 let version=1;const port=Number(process.env.DFO_UPGRADE_TEST_PORT??19639);
 const snapshot=()=>({...fixture,lastSuccess:new Date().toISOString(),detailsAt:new Date().toISOString(),serverTime:new Date().toISOString(),detailsVersion:version});
 const server=createDashboardServer({snapshot},{port,launchGame:async()=>{throw Error('Game launch forbidden');},onManualRefresh:()=>{throw Error('Game reads forbidden');}});
@@ -37,8 +44,19 @@ try{
   assert.match(await detail.innerText(),/Replacing Worn strong ring/);
   // Character/snapshot replacement must clear the previous generation's result.
   if(viewport.width>800){fixture.details.items=fixture.details.items.map(i=>i.index===3?{...i,identified:false,magicKnown:false}:i);version++;await page.waitForFunction(()=>!document.querySelector('#inventory-items .item[title^="Best intelligence ring"] .upgrade-indicator.upgrade'));}
+  const sheet=page.locator('dialog.mobile-item-sheet');if(await sheet.isVisible())await page.keyboard.press('Escape');
+  // Real reader-shaped input: no optional template/display enrichment at all.
+  fixture.details=rawDetails;version++;
+  for(const name of ['Identified claymore','Identified bow','Identified Thunderlock']){
+   const card=page.locator('#inventory-items .item').filter({hasText:name});await card.waitFor({state:'visible'});
+   await page.waitForFunction(name=>{const card=[...document.querySelectorAll('#inventory-items .item')].find(e=>e.textContent.includes(name));return card?.querySelector('.upgrade-indicator:not(.pending):not(.unknown)');},name);
+   assert.equal(await card.locator('.upgrade-indicator.unknown').count(),0);
+  }
+  assert.equal(await page.locator('#inventory-items .item').filter({hasText:'Unidentified staff'}).locator('.upgrade-indicator.unknown').count(),1);
+  await page.locator('#inventory-items .item').filter({hasText:'Identified bow'}).click();
+  assert.match(await detail.innerText(),/timing|reload/);assert.doesNotMatch(await detail.innerText(),/Can't judge yet/);
   assert.deepEqual(errors,[]);await page.close();
-  fixture.details.items[3]={...fixture.details.items[3],identified:true,magicKnown:true};version++;
+  fixture.details=structuredClone(ringDetails);version++;
  }
- console.log(JSON.stringify({passed:true,viewports:2,gameReads:0,checks:['score sorting','recommendation reason','explicit ring target','snapshot invalidation','no browser script errors']}));
+ console.log(JSON.stringify({passed:true,viewports:2,gameReads:0,checks:['score sorting','recommendation reason','explicit ring target','snapshot invalidation','raw equipment without template cache','unidentified effects remain unknown','ranged timing explanation','no browser script errors']}));
 }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}
