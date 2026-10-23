@@ -240,6 +240,40 @@ Public workflow/release status can be read through GitHub's API or normal GitHub
 
 ## Upgrade scoring (phase 1, inventory only)
 
+### Automatic-build recommendations (0.4.31 release source, 2026-10-23)
+
+The current implementation extends phase 1 with automatic build-weighted
+recommendations. See [EQUIPMENT_SCORING.md](EQUIPMENT_SCORING.md) for the precise
+weights, DFO source references, assumptions and remaining coverage limits. Green
+now means estimated improvement for the inferred build; a larger benefit may
+outweigh a smaller loss, and the loss stays visible. Do not describe it as exact
+DPS or a globally optimal simultaneous loadout.
+
+Primary/major/minor career skills and permanent proficiencies blend combat,
+magic and stealth priorities without class-name rules. Utility magnitude now
+participates in ranking. Complete displaced items and attribute/skill changes
+are evaluated, including retained weapons; effective skills already copied by
+the reader are reused. RRI armor ladders, resistance caps, majority armor class,
+both occupied paired slots and custom two-handed weapon 560 displacement are
+covered. A matching bow in its observed worn hand can be compared without
+guessing the bow-hand setting; unestablished ranged configurations stay unknown.
+
+Performance remains a hard requirement: no reader, transport, game-copy fields,
+sampling intervals or game settings changed. Only existing snapshot fields are
+projected differently. One cached comparison session per pack snapshot yields
+between approximately 4 ms batches in Companion's browser and cancels superseded
+work. Hover/filter/sort reuse cached results. Numeric ranges and the 500-item
+inventory bound constrain work. `scripts/benchmark-upgrades.mjs` exercises a
+synthetic full pack; it is not a live-game FPS measurement.
+
+Added class/hybrid, swap, caps, incomplete-effects and cancellation tests plus
+`scripts/check-upgrades-ui.mjs`, which uses invented data on the actual server
+routes in desktop and phone browsers. Release 0.4.31 was explicitly requested;
+publication requires both native builds and mobile checks to succeed. No
+installed-app or game launch is part of local validation. The phase-1 notes below
+describe the prior implementation; the linked scoring document supersedes its
+green-only-with-no-loss rule.
+
 - `src/upgrade-scoring.mjs` is pure and uses only fields already in the detail snapshot. `comparisonContext` now also carries live attributes, level, race, class name, primary/major skill indices and the carrying summary, all copied from the existing snapshot (no new reads).
 - Weapons: expected damage per swing = mean over the displayed damage range (already material-adjusted) of max(0, roll×(1+damage affix%) + STR damageModifier + expertise + racial), times hit chance against a stated reference foe (monster armour 5: +15), with skill, expertise, racial, material×10, luck/agility and expected Critical Strike, clamped 3..97 (DFO `combat/formulas.js`, DFU `FormulaHelper`).
 - Armour: per body part, rating×5 plus armour-affix points, weighted by the struck-part table (2,3,3,4,4,3,1 of 20) = average enemy hit-chance points blocked per blow (DFO `armorMaterials.js`, `ui/armourCard.js`).
