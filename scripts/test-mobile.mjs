@@ -84,8 +84,10 @@ async function runCase(engine,profile){
   });
   await page.goto(target.href);
   await page.locator('#inventory-items .item').first().waitFor({state:'attached',timeout:20000});
-  assert(await page.evaluate(()=>navigator.maxTouchPoints>0&&matchMedia('(pointer:coarse)').matches),'Phone touch emulation inactive');entry.checks.push('touch context');
-  await tab('pack');await page.locator('[data-mobile-view="inventory"]').tap();
+  entry.capabilities=await page.evaluate(()=>({maxTouchPoints:navigator.maxTouchPoints,coarsePointer:matchMedia('(pointer:coarse)').matches,touchStart:'ontouchstart' in window}));
+  await page.evaluate(()=>{window.__mobileTestTouch=false;document.addEventListener('touchstart',event=>{if(event.isTrusted)window.__mobileTestTouch=true;},{once:true});});
+  await tab('pack');assert(await page.evaluate(()=>window.__mobileTestTouch),'Phone tap did not deliver a trusted touch event');entry.checks.push('trusted touch interaction');
+  await page.locator('[data-mobile-view="inventory"]').tap();
   assert.equal(await page.locator('.equipment-panel').isVisible(),false,'Inventory must replace Equipment');
   for(const fraction of [0,.5,1]){await page.evaluate(f=>scrollTo(0,f*(document.documentElement.scrollHeight-innerHeight)),fraction);await page.waitForTimeout(80);assert(await page.locator('.tabs').evaluate(n=>Math.abs(n.getBoundingClientRect().bottom-innerHeight)<2),'Navigation detached from viewport bottom');}entry.checks.push('bottom navigation at all scroll positions');
   await noClipping(page,'.item-name');await capture('inventory');entry.checks.push('inventory replaces equipment; full names');
