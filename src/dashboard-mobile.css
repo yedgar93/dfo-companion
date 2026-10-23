@@ -186,3 +186,7 @@
  body.map-expanded #map{overflow:auto;padding:8px}body.map-expanded .map-layout{min-height:0}body.map-expanded .map-main>.map-stage{flex:1;min-height:240px;height:auto}body.map-expanded .map-floor-menu{display:none}body.map-expanded .map-help,body.map-expanded .map-area-controls{display:none}
 }
 @media(max-width:800px){.map-camera-controls #map-dungeon-plan,.map-camera-controls #map-pan-toggle{grid-column:span 1}.map-camera-controls #map-expand{grid-column:span 2}.map-camera-controls button{min-width:0}.map-floor-menu>summary{min-width:0}}
+
+/* Section visibility must win over the desktop equipment layout. */
+@media(max-width:800px){.pack[data-mobile-view=character]>.inventory-panel,.pack[data-mobile-view=inventory]>.equipment-panel{display:none!important}}
+@media(max-width:800px){.inventory-options{border:1px solid var(--edge-mid);padding:8px}.inventory-options>summary{display:list-item;min-height:36px;line-height:1.5;padding:6px;font-size:15px;cursor:pointer}.inventory-options>.inventory-tools{grid-template-columns:minmax(0,1fr);padding:8px 0}.inventory-options .category-select-label{display:flex;flex-direction:column;align-items:stretch;font-size:14px}.inventory-options .category-select-label select{width:100%;min-width:0}}

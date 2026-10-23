@@ -1,6 +1,6 @@
 # DFO Companion: development handoff
 
-Last reconciled: 2026-10-22. Current release candidate source: **0.4.23**, based on main `6ffebde` (0.4.22); the historical fully verified packaged baseline was **0.4.9** for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
+Last reconciled: 2026-10-22. Current release candidate source: **0.4.24**, based on main `11956bb` (0.4.23); the historical fully verified packaged baseline was **0.4.9** for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
 
 Read this file, `AGENTS.md`, `README.md`, and `docs/RELEASING.md` before changing the application. Inspect the current source and latest release: this document records findings at the baseline, not a promise that future game versions have identical internals. Keep this document updated as findings change.
 
@@ -273,3 +273,13 @@ Public workflow/release status can be read through GitHub's API or normal GitHub
 - Map controls precede a 300px ordinary phone stage; service search and detailed help follow it. Floors are collapsed initially; Pan is immediately reachable and defaults on coarse pointers. Plan drag pans without exiting Plan. Expanded-map transitions refit cached geometry only. Collapsed desktop quest sidebar does not stretch to full height.
 - Visual harness explicitly exercises both phone grid and list, actual name bounds for long carried/equipped fixtures, long sheet headings, desktop hover/focus-to-selection tooltip dismissal, and normal phone map minimum height. This does not establish real Safari/multitouch parity or eliminate the documented artwork/character-sheet gaps.
 - No game readers, snapshot budgets, signing keys, portable paths or updater mechanics changed.
+
+## Independent live QA follow-up (0.4.24)
+
+- Native 0.4.23 and Chrome phone emulation confirmed: Inventory's selected tab could leave Equipment visible above it because desktop `display:flex!important` defeated the phone hide rule. Phone section hide rules now win explicitly; tests assert actual computed visibility at 375/393/800/801px.
+- Seven accessory groups produced a lone Lantern row in the live wide window. Crystals and light now share one three-slot group; six groups use balanced desktop/phone columns. Existing Light slot identity is retained; only presentation changed.
+- Directly pasting the current local phone link into Chrome succeeded in live QA; an old pre-update token correctly expired. However, native Open phone view was blocked by Electron's external-navigation handler (which allowed only the About website). A tested helper now validates URL shape and exact equality with the currently issued local `/api/phone/status` URL before opening the default browser. Arbitrary local/public URLs remain blocked. Only own-window sanitized clipboard writes are permitted; read and other permissions remain denied.
+- The QR's 180px white container and 160px SVG caused the observed white side strip. Both now share a square width, with the QR's built-in quiet zone retained. A fixture status exercises actual QR rendering and checks matching square bounds.
+- Phone sort/filter/layout controls are a collapsible disclosure with full-width selects, avoiding both crowded inventory and clipped selected option labels. Search stays immediately available.
+- Character snapshot rebuilds preserve faction search focus/caret and scroll position, not just the search value and disclosure state. Fixture checks exercise a changing player snapshot while the input is focused.
+- No game sampling/transport changes. Desktop and phone GUI verification after each packaged update remains separate from fixture assertions; do not claim Safari or physical-device testing from Chrome emulation.

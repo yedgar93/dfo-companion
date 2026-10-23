@@ -10,7 +10,7 @@ async function run(){
  const {interiorSceneKey}=await import('../src/dashboard-interior-model.mjs');
  const base=JSON.parse(await fs.readFile(path.join(__dirname,'../src/test/fixtures/snapshots/town-full.json'),'utf8'));
  let fixture=base;const snapshot=()=>{const s=structuredClone(fixture),now=new Date().toISOString();s.serverTime=now;if(!s.stale){s.lastSuccess=s.detailsAt=now;if(s.pose)s.pose.capturedAt=now;}return s;};
- server=createDashboardServer({snapshot,poll:async()=>snapshot()},{port:19261,launchGame:async()=>{throw Error('Game launch forbidden in visual tests');}});
+ server=createDashboardServer({snapshot,poll:async()=>snapshot()},{port:19261,phoneStatus:()=>({enabled:true,url:'http://192.168.1.10:9235/pair/'+'a'.repeat(43),expiresAt:new Date(Date.now()+600000).toISOString()}),launchGame:async()=>{throw Error('Game launch forbidden in visual tests');}});
  await new Promise(r=>server.listen(19261,'127.0.0.1',r));const origin='http://127.0.0.1:'+server.address().port;
  win=new BrowserWindow({show:false,width:1440,height:1000,webPreferences:{offscreen:true,contextIsolation:true,nodeIntegration:false}});
  win.webContents.on('console-message',event=>{if(event.level==='error'&&!/404|ERR_FILE_NOT_FOUND/.test(event.message))errors.push(event.message);});
@@ -30,14 +30,19 @@ async function run(){
  assert.equal(await js("document.querySelectorAll('.character-column').length"),3);
  assert(await js("document.querySelector('.character-skills').getBoundingClientRect().top < 500"),'skills must appear in initial desktop viewport');
  assert(await js("document.querySelector('#game-start-panel').hidden"),'connected startup advice must be hidden');
+ await js("document.querySelector('.faction-search').closest('details').open=true;document.querySelector('.faction-search').value='Fixture';document.querySelector('.faction-search').focus();document.querySelector('.faction-search').setSelectionRange(2,4)");
+ const changed=structuredClone(base);changed.player.gold=(changed.player.gold??0)+1;
+ await js(`import('/dashboard-character.mjs').then(m=>m.renderCharacterRecord(document.querySelector('#character-record'),${JSON.stringify(changed)}))`);
+ assert(await js("document.activeElement.matches('.faction-search')&&document.activeElement.value==='Fixture'&&document.activeElement.selectionStart===2&&document.activeElement.selectionEnd===4"),'snapshot update must preserve faction typing focus and selection');
+ await js("document.querySelector('.faction-search').blur();document.querySelector('.faction-search').closest('details').open=false");
  await capture('desktop-character');
  await page('pack');await js("document.querySelector('#inventory-layout').value='list';document.querySelector('#inventory-layout').dispatchEvent(new Event('change'))");await settle();
- assert.equal(await js("document.querySelector('#inventory-items').dataset.layout"),'list');await fullText('.item-name,.gear-name');await capture('desktop-pack-list');
+ assert.equal(await js("document.querySelector('#inventory-items').dataset.layout"),'list');await fullText('.item-name,.gear-name,.accessory-name');assert.equal(await js("document.querySelectorAll('.accessory-group').length"),6);assert.equal(await js("document.querySelector('.accessory-group:last-child .accessory-pair').children.length"),3);await capture('desktop-pack-list');
  await js("document.querySelector('#inventory-items .item').dispatchEvent(new MouseEvent('mouseenter'));document.querySelector('#inventory-items .item').focus();document.querySelector('#inventory-items .item').click()");await settle();assert(await js("document.querySelector('#item-tooltip').hidden"),'desktop selection must dismiss tooltip');
- await page('connection-page');await capture('desktop-connection');
+ await page('connection-page');for(let i=0;i<30;i++){if(await js("!!document.querySelector('#phone-qr svg')"))break;await new Promise(r=>setTimeout(r,30));}assert(await js("(()=>{const q=document.querySelector('#phone-qr').getBoundingClientRect(),s=document.querySelector('#phone-qr svg').getBoundingClientRect();return Math.abs(q.width-s.width)<1&&Math.abs(q.width-q.height)<1})()"),'QR must fill a square without a white side strip');await capture('desktop-connection');
  for(const width of [375,393]){
   await load(width,852);await page('pack');await js("document.querySelector('[data-mobile-view=inventory]').click()");await settle();
-  assert(await js("getComputedStyle(document.querySelector('#categories')).display==='none'"));
+  await js("document.querySelector('.inventory-options').open=true");assert(await js("getComputedStyle(document.querySelector('#categories')).display==='none'"));assert(await js("getComputedStyle(document.querySelector('.equipment-panel')).display==='none'"),'Inventory section must hide equipment');
   await js("document.querySelector('#item-search').value='very long';document.querySelector('#item-search').dispatchEvent(new Event('input'))");await settle();for(let i=0;i<30;i++){if(await js("document.querySelectorAll('#inventory-items .item').length===1"))break;await new Promise(r=>setTimeout(r,30));}
   assert.equal(await js("document.querySelectorAll('#inventory-items .item').length"),1);
   for(const layout of ['grid','list']){await js(`document.querySelector('#inventory-layout').value='${layout}';document.querySelector('#inventory-layout').dispatchEvent(new Event('change'))`);await settle();await fullText('.item-name');await capture('phone-'+width+'-pack-'+layout);}
@@ -50,6 +55,7 @@ async function run(){
   await page('character');await fullText('h1,.hud-place>strong,.character-row');await capture('phone-'+width+'-character');
   assert(await js("document.documentElement.scrollWidth <= innerWidth+1"),'phone page must not overflow horizontally');
  }
+ for(const width of [800,801]){await load(width,1000);await page('pack');if(width===800)await js("document.querySelector('[data-mobile-view=inventory]').click()");await settle();assert.equal(await js("getComputedStyle(document.querySelector('.equipment-panel')).display==='none'"),width===800,'equipment visibility at responsive boundary');assert(await js("document.documentElement.scrollWidth<=innerWidth+1"),'responsive boundary must not overflow');await capture('boundary-'+width);}
  const dungeon=JSON.parse(await fs.readFile(path.join(__dirname,'../src/test/fixtures/snapshots/dungeon.json'),'utf8'));
  const loc=dungeon.pose?.location??dungeon.details.location;loc.position={x:0,y:0,z:0};loc.mode='dungeon';
  const part={positions:[-20,0,-10,20,0,-10,20,0,10,-20,0,10,-5,8,-20,5,8,-20,5,8,20,-5,8,20],indices:[0,1,2,0,2,3,4,5,6,4,6,7]};
