@@ -80,7 +80,7 @@ async function runCase(engine,profile){
     forbidden.push(u.pathname);await route.abort();return;
    }
    if(live)await route.continue();
-   else{const upstream=await route.fetch({url:origin+u.pathname+u.search,headers:{Host:new URL(origin).host}});await route.fulfill({response:upstream});}
+   else{const upstream=await fetch(origin+u.pathname+u.search,{headers:{Host:new URL(origin).host},signal:AbortSignal.timeout(10000)});const headers=Object.fromEntries(upstream.headers);for(const h of ['connection','transfer-encoding','content-encoding','content-length'])delete headers[h];await route.fulfill({status:upstream.status,headers,body:Buffer.from(await upstream.arrayBuffer())});}
   });
   await page.goto(target.href);
   await page.locator('#inventory-items .item').first().waitFor({state:'attached',timeout:20000});

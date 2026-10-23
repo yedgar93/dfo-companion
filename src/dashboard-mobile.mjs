@@ -1,9 +1,17 @@
-let phoneRevealUntil=0;
+let phoneRevealUntil=0,phoneRevealCompact=true;
 function revealPhoneSection(target){
  if(!target)return;
  if(matchMedia('(max-width:800px)').matches){
-  phoneRevealUntil=Date.now()+250;document.body.classList.add('mobile-hud-compact');
-  const align=()=>{const top=document.querySelector('.hud')?.getBoundingClientRect().bottom??0;document.documentElement.style.setProperty('--hud-h',top+'px');window.scrollTo({top:Math.max(0,scrollY+target.getBoundingClientRect().top-top-8),behavior:'instant'});};
+  phoneRevealUntil=Date.now()+250;phoneRevealCompact=true;document.body.classList.add('mobile-hud-compact');
+  const align=()=>{
+   const hud=document.querySelector('.hud'),space=document.querySelector('.mobile-hud-space');let top=hud?.getBoundingClientRect().bottom??0;
+   if(space)space.style.height=top+'px';
+   let at=Math.max(0,scrollY+target.getBoundingClientRect().top-top-8);
+   // A short page may have no scroll range. Keep its full header rather than
+   // leaving an expanded-height hole beneath a compact bar.
+   if(at<=1){phoneRevealCompact=false;document.body.classList.remove('mobile-hud-compact');top=hud?.getBoundingClientRect().bottom??0;if(space)space.style.height=top+'px';at=Math.max(0,scrollY+target.getBoundingClientRect().top-top-8);}
+   document.documentElement.style.setProperty('--hud-h',top+'px');window.scrollTo({top:at,behavior:'instant'});
+  };
   requestAnimationFrame(()=>{align();requestAnimationFrame(align);});
  }
  else target.scrollIntoView({block:'start'});
@@ -127,7 +135,7 @@ if(phoneHud){
  function density(){
   queued=false;const y=Math.max(0,scrollY),delta=y-lastY;lastY=y;
   if(!mobile.matches){document.body.classList.remove('mobile-hud-compact');return;}
-  if(Date.now()<phoneRevealUntil){travel=0;document.body.classList.add('mobile-hud-compact');return;}
+  if(Date.now()<phoneRevealUntil){travel=0;document.body.classList.toggle('mobile-hud-compact',phoneRevealCompact);return;}
   if(y<=1){travel=0;document.body.classList.remove('mobile-hud-compact');return;}
   if(delta>0)travel=Math.max(0,travel)+delta;else if(delta<0)travel=Math.min(0,travel)+delta;
   if(travel>=24)document.body.classList.add('mobile-hud-compact');
