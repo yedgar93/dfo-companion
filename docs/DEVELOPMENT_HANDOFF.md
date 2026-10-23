@@ -1,6 +1,6 @@
 # DFO Companion: development handoff
 
-Last reconciled: 2026-10-22. Current release candidate source: **0.4.24**, based on main `11956bb` (0.4.23); the historical fully verified packaged baseline was **0.4.9** for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
+Last reconciled: 2026-10-22. Current release candidate source: **0.4.25**, based on main `ca08567` (0.4.24); the historical fully verified packaged baseline was **0.4.9** for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
 
 Read this file, `AGENTS.md`, `README.md`, and `docs/RELEASING.md` before changing the application. Inspect the current source and latest release: this document records findings at the baseline, not a promise that future game versions have identical internals. Keep this document updated as findings change.
 
@@ -283,3 +283,24 @@ Public workflow/release status can be read through GitHub's API or normal GitHub
 - Phone sort/filter/layout controls are a collapsible disclosure with full-width selects, avoiding both crowded inventory and clipped selected option labels. Search stays immediately available.
 - Character snapshot rebuilds preserve faction search focus/caret and scroll position, not just the search value and disclosure state. Fixture checks exercise a changing player snapshot while the input is focused.
 - No game sampling/transport changes. Desktop and phone GUI verification after each packaged update remains separate from fixture assertions; do not claim Safari or physical-device testing from Chrome emulation.
+
+## Freshness and network-change QA follow-up
+
+- Live 0.4.24 showed duplicate Last known labels in the HUD: the connection line and an absolutely positioned tag above vitals. Vitals no longer receive a second tag; the header retains the freshness age and phone layouts give it a separate line. Per-panel stale labels remain useful when viewing cached data.
+- The Connection pairing display now refreshes from the existing computer-only phone status endpoint at most every 15 seconds while visible, rather than waiting up to ten minutes for expiry. This catches LAN address changes without any DFO reads. The link, copy field and QR update together; unchanged QR content is retained to avoid flicker, and failed/unavailable status clears obsolete pairing actions.
+- Tests cover hidden-page suppression, address/link refresh timing, clearing unavailable pairing actions, and desktop/phone stale HUD geometry. Native/full-suite and installed-app verification are separate from the sandbox's loopback restrictions.
+
+- Current local validation: bundle build passed; 336 of 345 tests passed, with the remaining nine blocked exclusively by sandbox `listen EPERM` on loopback. The offscreen Electron harness aborted during macOS app registration before running. Computer Use denied Terminal access; do not bypass that denial. Independent live QA confirmed the installed 0.4.24 pairing button works and its desktop HUD duplicates freshness, but did not complete Safari/mobile candidate verification. Candidate fixes remain uninstalled.
+- Publishing this batch was rejected by automatic approval review pending a fresh explicit release request. Package version remains 0.4.24; no candidate source was pushed. Resume from these local changes, obtain release authorization, run both native CI jobs, then verify installed desktop and phone views before claiming completion.
+
+## Desktop launcher recovery regression (local candidate)
+
+- User reported losing the Companion startup action required to launch DFO with its loopback listener. The 0.4.22 UI gate only displayed the button for exact GAME_NOT_RUNNING, so missing-flags/generic-read failures could remove the recovery path even though the launch endpoint remained intact.
+- The local desktop Connection page now keeps Start DFO with Companion available independently of cached reader reason or freshness, including before the first snapshot. Its copy does not claim that an active game is closed. Phone views hide the entire computer-only panel.
+- Explicit clicks still use the existing origin-checked POST endpoint and launchOfficialGame process checks: existing DFO or an unverifiable process list refuses launch; no game close/restart, no added game reads, no changed startup flags. Never click this against the user's running game just for testing.
+- Twelve focused tests passed, including state transitions, missing listener/update flags, generic failure, fresh live state, phone hiding, Windows/Mac diagnostic args and duplicate-process refusal. The bundle build passed. The installed 0.4.24 has not received this local fix.
+- Additional local UI fixes include freshness-aware vitals accessibility, a neutral paperdoll accessibility label, mobile section scrolling without the obsolete nonsticky-header gap, stale dungeon marker wording/heading suppression and stronger clipping assertions. New visual assertions still require a permitted native test environment. A network-free fixture preview was generated but browser policy refused file:// navigation; do not bypass that refusal.
+
+- Latest validation supersedes the earlier sandbox-limited run: all **347 tests passed** after the environment changed. Bundle build and diff checks passed. The visual harness still aborts at native Electron startup (SIGABRT), before fixture assertions; do not report those new visual assertions as passed. Independent source review found no blocking launcher issue.
+
+- User explicitly authorized publishing the launcher fix and pending usability batch. Candidate browser checks through the real allowlisted fixture server confirm Start DFO is visible during a healthy connection and the 393px Skills shortcut lands at 8.23px with 8px scroll padding. No launch against DFO was performed. Version 0.4.25 requires both native CI jobs before publication.

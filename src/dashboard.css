@@ -223,7 +223,6 @@ html.game-cursor input:not([type=range]):not([type=checkbox]):not([type=radio]):
 /* 0.4.13 polish: footer line gets its full height. */
 footer{min-height:20px;line-height:14px;overflow:visible;align-items:center;box-sizing:border-box}
 
-.stale-data .hud .vitals>.stale-age-tag{position:absolute;margin:-13px 0 0;border:0;background:none;padding:0;line-height:11px}
 
 /* 0.4.13 polish: the ◇ placeholder on the tan selected/upgrade tile sits on its own dark chip (was 1.29:1). */
 .selected .fallback,.upgrade .fallback,.gear.selected>.fallback,.item.selected .fallback,.accessory.selected .fallback{opacity:1!important;color:#f4e6b4!important;background:none;text-shadow:1px 1px 0 #1d221a,-1px -1px 0 #1d221a,1px -1px 0 #1d221a,-1px 1px 0 #1d221a,0 1px 0 #1d221a,0 -1px 0 #1d221a,1px 0 0 #1d221a,-1px 0 0 #1d221a}

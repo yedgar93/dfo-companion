@@ -190,3 +190,8 @@
 /* Section visibility must win over the desktop equipment layout. */
 @media(max-width:800px){.pack[data-mobile-view=character]>.inventory-panel,.pack[data-mobile-view=inventory]>.equipment-panel{display:none!important}}
 @media(max-width:800px){.inventory-options{border:1px solid var(--edge-mid);padding:8px}.inventory-options>summary{display:list-item;min-height:36px;line-height:1.5;padding:6px;font-size:15px;cursor:pointer}.inventory-options>.inventory-tools{grid-template-columns:minmax(0,1fr);padding:8px 0}.inventory-options .category-select-label{display:flex;flex-direction:column;align-items:stretch;font-size:14px}.inventory-options .category-select-label select{width:100%;min-width:0}}
+/* Keep the single freshness indicator on its own line, clear of vitals. */
+@media(max-width:800px){.hud .connection{align-items:flex-start;flex-wrap:wrap;line-height:1.4}.hud .connection #freshness{flex-basis:100%;margin-left:0!important;white-space:normal}}
+
+/* The mobile header scrolls normally; section jumps need no header-sized gap. */
+@media(max-width:800px){html{scroll-padding-top:8px}.character-column{scroll-margin-top:0}}
