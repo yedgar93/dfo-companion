@@ -1,6 +1,6 @@
 # DFO Companion: development handoff
 
-Last reconciled: 2026-10-23. Current release candidate source: **0.4.34**, based on main `e0ef4f1` (0.4.33); the latest verified published baseline is **0.4.33** for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
+Last reconciled: 2026-10-23. Latest verified published baseline: **0.4.34**, release source `569b4b7`, for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
 
 Read this file, `AGENTS.md`, `README.md`, and `docs/RELEASING.md` before changing the application. Inspect the current source and latest release: this document records findings at the baseline, not a promise that future game versions have identical internals. Keep this document updated as findings change.
 
@@ -254,6 +254,15 @@ Normal snapshot renders replace those children, replaying the fade and causing
 visible flicker. These refreshed children now use `animation: none`; snapshot
 acquisition, render cadence and game sampling remain unchanged. The desktop/phone
 browser regression replaces its snapshot and checks computed animation names.
+
+Post-release verification: Windows/Mac/mobile CI and all 374 tests passed; the
+pinned Ed25519 signature, tag, artifact digests and updater metadata verified.
+The running Companion automatically installed 0.4.34. Its sixteen served UI
+assets matched release source after line-ending normalization (UI fingerprint
+`d2187b1d25fda406`). The refreshed live browser had zero weapon question-mark
+markers and `animation: none` on all forty checked inventory/equipment/detail/
+category elements. The hidden-properties warning remained in provisional
+details. No manual game refresh, debugger read or DFO restart was used.
 
 ### Provisional markers (0.4.33 release source)
 
