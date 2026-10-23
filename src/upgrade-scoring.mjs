@@ -1,6 +1,6 @@
 // Item-upgrade scoring, phase 1: carried items against equipped ones, from the existing snapshot only.
 // No game reads. Every formula below cites its home in daggerfall-js-source (DFO) and Daggerfall Unity (DFU).
-// A missing input yields null (shown as "?"), never a guessed value.
+// Unbounded missing inputs stay unknown; verified finite armor alternatives use conservative bounds.
 
 // DFU DFCareer.Skills / DFO SKILL ids: weapon skills 28..33, Critical Strike 34.
 export const WEAPON_SKILLS=['Short Blade','Long Blade','Hand-to-Hand','Axe','Blunt Weapon','Archery'];
@@ -76,7 +76,7 @@ export function weaponScore(item,context={}){
  const expected=n?total/n:0;
  // calculateAttackDamage (formulas.js:597+): skill + proficiency + racial + material*10; then calculateSuccessfulHit:
  // statsToHit (luck, agility vs 50), Critical Strike's expected bonus (floor(crit/10) with chance crit%), clamp 3..97.
- const crit=context.skills?.find(s=>s.name==='Critical Strike')?.display;
+ const critRow=context.skills?.find(s=>s.name==='Critical Strike'),crit=critRow?.effective??critRow?.display;
  const raw=skillValue+prof.toHit+race+mod*10+tr((a.luck-50)/10)+tr((a.agility-50)/10)+REFERENCE_FOE_TO_HIT;
  const clamp=v=>Math.max(3,Math.min(97,v));
  const hit=fin(crit)?(clamp(raw+Math.floor(crit/10))*Math.min(crit,100)+clamp(raw)*(100-Math.min(crit,100)))/100:clamp(raw);
@@ -97,7 +97,7 @@ export function armorParts(item){
   // Non-shield armour artifacts are halved (armorMaterials.js itemArmorValue, DFU :1054-1056). The snapshot only says
   // "special" (artifact, legendary, aetheric or sigil), so a special non-shield piece is unknown rather than guessed.
   if(item.special&&typeof item.artifact!=='boolean')return {known:false,parts,missing:['special armour rating (artifacts are halved)']};
-  if(t>=515&&t<=526)value=customArmorValue(item);
+  if(t>=515&&t<=526)value=customArmorValue(item)??(fin(item.displayStats?.baseArmour)?item.displayStats.baseArmour:null);
   else if(fin(item.displayStats?.baseArmour))value=item.displayStats.baseArmour;
   else if(t<512&&fin(item.material)){const m=item.material;value=m===0?3:m===0x100||m===0x103?6:m>=0x200&&m<=0x209?PLATE_ARMOR_VALUES[m-0x200]:null;}
   if(item.artifact&&value!==null&&t<512)value=Math.trunc(value/2);}
@@ -108,6 +108,18 @@ export function armorParts(item){
 }
 /** Average hit-chance points a blow loses to this set (struck-part frequency weighted). */
 export const armorProtection=parts=>parts.reduce((n,v,i)=>n+v*STRUCK_WEIGHTS[i],0);
+
+/** Known protection, or the complete verified leather/fur range when only its
+ * copied appearance variant is absent. No other missing armor data is guessed. */
+export function armorPartsRange(item){
+ const exact=armorParts(item);
+ if(exact.known)return {known:true,minParts:exact.parts,maxParts:exact.parts,bounded:false,missing:[]};
+ const t=item?.templateIndex;
+ if(item?.group!=='Armor'||!Number.isInteger(t)||t<520||t>526||item.material!==0||item.special||item.artifact||item.appearance?.message!==null&&item.appearance?.message!==undefined)return {known:false,minParts:exact.parts,maxParts:exact.parts,bounded:false,missing:exact.missing};
+ const variants=[0,1].map(message=>armorParts({...item,appearance:{...item.appearance,message}}));
+ if(variants.some(p=>!p.known))return {known:false,minParts:exact.parts,maxParts:exact.parts,bounded:false,missing:exact.missing};
+ return {known:true,minParts:variants[0].parts.map((v,i)=>Math.min(v,variants[1].parts[i])),maxParts:variants[0].parts.map((v,i)=>Math.max(v,variants[1].parts[i])),bounded:true,missing:[]};
+}
 
 // Enchantment weighting: how much a point of each attribute matters for the build's lean. Unknown ids -> '?'.
 const STAT_WEIGHT={combat:{strength:1,agility:1,endurance:1,speed:.7,luck:.5,willpower:.2,intelligence:.1,personality:.1},magic:{intelligence:1,willpower:1,endurance:.5,agility:.4,speed:.4,luck:.5,strength:.2,personality:.2},stealth:{agility:1,speed:1,luck:.8,endurance:.5,strength:.4,intelligence:.3,willpower:.3,personality:.4}};
@@ -245,12 +257,18 @@ export function contextAfterSwap(context,beforeItems,afterItems){
  return {...context,attributes,skills};
 }
 
-// DFO SWING-LAW's five-frame reference swing, including weight, STR and handling.
-// Optional mod clocks/archery draws are not represented as exact DPS.
+// DFO b0765ab2 reference cycles: weaponStates.js SWING-LAW and default
+// BowDrawback=false (four 16Hz release ticks plus Speed cooldown); gunFeel.js
+// uses six firing frames plus fixed reload. These are single-weapon reference
+// clocks, not exact player DPS: held draws, arm readiness, pairs and mods vary.
 export function weaponTempo(item,context){
- const speed=context.attributes?.speed,str=context.attributes?.strength,w=item.displayStats?.perUnitWeightKg;
+ const speed=context.attributes?.speed,t=item?.templateIndex;
+ if(t===560)return 6/14+1.7;
+ if(t===562)return 6/12+1.4;
+ if(t===129||t===130)return fin(speed) ? .25+(10*(100-Math.max(0,Math.min(100,speed)))+800)/980 : null;
+ const str=context.attributes?.strength,w=item.displayStats?.perUnitWeightKg;
  if(!fin(speed)||!fin(str)||!fin(w)||w<0)return null;
- const kind=skillKey(item),t=item.templateIndex;
+ const kind=skillKey(item);
  if(kind==='Archery'||![113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,513,514].includes(t))return null;
  const handling=['Short Blade','Hand-to-Hand'].includes(kind)?.9:kind==='Axe'?1.05:kind==='Blunt Weapon'?(t===115?.97:t===124?1.03:t===127?1.05:1.06):1;
  const both=item.displayStats?.hands==='Two-handed';
@@ -278,7 +296,7 @@ export function createBuildEvaluator(context,worn,profile=buildProfile(context,w
  return (candidate,removed,slot)=>{
   const after=worn.filter(i=>!removed.includes(i));after.push({...candidate,equipSlot:slot});
   const afterContext=contextAfterSwap(context,worn,after),afterTotals=totalsFor(after),unknown=[],components=[],notes=[];
-  let delta=0;const add=(label,value)=>{if(Math.abs(value)>1e-8){components.push({label,delta:value});delta+=value;}};
+  let delta=0,armorUncertainty=0;const add=(label,value)=>{if(Math.abs(value)>1e-8){components.push({label,delta:value});delta+=value;}};
   const keys=new Set([...beforeTotals.keys(),...afterTotals.keys()]);
   for(const key of keys){const a=afterTotals.get(key),b=beforeTotals.get(key),row=a??b,change=(a?.value??0)-(b?.value??0);if(!change||['armor','damage'].includes(row.id))continue;
    const weight=affixWeight(row,profile);if(weight===null){unknown.push('An affix parameter cannot be evaluated for this build.');continue;}
@@ -290,18 +308,20 @@ export function createBuildEvaluator(context,worn,profile=buildProfile(context,w
   // shield changes the weapon left in hand. The live baseline already has them.
   const changesWeapon=candidate.group==='Weapons'||removed.some(i=>i.group==='Weapons');
   const changesCombatStats=[...keys].some(k=>{const r=afterTotals.get(k)??beforeTotals.get(k);return ['stat','skill'].includes(r.id)&&(afterTotals.get(k)?.value??0)!==(beforeTotals.get(k)?.value??0);});
-  let offensiveChange=null;
+  let offensiveChange=null,weaponComparisonBasis=null;
   if(changesWeapon||changesCombatStats){const next=offense(after,afterContext);if(baselineOffense.known&&next.known){
-    const clocksKnown=baselineOffense.tempoKnown&&next.tempoKnown;offensiveChange=clocksKnown?next.value-baselineOffense.value:next.perSwing-baselineOffense.perSwing;
-    const sameWeaponBasis=!changesWeapon||removed.some(i=>i.group==='Weapons'&&i.templateIndex===candidate.templateIndex);
-    if(!sameWeaponBasis&&!clocksKnown)notes.push('Draw, reload and swing timing are not included: weapon output is compared per attack, not per second.');
-    add('reference weapon output',offensiveChange*(1+profile.mix.combat));
+    const clocksKnown=baselineOffense.tempoKnown&&next.tempoKnown,perAttack=context.weaponComparisonBasis==='per-attack';
+    if(!perAttack&&!clocksKnown)unknown.push('Reference attack cadence is unavailable for this swap.');
+    else{weaponComparisonBasis=perAttack?'per-attack':'per-second';offensiveChange=perAttack?next.perSwing-baselineOffense.perSwing:next.value-baselineOffense.value;
+     if(perAttack)notes.push('Draw, reload and swing timing are not included: weapon output is compared per attack, not per second.');
+     else if([...worn,...after].some(i=>i.group==='Weapons'&&[129,130,560,562].includes(i.templateIndex)))notes.push('Reference cadence assumes default instant bow shots and single-gun reloads; held draws, arm readiness and paired-hand timing can change actual output.');
+     add('reference weapon output',offensiveChange*(1+profile.mix.combat));}
    }else if(changesWeapon&&!(removed.length===1&&removed[0].group==='Weapons'&&candidate.templateIndex===removed[0].templateIndex&&candidate.material===removed[0].material))unknown.push('Weapon output cannot be estimated from these item and character stats.');}
   // Compare only changed protection. Unknown retained effects cancel; unknown
   // removed/incoming armour cannot silently become zero.
-  const incoming=armorParts(candidate),outgoing=removed.filter(isArmourPiece).map(armorParts);
+  const incoming=armorPartsRange(candidate),outgoing=removed.filter(isArmourPiece).map(armorPartsRange);
   if(isArmourPiece(candidate)||outgoing.length){
-   if(incoming.known&&outgoing.every(p=>p.known))add('armor protection',armorProtection(incoming.parts)-outgoing.reduce((n,p)=>n+armorProtection(p.parts),0));
+   if(incoming.known&&outgoing.every(p=>p.known)){const minimum=armorProtection(incoming.minParts)-outgoing.reduce((n,p)=>n+armorProtection(p.maxParts),0),maximum=armorProtection(incoming.maxParts)-outgoing.reduce((n,p)=>n+armorProtection(p.minParts),0);add('armor protection',minimum);armorUncertainty=maximum-minimum;if(armorUncertainty>0)notes.push('Leather/fur armor variant is unavailable; the score uses the least favorable protection within its verified range.');}
    else if(!(removed.length===1&&candidate.group==='Armor'&&removed[0].group==='Armor'&&candidate.templateIndex===removed[0].templateIndex&&candidate.material===removed[0].material&&(candidate.templateIndex<520||candidate.material!==0||Number.isInteger(candidate.appearance?.message)&&candidate.appearance.message===removed[0].appearance?.message)&&!candidate.special&&!removed[0].special))unknown.push('Base armor protection is unavailable for this swap.');
    else add('armor bonus',(candidate.affixes??[]).filter(a=>a.id==='armor').reduce((n,a)=>n+a.value,0)-(removed[0].affixes??[]).filter(a=>a.id==='armor').reduce((n,a)=>n+a.value,0));
   }
@@ -310,6 +330,6 @@ export function createBuildEvaluator(context,worn,profile=buildProfile(context,w
   if((changesResist||ench.armor||ench.carry)&&worn.some(i=>!removed.includes(i)&&(i.identified!==true||i.magicKnown===false||i.effectsComplete===false)))unknown.push('Stacking and caps are uncertain while other worn magical properties are unknown.');
   unknown.push(...ench.unknown);
   const neededOutput=!(changesWeapon||changesCombatStats)||offensiveChange!==null;
-  return {known:unknown.length===0&&profile.known&&neededOutput,delta,components,unknowns:[...new Set(unknown)],notes,offensiveChange,profile:profile.label,model:'Estimated build fit; reference combat and inferred priorities. Enemy, combat mods and tactics can change results.'};
+  return {known:unknown.length===0&&profile.known&&neededOutput,delta,deltaMin:delta,deltaMax:delta+armorUncertainty,boundedArmor:armorUncertainty>0,components,unknowns:[...new Set(unknown)],notes,offensiveChange,weaponComparisonBasis,profile:profile.label,model:'Estimated build fit; reference combat and inferred priorities. Enemy, combat mods and tactics can change results.'};
  };
 }

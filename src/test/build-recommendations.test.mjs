@@ -49,9 +49,9 @@ test('all compatible slots are evaluated and manual targets do not change automa
 });
 
 test('custom two-hander 560 is displaced by a shield and either one-handed target',()=>{
- const two=sword({index:0,name:'Thunderlock',templateIndex:560,equipSlot:19,displayStats:{damage:{min:5,max:20},hands:'Two-handed',perUnitWeightKg:8}}),shield=item({group:'Armor',templateIndex:109,material:0,displayStats:{baseArmour:1}}),next=sword();
+ const two=sword({index:0,name:'Thunderlock',templateIndex:560,template:{weaponSkillUsed:'Archery'},equipSlot:19,displayStats:{damage:{min:5,max:20},hands:'Two-handed',perUnitWeightKg:8}}),shield=item({group:'Armor',templateIndex:109,material:0,displayStats:{baseArmour:1}}),next=sword();
  for(const c of [compareEquipment(shield,[two,shield],context()),compareEquipment(next,[two,next],context(),21)]){
-  assert(c.swap.removed.some(i=>i.name==='Thunderlock'));assert.notEqual(c.kind,'upgrade');
+  assert.deepEqual(c.swap.removed.map(i=>i.name),['Thunderlock']);assert.equal(c.unknowns.length,0);
  }
 });
 
@@ -81,13 +81,21 @@ test('known gains can outweigh minor losses, which stay visible beside the green
  const c=compareEquipment(next,[old,next],context());assert.equal(c.kind,'upgrade');assert(c.losses.some(l=>l.includes('warmth')));assert.match(c.reason,/estimated score with trade-offs/);assert.equal(comparisonIndicator(c).kind,'upgrade');
 });
 
-test('custom armor uses RRI tables and needs the fur variant when the material is leather',()=>{
+test('custom armor uses RRI tables and a conservative range when leather or fur is unknown',()=>{
  assert.equal(customArmorValue({templateIndex:515,material:512}),6);
  assert.equal(customArmorValue({templateIndex:520,material:512}),5);
  assert.equal(customArmorValue({templateIndex:522,material:0,appearance:{message:1}}),5);
  assert.equal(customArmorValue({templateIndex:522,material:0}),null);
  const helmet=item({group:'Armor',templateIndex:522,material:0,appearance:{message:0},affixes:[{id:'stat',param:'endurance',value:2}]});
  assert.equal(compareEquipment(helmet,[helmet],context()).kind,'upgrade');
+ const uncertain={...helmet,appearance:null},comparison=compareEquipment(uncertain,[uncertain],context());
+ assert.equal(comparison.kind,'upgrade');assert.equal(comparison.buildScore.boundedArmor,true);assert(comparison.buildScore.deltaMin>0);assert(comparison.buildScore.deltaMax>comparison.buildScore.deltaMin);assert.equal(comparison.unknowns.length,0);
+ const unsupported={...helmet,appearance:{message:2}};assert.equal(comparisonIndicator(compareEquipment(unsupported,[unsupported],context())).kind,'unknown');
+});
+
+test('overlapping armor variants show an explicit tradeoff and never a confirmed slot upgrade',()=>{
+ const old=item({index:0,name:'Unknown leather or fur helm',group:'Armor',templateIndex:522,material:0,equipSlot:12,displayStats:null}),next=item({index:1,name:'Leather helm with armor bonus',group:'Armor',templateIndex:107,material:0,displayStats:{baseArmour:3},affixes:[{id:'armor',value:5}]}),session=createComparisonSession([old,next],context()),c=session.compare(next,12);
+ assert(c.buildScore.deltaMin<0&&c.buildScore.deltaMax>0);assert.equal(c.kind,'tradeoff');assert.equal(c.unknowns.length,0);assert.equal(comparisonIndicator(c).kind,'tradeoff');assert.equal(comparisonIndicator(c).symbol,'↔');assert.match(c.reason,/variant uncertainty/);assert.equal(session.forSlot(12).length,0);assert.equal(session.suggestionsForSlot(12).length,0);
 });
 
 test('armor-class profile reports the majority, with custom material families normalized',()=>{
@@ -123,7 +131,8 @@ test('archers compare a matching bow in its observed hand without guessing the b
   const old=bow({index:0,equipSlot:slot}),next=bow({index:1,displayStats:{damage:{min:6,max:20},hands:'Two-handed',perUnitWeightKg:2}}),c=compareEquipment(next,[old,next],context());
   assert.equal(c.kind,'upgrade');assert.equal(c.slot,slot);assert.equal(c.swap.removed.length,1);
  }
- const next=bow();assert.notEqual(compareEquipment(next,[next],context()).kind,'upgrade');
+ const next=bow(),archer=context({skills:context().skills.map(s=>({...s,display:s.name==='Archery'?95:s.name==='Hand-to-Hand'?5:s.display,effective:s.name==='Archery'?95:s.name==='Hand-to-Hand'?5:s.effective}))});
+ assert.equal(compareEquipment(next,[next],archer).kind,'upgrade');
 });
 
 test('projection reuses copied effective skills, all sixteen affixes, minor skills and coverage flags',()=>{
@@ -149,9 +158,34 @@ test('fallback respects copied overrides and template IDs, not enchanted display
  const unknown=sword({templateIndex:99999,template:{weaponSkillUsed:null},displayStats:null});completeEquipmentData(unknown);assert.equal(unknown.displayStats,null);assert.equal(unknown.template.weaponSkillUsed,null);
 });
 
-test('changing ranged timing is a loadout tradeoff in either direction',()=>{
- const bow=sword({templateIndex:129,template:{weaponSkillUsed:'Archery'},equipSlot:19}),melee=sword({templateIndex:120,index:2}),gun=sword({templateIndex:560,template:{weaponSkillUsed:'Archery'},index:3});
- for(const next of [melee,gun]){const c=compareEquipment(next,[bow,next],context(),19);assert.equal(c.requiresChoice,true);assert.equal(comparisonIndicator(c).kind,'tradeoff');assert.match(c.reason,/loadout choice/);}
+test('weak Archery does not hide a strong melee recommendation while wearing a bow',()=>{
+ const bow=sword({index:0,templateIndex:129,template:{weaponSkillUsed:'Archery'},equipSlot:19,displayStats:{damage:{min:4,max:16},hands:'Two-handed',perUnitWeightKg:1}}),melee=sword({templateIndex:120,index:2,displayStats:{damage:{min:2,max:15},hands:'One-handed',perUnitWeightKg:4.5}}),claymore=sword({index:3,templateIndex:122,displayStats:{damage:{min:2,max:19},hands:'Two-handed',perUnitWeightKg:7.5}}),ctx=context({skills:context().skills.map(s=>({...s,display:s.name==='Archery'?6:s.name==='Long Blade'?51:s.display,effective:s.name==='Archery'?6:s.name==='Long Blade'?51:s.effective}))}),all=[bow,melee,claymore];
+ for(const next of [melee,claymore]){
+  const c=createComparisonSession(all,ctx).compare(next,19);assert.equal(c.requiresChoice,true);assert.equal(c.kind,'upgrade');assert.equal(comparisonIndicator(c).kind,'upgrade');assert(c.rank>0);assert.deepEqual(c.swap.removed.map(i=>i.slot),[19]);
+ }
+ assert.equal(createComparisonSession(all,ctx).forSlot(19).length,2);
+});
+
+test('an unrelated forbidden bow cannot alter melee score, certainty or recommendation order',()=>{
+ const fixed=(index,templateIndex,skill,damage,weight,both=false,equipSlot=null)=>sword({index,templateIndex,template:{weaponSkillUsed:skill},equipSlot,displayStats:{damage:{min:damage,max:damage},hands:both?'Two-handed':'One-handed',perUnitWeightKg:weight}});
+ const old=fixed(0,120,'LongBlade',8,3,false,19),dagger=fixed(1,113,'ShortBlade',10,.5),claymore=fixed(2,122,'LongBlade',11,20,true),forbiddenBow=fixed(3,129,'Archery',4,1,true),ctx=context({careerFlags:1<<5,attributes:{...context().attributes,strength:50},skills:context().skills.map(s=>({...s,display:50,effective:50,permanent:50}))});
+ const before=createComparisonSession([old,dagger,claymore],ctx),after=createComparisonSession([old,dagger,claymore,forbiddenBow],ctx);
+ assert.equal(after.compare(forbiddenBow).kind,'blocked');
+ for(const candidate of [dagger,claymore]){const a=before.compare(candidate,19),b=after.compare(candidate,19);assert.equal(a.rank,b.rank);assert.equal(a.kind,b.kind);assert.equal(a.buildScore.weaponComparisonBasis,b.buildScore.weaponComparisonBasis);assert.equal(compareEquipment(candidate,[old,dagger,claymore],ctx,19).rank,compareEquipment(candidate,[old,dagger,claymore,forbiddenBow],ctx,19).rank);}
+ assert.deepEqual(before.forSlot(19).map(x=>x.item.index),after.forSlot(19).map(x=>x.item.index));
+});
+
+test('incoming hit and damage explanations include the complete stat and skill swap',()=>{
+ const old=sword({index:0,templateIndex:120,equipSlot:19,affixes:[{id:'stat',param:'strength',value:10},{id:'skill',param:29,value:8}]}),next=sword({index:1,templateIndex:120,affixes:[{id:'stat',param:'strength',value:3},{id:'skill',param:29,value:2}]}),ctx=context(),after=contextAfterSwap(ctx,[old],[next]),beforeScore=weaponScore(old,ctx),afterScore=weaponScore(next,after),c=compareEquipment(next,[old,next],ctx,19),expected=afterScore.perSwing-beforeScore.perSwing;
+ assert(Math.abs(c.score.delta-expected)<1e-9);assert.notEqual(afterScore.hitChance,weaponScore(next,ctx).hitChance);assert.notEqual(afterScore.expectedDamage,weaponScore(next,ctx).expectedDamage);
+ assert(c.notes.some(n=>n.includes('Hit chance '+Math.round(beforeScore.hitChance*100)+'% → '+Math.round(afterScore.hitChance*100)+'%')));assert(c.notes.some(n=>n.includes('average hit '+beforeScore.expectedDamage.toFixed(1)+' → '+afterScore.expectedDamage.toFixed(1))));
+});
+
+test('positive provisional slot suggestions stay amber and separate from confirmed upgrades',()=>{
+ const old=sword({index:0,templateIndex:120,equipSlot:19,displayStats:{damage:{min:1,max:2},hands:'One-handed',perUnitWeightKg:3}}),confirmed=sword({index:1,templateIndex:120,displayStats:{damage:{min:3,max:4},hands:'One-handed',perUnitWeightKg:3}}),partial=sword({index:2,templateIndex:120,identified:false,magicKnown:false,enchantmentCount:null,displayStats:{damage:{min:10,max:15},hands:'One-handed',perUnitWeightKg:3}}),negative=sword({index:3,templateIndex:120,identified:false,magicKnown:false,enchantmentCount:null,displayStats:{damage:{min:0,max:0},hands:'One-handed',perUnitWeightKg:3}}),session=createComparisonSession([old,confirmed,partial,negative],context());
+ assert.deepEqual(session.forSlot(19).map(x=>x.item.index),[1]);
+ assert.deepEqual(session.suggestionsForSlot(19).map(x=>x.item.index),[1,2]);
+ const estimate=session.suggestionsForSlot(19)[1].comparison;assert.equal(estimate.kind,'unknown');assert.equal(estimate.provisional,true);assert.equal(comparisonIndicator(estimate).kind,'provisional');assert.equal(comparisonIndicator(estimate).symbol,'↑');assert.equal(bestInPack([{item:partial,comparison:estimate}]).size,0);
 });
 
 test('missing unidentified effect arrays are not misreported as a snapshot overflow',()=>{

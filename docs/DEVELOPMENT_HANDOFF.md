@@ -4,6 +4,18 @@ Last reconciled: 2026-10-23. Latest verified published baseline: **0.4.34**, rel
 
 Read this file, `AGENTS.md`, `README.md`, and `docs/RELEASING.md` before changing the application. Inspect the current source and latest release: this document records findings at the baseline, not a promise that future game versions have identical internals. Keep this document updated as findings change.
 
+## Upgrade scoring and unidentified labels (0.4.35 candidate)
+
+Unidentified items must never use their stored magical name: projectDetails/normalizeItemName exposes only a bundled base-template label (or Unidentified item). Identified %it names resolve from copied template metadata or the bundled template cache. Hidden affixes, enchantments, description and rarity remain redacted. This changes copied presentation only.
+
+Upgrade comparison now permits a positive, known ranged-to-melee swap instead of blanket tradeoff suppression. It evaluates every displaced hand item and uses post-swap Strength/skills for both rank and displayed weapon figures. Critical Strike uses effective skill when available. Scores use a stable reference cadence independent of bag contents: default instant-shot bows, single free-hand firearms, and SWING-LAW melee. These are estimated comparisons, not observed DPS; BowDrawback, held draws, pose readiness, paired guns, tactics and combat mods can change actual results.
+
+For RRI leather/fur armor (520–526, material0) missing only the appearance variant, compare the complete verified protection range. Green requires a positive worst-case score; overlapping results remain tradeoffs. Unknown material/special armor is still incomplete. Positive unidentified known-stat suggestions may appear on worn slots in amber; confirmed filters and best-in-pack green selection exclude them.
+
+Pawn reference: https://github.com/VgerMods/Pawn. Reusable ideas are consistent character-specific scales, eligibility, compatible-slot baselines and cached comparison. This implementation is independent; no Pawn code or WoW class weights are copied. Automatic priorities remain heuristic, and this is a compatible single-item swap evaluator rather than a complete multi-item loadout optimizer.
+
+All computation reuses bounded cached snapshots (500 items maximum); no polling changes, game reads, debugger attachment or game control were added. Validation: 393/393 tests, production build, and synthetic browser checks at desktop/phone sizes passed. A frozen cached 131-item inventory replay produced longsword/claymore switch-back and helm recommendations in about 8 ms locally. Installed-release verification remains a separate step.
+
 ## Repository and portable setup
 
 - Public canonical repository: https://github.com/yedgar93/dfo-companion

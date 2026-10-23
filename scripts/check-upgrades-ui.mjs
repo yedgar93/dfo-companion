@@ -16,7 +16,8 @@ const rawItem=(name,templateIndex,extra={})=>({name,templateIndex,group:'Weapons
 const rawDetails=projectDetails({identity:{level:5,race:'Breton'},attributes:{live:ringDetails.comparisonContext.attributes},skills:ringDetails.comparisonContext.skills,characterSheet:{career:{weaponArmorShieldsBitfield:0,forbiddenMaterialsFlags:0,primarySkills:[29],majorSkills:[31],minorSkills:[28]}},inventory:{available:true,items:[
  rawItem('Worn longsword',120,{equipSlot:19,storedStats:{minDamage:2,maxDamage:15}}),rawItem('Worn shield',110,{group:'Armor',equipSlot:21}),
  rawItem('Identified claymore',122,{storedStats:{minDamage:2,maxDamage:19}}),rawItem('Identified bow',129),rawItem('Identified Thunderlock',560,{material:4}),
- rawItem('Unidentified staff',115,{identified:false,affixes:null,enchantments:null,customEnchantments:null})]}},null);
+ rawItem('Unidentified Staff',115,{identified:false,affixes:null,enchantments:null,customEnchantments:null})]}},null);
+const possibleDetails=structuredClone(rawDetails);possibleDetails.items=[{...structuredClone(rawDetails.items[0]),name:'Known better longsword',equipSlot:null},{...structuredClone(rawDetails.items.at(-1)),equipSlot:19,displayStats:{...rawDetails.items.at(-1).displayStats,damage:{min:1,max:2}}}];
 let version=1;const port=Number(process.env.DFO_UPGRADE_TEST_PORT??19639);
 const snapshot=()=>({...fixture,lastSuccess:new Date().toISOString(),detailsAt:new Date().toISOString(),serverTime:new Date().toISOString(),detailsVersion:version});
 const server=createDashboardServer({snapshot},{port,launchGame:async()=>{throw Error('Game launch forbidden');},onManualRefresh:()=>{throw Error('Game reads forbidden');}});
@@ -52,7 +53,7 @@ try{
    await page.waitForFunction(name=>{const card=[...document.querySelectorAll('#inventory-items .item')].find(e=>e.textContent.includes(name));return card?.querySelector('.upgrade-indicator:not(.pending):not(.unknown)');},name);
    assert.equal(await card.locator('.upgrade-indicator.unknown').count(),0);
   }
-  const unidentified=page.locator('#inventory-items .item').filter({hasText:'Unidentified staff'});
+  const unidentified=page.locator('#inventory-items .item').filter({hasText:'Unidentified Staff'});
   assert.equal(await unidentified.locator('.upgrade-indicator.provisional').count(),1);
   assert.equal(await unidentified.locator('.upgrade-indicator.upgrade').count(),0);
   assert.match(await unidentified.getAttribute('title'),/Known stats only/);
@@ -68,8 +69,20 @@ try{
   // rather than replaying entry fades on every normal reader update.
   const refreshAnimations=await page.evaluate(()=>[...document.querySelectorAll('#inventory-items>*,#gear-left>*,#gear-right>*,#accessories>*,#item-detail>*,#categories>*')].map(e=>getComputedStyle(e).animationName).filter(name=>name!=='none'));
   assert.deepEqual(refreshAnimations,[]);
+  if(await sheet.isVisible())await sheet.getByRole('button',{name:'Done',exact:true}).click();
+  // A known weapon can be a useful possible upgrade over unidentified worn gear.
+  // It must be discoverable from the worn slot while retaining amber certainty.
+  fixture.details=possibleDetails;version++;
+  await page.waitForFunction(()=>[...document.querySelectorAll('#gear-right .gear')].some(e=>e.textContent.includes('Unidentified Staff')&&e.dataset.upgradeCertainty==='provisional'));
+  const wornGear=page.locator('#gear-right .gear').filter({hasText:'Unidentified Staff'});
+  assert.equal(await wornGear.locator('.upgrade-indicator.provisional').count(),1);assert.equal(await wornGear.locator('.upgrade-indicator.upgrade').count(),0);
+  assert.match(await wornGear.getAttribute('title'),/Possible upgrade in pack/);
+  assert.match(await page.locator('#upgrade-summary').textContent(),/Possible upgrades in pack/);
+  const equipmentTab=page.getByRole('button',{name:'Equipment',exact:true});if(await equipmentTab.count())await equipmentTab.click();
+  await wornGear.click();assert.match(await detail.innerText(),/Possible upgrade: Known better longsword/);assert.match(await detail.innerText(),/hidden bonuses can change/);
+  assert.equal(await detail.locator('.better-in-pack.provisional').count(),1);assert.equal(await detail.locator('.better-in-pack.upgrade').count(),0);
   assert.deepEqual(errors,[]);await page.close();
   fixture.details=structuredClone(ringDetails);version++;
  }
- console.log(JSON.stringify({passed:true,viewports:2,gameReads:0,checks:['score sorting','recommendation reason','explicit ring target','snapshot invalidation','raw equipment without template cache','provisional unidentified weapon estimates','ranged timing explanation','no repeated refresh fades','no browser script errors']}));
+ console.log(JSON.stringify({passed:true,viewports:2,gameReads:0,checks:['score sorting','recommendation reason','explicit ring target','snapshot invalidation','raw equipment without template cache','provisional unidentified weapon estimates','positive provisional worn-slot suggestions','ranged timing explanation','no repeated refresh fades','no browser script errors']}));
 }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}

@@ -622,3 +622,5 @@ h1,#character-meta,.hud-place>strong,.hud-place>small,#map-title,.quest h3,.curr
 
 /* Amber, dotted estimates stay distinct from confirmed green recommendations. */
 .upgrade-indicator.provisional{color:#e5bc66;font-size:17px;line-height:17px;border-bottom:1px dotted #e5bc66;padding-bottom:2px}.gear-comparison.provisional h4{color:#e5bc66}
+
+#upgrade-summary.provisional{color:#e5bc66}
