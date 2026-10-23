@@ -264,3 +264,26 @@
  #current-quest .quest-toggle{min-height:32px!important;justify-self:end;padding:4px 8px!important;font-size:12px!important;line-height:1.25;border:1px solid #79765c;border-radius:4px;background:#30382a;box-shadow:none}
  .current-quest{padding:7px 9px!important;gap:4px!important}.current-quest strong{font-size:14px!important}.current-quest>div>span,.current-quest .quest-clock{font-size:10px!important}
 }
+
+@media(max-width:800px){
+ #inventory-items:not([data-layout=list]){grid-template-columns:repeat(auto-fill,minmax(94px,1fr))!important;grid-auto-rows:86px!important;gap:5px}
+ #inventory-items:not([data-layout=list])>.item{height:86px!important;min-height:0!important;padding:6px 5px 8px!important;gap:5px}
+ #inventory-items:not([data-layout=list]) .item-name{font-size:13px!important;line-height:15px!important;max-height:30px!important}
+ #inventory-items[data-layout=list]{grid-auto-rows:minmax(54px,auto)!important}
+ #inventory-items[data-layout=list]>.item{min-height:54px!important;padding:6px 26px 6px 7px!important}
+ #inventory-items[data-layout=list] .item-name{font-size:14px!important;line-height:1.25!important}
+ #inventory-items[data-layout=list] .item-list-compact{font-size:11px}
+ .inventory-panel{gap:7px!important;padding:8px!important}.inventory-panel>.panel-heading h2{font-size:14px}
+}
+
+/* Natural page height prevents empty viewport-sized tails on mobile Safari. */
+@media(max-width:800px){
+ html,body{height:auto!important;min-height:0!important}
+ main{min-height:0!important;padding-bottom:calc(var(--phone-bar) + 8px + env(safe-area-inset-bottom))!important}
+}
+@media(max-width:800px){
+ main{gap:8px!important}.pack{gap:6px!important}.equipment-panel{gap:4px!important}
+ .equipment-panel>.panel-heading{min-height:24px;padding-bottom:3px}
+}
+@media(max-width:800px){.pack{gap:5px!important}.equipment-panel{gap:3px!important}}
+@media(max-width:800px) and (max-height:740px){.equipment-panel>#upgrade-summary{display:none}}

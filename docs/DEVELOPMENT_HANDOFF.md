@@ -1,6 +1,6 @@
 # DFO Companion: development handoff
 
-Last reconciled: 2026-10-23. Current release candidate source: **0.4.28**, based on main `ca08567` (0.4.24); the historical fully verified packaged baseline was **0.4.9** for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
+Last reconciled: 2026-10-23. Current release candidate source: **0.4.29**, based on main `ca08567` (0.4.24); the historical fully verified packaged baseline was **0.4.9** for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
 
 Read this file, `AGENTS.md`, `README.md`, and `docs/RELEASING.md` before changing the application. Inspect the current source and latest release: this document records findings at the baseline, not a promise that future game versions have identical internals. Keep this document updated as findings change.
 
@@ -324,3 +324,9 @@ The map toolbar now keeps Fit, Follow, zoom and expand in one row; More contains
 Real iPhone screenshots established that the 3D map was clipped to a fixed 2:1 drawing strip inside a tall frame. Dungeon camera projection, fitted bounds, backing canvas resolution, SVG marker viewport, labels and panning now share the actual frame aspect. Pixel density is capped at 2; no extra game reads. Priority markers reserve space during label placement.
 
 Phone equipment is an overview with the full portrait between compact slot buttons and accessory groups below. Full names/comparisons are available by tapping into the existing item sheet. Equipment has no duplicate quest banner or attributes section; attributes remain on Character. The character/vitals HUD stays above all phone pages and compacts on downward scrolling and expands on upward scrolling (24px/48px direction thresholds, always full at the top); a reserved expanded-height spacer prevents density changes from shifting content. Section jumps compact first and measure the actual bar, with a short programmatic-scroll guard to prevent expansion from hiding the destination. Equipment/Inventory use 36px tabs and Quest details uses a compact 32px action. About lives in Connection on phone and returns to its desktop location when widened. Character/pack navigation uses compact tab strips rather than pill buttons.
+
+## Inventory density follow-up (0.4.29)
+
+Inventory grid tiles now use 82px desktop / 86px phone rows with 28px artwork and two-line names. Full names remain in accessible labels, hover inspection and item details; List preserves complete wrapping names. Compact list rows start at 52px desktop / 54px phone and show a short condition line, with detailed stats/bonuses in inspection. Quantity badges occupy the upper-left artwork area, separate from upgrade indicators and names. Desktop detail height follows its content up to 30% of the panel, rather than reserving that space unconditionally. Search, sorting, category and comparison filtering still use cached items only.
+
+Phone pages now use natural content height instead of a forced 100vh minimum, with only navigation-height + 8px + safe-area bottom padding. Header density checks whether content would overflow with the full HUD; fitting pages stay full, while long pages retain directional compact behavior. Main-content resizing (including filtering) re-evaluates this without any game reads.

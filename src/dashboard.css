@@ -597,3 +597,24 @@ h1,#character-meta,.hud-place>strong,.hud-place>small,#map-title,.quest h3,.curr
 }
 .map-floor-menu .service-finder{position:static!important;inset:auto!important;transform:none!important;width:100%;max-width:none;display:flex;flex-wrap:wrap;margin:6px 0;padding:0}
 .map-floor-menu .service-finder select{flex:1;min-width:0;max-width:100%;font-size:13px;min-height:36px}.map-floor-menu .service-finder small{position:static;flex-basis:100%;white-space:normal}
+
+/* Dense inventory: grid for scanning artwork, list for readable full names. */
+.item-list-compact{display:none}
+#inventory-items:not([data-layout=list]){grid-template-columns:repeat(auto-fill,minmax(88px,1fr))!important;grid-auto-rows:82px!important;gap:4px}
+#inventory-items:not([data-layout=list])>.item{height:82px!important;min-height:0!important;padding:5px 5px 8px!important;gap:4px;justify-content:flex-start}
+#inventory-items:not([data-layout=list]) .item-name{font-size:12px!important;line-height:14px!important;display:-webkit-box!important;-webkit-line-clamp:2!important;line-clamp:2!important;-webkit-box-orient:vertical;overflow:hidden!important;max-height:28px!important}
+#inventory-items:not([data-layout=list]) .item-list-meta,#inventory-items:not([data-layout=list]) .item-list-bonus,#inventory-items:not([data-layout=list]) .item-list-verdict{display:none}
+#inventory-items .item>img,#inventory-items .item>.fallback{width:28px;height:28px;font-size:24px;line-height:28px;flex:none}
+#inventory-items[data-layout=list]{display:grid!important;grid-template-columns:1fr!important;grid-auto-rows:minmax(52px,auto)!important;gap:4px}
+#inventory-items[data-layout=list]>.item{display:grid!important;grid-template-columns:30px minmax(0,1fr)!important;grid-template-rows:auto auto!important;min-height:52px!important;height:auto!important;gap:2px 8px!important;padding:6px 26px 6px 7px!important;text-align:left;align-content:center}
+#inventory-items[data-layout=list]>.item>img,#inventory-items[data-layout=list]>.item>.fallback{grid-column:1!important;grid-row:1/3!important;width:28px;height:28px;align-self:center}
+#inventory-items[data-layout=list] .item-name{grid-column:2!important;grid-row:1!important;font-size:13px!important;line-height:1.25!important;display:block!important;white-space:normal!important;overflow:visible!important;max-height:none!important;-webkit-line-clamp:unset!important;line-clamp:unset!important}
+#inventory-items[data-layout=list] .item-list-meta,#inventory-items[data-layout=list] .item-list-bonus,#inventory-items[data-layout=list] .item-list-verdict{display:none!important}
+#inventory-items[data-layout=list] .item-list-compact{display:block;grid-column:2;grid-row:2;font-size:10px;line-height:1.25;color:#b8bca5}
+#inventory-items .item .count{font-size:10px;line-height:12px;bottom:2px;right:3px;top:auto}
+@media(min-width:801px){
+ .inventory-panel>.item-detail{flex:0 1 auto;max-height:30%}
+ .inventory-panel .detail-section-title{margin:8px 0 4px;font-size:12px}.inventory-panel .detail-description{font-size:12px;margin:5px 0;line-height:1.35}
+ .inventory-panel .categories button{font-size:11px;padding:4px 3px}
+}
+#inventory-items .item .count{top:2px;left:3px;right:auto;bottom:auto;padding:0 2px;background:#22291fd9;border-radius:2px}

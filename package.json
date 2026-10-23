@@ -1,7 +1,7 @@
 {
   "name": "dfo-companion",
   "productName": "DFO Companion",
-  "version": "0.4.28",
+  "version": "0.4.29",
   "description": "Lightweight DFO Companion desktop dashboard",
   "main": "desktop/main.cjs",
   "license": "MIT",
