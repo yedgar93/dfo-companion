@@ -1,6 +1,8 @@
 // Presentation only: reuse existing DOM and snapshots. No reader or network access.
 export function installLayout() {
   const $ = id => document.getElementById(id);
+  // Attributes are available on Character; keep the equipment overview compact.
+  document.querySelector('.character-stats')?.removeAttribute('open');
   const make = (tag, cls, text) => { const n = document.createElement(tag); n.className = cls; if (text) n.textContent = text; return n; };
   const disclosure = (title, nodes, cls='') => {
     const d = make('details', 'ui-disclosure '+cls); d.append(make('summary','',title));
@@ -19,19 +21,19 @@ export function installLayout() {
   for(const id of ['map-focus','map-follow','map-zoom-in','map-zoom-out'])camera.append($(id));
   const floors=make('div','map-floor-controls');floors.setAttribute('aria-label','Dungeon floors and orientation');
   for(const id of ['map-height','map-floor-down','map-floor-up','map-face-objective'])floors.append($(id));
-  const expand=make('button','map-expand','Expand map');expand.id='map-expand';expand.type='button';expand.setAttribute('aria-pressed','false');
-  const setExpanded=value=>{if(document.body.classList.contains('map-expanded')===value)return;document.body.classList.toggle('map-expanded',value);expand.textContent=value?'Close expanded map':'Expand map';expand.setAttribute('aria-pressed',String(value));requestAnimationFrame(()=>document.dispatchEvent(new CustomEvent('dfo-map-resize')));};
+  const expand=make('button','map-expand','Expand map');expand.textContent='⛶';expand.title='Expand map';expand.setAttribute('aria-label','Expand map');expand.id='map-expand';expand.type='button';expand.setAttribute('aria-pressed','false');
+  const setExpanded=value=>{if(document.body.classList.contains('map-expanded')===value)return;document.body.classList.toggle('map-expanded',value);expand.textContent=value?'↙':'⛶';expand.setAttribute('aria-label',value?'Close expanded map':'Expand map');expand.title=value?'Close expanded map':'Expand map';expand.setAttribute('aria-pressed',String(value));requestAnimationFrame(()=>document.dispatchEvent(new CustomEvent('dfo-map-resize')));};
   expand.addEventListener('click',()=>setExpanded(!document.body.classList.contains('map-expanded')));
-  document.addEventListener('keydown',e=>{if(e.key==='Escape')setExpanded(false);});
-  document.querySelector('.tabs').addEventListener('click',()=>setExpanded(false));camera.append($('map-dungeon-plan'),expand);
-  const floorMenu=disclosure('Floors & camera',[floors],'map-floor-menu');floorMenu.open=false;toolbar.append(camera,floorMenu);document.querySelector('.map-main').prepend(toolbar);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(floorMenu.open){floorMenu.open=false;floorMenu.querySelector('summary').focus();}else setExpanded(false);}});
+  document.querySelector('.tabs').addEventListener('click',()=>setExpanded(false));floors.prepend($('map-dungeon-plan'));camera.append(expand);
+  const floorMenu=disclosure('More',[floors],'map-floor-menu');floorMenu.open=false;toolbar.append(camera,floorMenu);document.querySelector('.map-main').prepend(toolbar);document.addEventListener('pointerdown',event=>{if(!floorMenu.contains(event.target))floorMenu.open=false;});
   const area=disclosure('Area maps & services',[switcher,document.querySelector('.service-finder')],'map-area-controls');
-  document.querySelector('#map .map-main').append(area);
-  const side=document.querySelector('.map-quest'), sidebar=disclosure('Quest & steps',[side],'map-quest-disclosure');sidebar.open=true;document.querySelector('.map-layout').append(sidebar);
+  floorMenu.querySelector('.disclosure-body').append(area);
+  const side=document.querySelector('.map-quest'), sidebar=disclosure('Quest & steps',[side],'map-quest-disclosure');sidebar.open=!matchMedia('(max-width:800px)').matches;document.querySelector('.map-layout').append(sidebar);
   const status=make('p','map-objective-status');status.id='map-objective-status';status.setAttribute('role','status');toolbar.after(status);
   const compass=make('div','map-compass');compass.id='map-compass';compass.setAttribute('aria-label','Map north');compass.textContent='↑ N';$('map-stage').append(compass);
-  const gestures=make('p','map-gestures','Drag to rotate · Shift/right-drag to pan · Scroll or +/− to zoom');gestures.id='map-gestures';const help=disclosure('Map help',[gestures,document.querySelector('.map-legend')],'map-help');document.querySelector('.map-main').append(help);
-  const pan=make('button','map-pan-toggle','Drag: rotate');pan.id='map-pan-toggle';pan.type='button';pan.setAttribute('aria-pressed','false');camera.insertBefore(pan,expand);
+  const gestures=make('p','map-gestures','Drag to rotate · Shift/right-drag to pan · Scroll or +/− to zoom');gestures.id='map-gestures';const help=disclosure('Map help',[gestures,document.querySelector('.map-legend')],'map-help');floorMenu.querySelector('.disclosure-body').append(help);
+  const pan=make('button','map-pan-toggle','Drag: rotate');pan.id='map-pan-toggle';pan.type='button';pan.setAttribute('aria-pressed','false');floors.append(pan);
 
   const jump=make('nav','character-jump');jump.setAttribute('aria-label','Character sections');for(const [name,label] of [['overview','Overview'],['skills','Skills'],['standing','Standing']]){const b=make('button','',label);b.type='button';b.addEventListener('click',()=>document.querySelector('.character-'+name)?.scrollIntoView({block:'start'}));jump.append(b);}document.querySelector('#character>.panel-heading').after(jump);
   const connection=document.querySelector('#connection-page>.scroll-area');

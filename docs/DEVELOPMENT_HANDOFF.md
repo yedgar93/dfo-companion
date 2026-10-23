@@ -1,6 +1,6 @@
 # DFO Companion: development handoff
 
-Last reconciled: 2026-10-23. Current release candidate source: **0.4.26**, based on main `ca08567` (0.4.24); the historical fully verified packaged baseline was **0.4.9** for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
+Last reconciled: 2026-10-23. Current release candidate source: **0.4.27**, based on main `ca08567` (0.4.24); the historical fully verified packaged baseline was **0.4.9** for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
 
 Read this file, `AGENTS.md`, `README.md`, and `docs/RELEASING.md` before changing the application. Inspect the current source and latest release: this document records findings at the baseline, not a promise that future game versions have identical internals. Keep this document updated as findings change.
 
@@ -312,3 +312,9 @@ Public workflow/release status can be read through GitHub's API or normal GitHub
 A real iPhone report showed bottom navigation floating above empty space; desktop phone emulation did not reproduce it. Candidate moves mobile navigation directly under body, uses fixed bottom placement throughout the <=800px layout, reserves safe-area space, and prevents single-letter tab wrapping. Physical iPhone verification remains required after release. Inventory result counts, active filters and Clear filters now remain outside the collapsed options. Successful live reads replace stale startup messages.
 
 Independent testing: `npm run test:mobile` uses Playwright WebKit/Chromium touch contexts and synthetic data through the real allowlisted server. The mobile CI workflow saves synthetic captures; no game connection. `--live` uses paired cached endpoints only, never publish its captures. Local macOS sandbox can block browser process startup; report this separately from assertion failures.
+
+## Desktop fit and touch gestures (0.4.27)
+
+Desktop equipment overview now uses the available viewport instead of fixed 560px portrait/104px gear/100px accessory minimums and an 800px page minimum. Attributes and inventory options start collapsed. Compact desktop names use two lines with full hover/focus inspection and accessible names; mobile keeps full text. Inventory and detail content scroll within the dashboard. Map gestures track pointer IDs independently, support two-finger centroid pan and pinch zoom, rebase after finger removal, and clear on cancellation/visibility changes. No new game reads.
+
+The map toolbar now keeps Fit, Follow, zoom and expand in one row; More contains plan/floors/orientation, area/service selection and help. Province/Bay maps now support bounded local pan/zoom with markers using the same cropped view coordinates. These are presentation-only operations on cached artwork.

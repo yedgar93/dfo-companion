@@ -35,6 +35,8 @@ jobs:
           const release=r.status===404&&process.env.GITHUB_EVENT_NAME!=='pull_request';
           fs.appendFileSync(process.env.GITHUB_OUTPUT,`version=${version}\nrelease=${release}\n`);
           NODE
+  mobile:
+    uses: ./.github/workflows/mobile.yml
   build:
     needs: plan
     strategy:
@@ -87,7 +89,7 @@ jobs:
             dist/*.blockmap
             dist/latest*.yml
   release:
-    needs: [plan, build]
+    needs: [plan, build, mobile]
     if: needs.plan.outputs.release == 'true' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
     runs-on: ubuntu-latest
     permissions:

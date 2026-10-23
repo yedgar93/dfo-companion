@@ -12,7 +12,7 @@ const contexts=new WeakMap;let trail=[],trailScene=null,trailVersion=0;
 export function recordInteriorPosition(loc){const key=loc?.mode==='dungeon'?interiorSceneKey(loc):null;if(key!==trailScene){trailScene=key;trail=[];trailVersion++;}const p=loc?.position;if(!key||!p||![p.x,p.y,p.z].every(Number.isFinite))return;const last=trail.at(-1);if(!last||Math.hypot(p.x-last.x,p.y-last.y,p.z-last.z)>=.65){if(trail.length>=2048)trail.shift();trail.push({...p});trailVersion++;}}
 
 export function zoomInteriorMap(factor){if(spanOverride!==null){spanOverride=Math.max(8,Math.min(2000,spanOverride*factor));return;}zoom=Math.max(.08,Math.min(6,zoom*factor));}
-export function panInteriorMap(x,z){follow=false;const c=Math.cos(yaw),s=Math.sin(yaw);if(cameraCenter){cameraCenter.x+=x*c+z*s;cameraCenter.z+=-x*s+z*c;}}
+export function panInteriorMap(x,z){follow=false;const angle=plan?0:yaw,c=Math.cos(angle),s=Math.sin(angle);if(cameraCenter){cameraCenter.x+=x*c+z*s;cameraCenter.z+=-x*s+z*c;}}
 export function orbitInteriorMap(dx,dy){plan=false;follow=false;yaw+=dx*.008;pitch=Math.max(.12,Math.min(1.5,pitch+dy*.006));}
 export function toggleInteriorObjective(){autoObjective=!(autoObjective&&follow&&!plan);if(autoObjective){follow=true;plan=false;cameraCenter=null;}return autoObjective;}
 export function toggleInteriorPlan(){plan=!plan;fitNext=true;return plan;}
