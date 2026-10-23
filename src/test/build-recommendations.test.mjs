@@ -160,6 +160,26 @@ test('missing unidentified effect arrays are not misreported as a snapshot overf
  const c=compareEquipment(projected,[oldSword,projected],context());assert.notEqual(c.kind,'upgrade');assert(!c.unknowns.some(s=>s.includes('coverage limit')));assert(c.unknowns.some(s=>s.includes('Unidentified')));
 });
 
+test('unidentified weapons show amber known-stat direction using the actual character skills',()=>{
+ const old=sword({index:0,templateIndex:120,equipSlot:19}),next=sword({index:1,templateIndex:115,template:{weaponSkillUsed:'BluntWeapon'},identified:false,magicKnown:false,enchantmentCount:null,displayStats:{damage:{min:20,max:35},hands:'Two-handed',perUnitWeightKg:3}});
+ const build=(long,blunt)=>context({skills:context().skills.map(s=>({...s,display:s.name==='Long Blade'?long:s.name==='Blunt Weapon'?blunt:s.display,effective:s.name==='Long Blade'?long:s.name==='Blunt Weapon'?blunt:s.effective,permanent:s.name==='Long Blade'?long:s.name==='Blunt Weapon'?blunt:s.permanent}))});
+ for(const [ctx,direction] of [[build(80,5),'↓'],[build(5,80),'↑']]){
+  const c=compareEquipment(next,[old,next],ctx),badge=comparisonIndicator(c);
+  assert.equal(c.kind,'unknown');assert.equal(c.provisional,true);assert.equal(badge.kind,'provisional');assert.equal(badge.symbol,direction);assert.match(c.reason,/Known stats only/);assert.match(c.reason,/hidden bonuses/);
+  assert.equal(bestInPack([{item:next,comparison:c}]).size,0);assert.equal(createComparisonSession([old,next],ctx).forSlot(19).length,0);
+ }
+ // Missing compatibility, numerical stats, or supported-effect coverage still
+ // require a real question mark, rather than manufacturing a partial score.
+ for(const [candidate,ctx] of [[{...next,displayStats:null},build(80,5)],[next,{...build(80,5),restrictionEvidenceKnown:false}],[{...next,special:true},build(80,5)]])assert.equal(comparisonIndicator(compareEquipment(candidate,[old,candidate],ctx)).kind,'unknown');
+});
+
+test('automatic slot choice prefers usable provisional evidence over an unsupported swap',()=>{
+ const old=sword({index:0,templateIndex:120,equipSlot:19,displayStats:{damage:{min:40,max:60},hands:'One-handed',perUnitWeightKg:3}}),shield=item({index:2,name:'Special shield',group:'Armor',templateIndex:110,equipSlot:21,special:true,displayStats:{baseArmour:2}}),next=sword({index:3,templateIndex:120,identified:false,magicKnown:false,enchantmentCount:null,displayStats:{damage:{min:1,max:2},hands:'One-handed',perUnitWeightKg:1}}),all=[old,shield,next],ctx=context();
+ const valid=compareEquipment(next,all,ctx,19),unsupported=compareEquipment(next,all,ctx,21);
+ assert.equal(valid.provisional,true);assert.equal(comparisonIndicator(unsupported).kind,'unknown');assert(unsupported.rank>valid.rank);
+ for(const c of [compareEquipment(next,all,ctx),createComparisonSession(all,ctx).compare(next)]){assert.equal(c.slot,19);assert.equal(c.provisional,true);assert.equal(comparisonIndicator(c).kind,'provisional');}
+});
+
 test('comparison preparation yields, cancels stale work and caches every target',async()=>{
  const rows=Array.from({length:500},(_,i)=>ring(i,i%12)),session=createComparisonSession(rows,context());let time=0,yields=0;
  assert.equal(await prepareComparisons(rows,session,{now:()=>++time,yieldNow:async()=>{yields++;}}),true);assert(yields>100);

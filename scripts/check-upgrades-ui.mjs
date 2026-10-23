@@ -52,11 +52,20 @@ try{
    await page.waitForFunction(name=>{const card=[...document.querySelectorAll('#inventory-items .item')].find(e=>e.textContent.includes(name));return card?.querySelector('.upgrade-indicator:not(.pending):not(.unknown)');},name);
    assert.equal(await card.locator('.upgrade-indicator.unknown').count(),0);
   }
-  assert.equal(await page.locator('#inventory-items .item').filter({hasText:'Unidentified staff'}).locator('.upgrade-indicator.unknown').count(),1);
+  const unidentified=page.locator('#inventory-items .item').filter({hasText:'Unidentified staff'});
+  assert.equal(await unidentified.locator('.upgrade-indicator.provisional').count(),1);
+  assert.equal(await unidentified.locator('.upgrade-indicator.upgrade').count(),0);
+  assert.match(await unidentified.getAttribute('title'),/Known stats only/);
+  await page.locator('#inventory-view').selectOption('unknown');
+  assert.equal(await unidentified.count(),1);assert.equal(await page.locator('#inventory-items .item').filter({hasText:'Identified claymore'}).count(),0);
+  await page.locator('#inventory-view').selectOption('upgrades');assert.equal(await unidentified.count(),0);
+  await page.locator('#inventory-view').selectOption('all');
+  await unidentified.click();assert.match(await detail.innerText(),/Provisional build estimate/);assert.match(await detail.innerText(),/hidden bonuses can change/);assert.doesNotMatch(await detail.innerText(),/Can't judge yet/);
+  if(await sheet.isVisible())await sheet.getByRole('button',{name:'Done',exact:true}).click();
   await page.locator('#inventory-items .item').filter({hasText:'Identified bow'}).click();
   assert.match(await detail.innerText(),/timing|reload/);assert.doesNotMatch(await detail.innerText(),/Can't judge yet/);
   assert.deepEqual(errors,[]);await page.close();
   fixture.details=structuredClone(ringDetails);version++;
  }
- console.log(JSON.stringify({passed:true,viewports:2,gameReads:0,checks:['score sorting','recommendation reason','explicit ring target','snapshot invalidation','raw equipment without template cache','unidentified effects remain unknown','ranged timing explanation','no browser script errors']}));
+ console.log(JSON.stringify({passed:true,viewports:2,gameReads:0,checks:['score sorting','recommendation reason','explicit ring target','snapshot invalidation','raw equipment without template cache','provisional unidentified weapon estimates','ranged timing explanation','no browser script errors']}));
 }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}

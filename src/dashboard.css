@@ -618,3 +618,6 @@ h1,#character-meta,.hud-place>strong,.hud-place>small,#map-title,.quest h3,.curr
  .inventory-panel .categories button{font-size:11px;padding:4px 3px}
 }
 #inventory-items .item .count{top:2px;left:3px;right:auto;bottom:auto;padding:0 2px;background:#22291fd9;border-radius:2px}
+
+/* Amber, dotted estimates stay distinct from confirmed green recommendations. */
+.upgrade-indicator.provisional{color:#e5bc66;font-size:17px;line-height:17px;border-bottom:1px dotted #e5bc66;padding-bottom:2px}.gear-comparison.provisional h4{color:#e5bc66}

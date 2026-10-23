@@ -104,6 +104,26 @@ Genuinely unidentified effects still prevent a green recommendation. Missing
 unidentified effect arrays are distinct from actual snapshot overflow; their
 marker explains identification rather than falsely reporting a coverage limit.
 
+### Provisional comparisons (0.4.33)
+
+When the only remaining uncertainty is genuinely unidentified magical properties,
+and a numerical weapon/protection comparison and complete build score exist,
+the UI shows a dotted amber arrow for the known-stat score direction. The detail
+calls this a provisional build estimate and explicitly warns that hidden bonuses
+can change the result. Ranged loadout choices retain a sideways estimate.
+Missing proficiency, restrictions, item stats, or unsupported special effects
+still require an incomplete marker; their gaps are not silently cleared.
+
+These items keep `kind: unknown` and their unknown reasons. They never enter
+confirmed build recommendations, green slot alerts, or best-in-pack selections.
+The incomplete-comparisons filter includes them. This reuses the existing score
+and comparison cache; it does not add game reads or a second scoring pass.
+Automatic slot selection prefers confirmed results, then provisional results,
+then unsupported results, comparing scores within the same evidence category.
+The weapon/armor metadata cache is offline, keyed by verified template IDs.
+Character priorities remain derived from actual stats and skills for every
+career, including renamed/custom careers; there is no class-name preset cache.
+
 ## Performance and verification
 
 One comparison session shares its build model and memoizes each candidate and

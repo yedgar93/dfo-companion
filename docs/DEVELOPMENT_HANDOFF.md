@@ -1,6 +1,6 @@
 # DFO Companion: development handoff
 
-Last reconciled: 2026-10-23. Current release candidate source: **0.4.32**, based on main `96d8c75` (0.4.31); the latest verified published baseline is **0.4.31** for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
+Last reconciled: 2026-10-23. Current release candidate source: **0.4.33**, based on main `26d7590` (0.4.32); the latest verified published baseline is **0.4.32** for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
 
 Read this file, `AGENTS.md`, `README.md`, and `docs/RELEASING.md` before changing the application. Inspect the current source and latest release: this document records findings at the baseline, not a promise that future game versions have identical internals. Keep this document updated as findings change.
 
@@ -239,6 +239,31 @@ Public workflow/release status can be read through GitHub's API or normal GitHub
 - Keep README, this handoff and tests aligned with actual implementation. A future AI should distinguish requests, code, tests, synthetic previews, user confirmation and release evidence.
 
 ## Upgrade scoring (phase 1, inventory only)
+
+### Provisional markers (0.4.33 release source)
+
+Browser inspection after 0.4.32 verified that the identified claymore, bow and
+Thunderlock now compare normally. The four remaining carried weapon question
+marks represented genuinely unidentified effects. The staff detail already
+contained useful known losses, including weapon proficiency and displaced shield.
+The UI now exposes that known-stat score as a dotted amber provisional arrow
+when identification is the only missing evidence. The hidden effects warning
+remains, and these items cannot become confirmed upgrades or best-in-pack alerts.
+Missing stats, restrictions and unsupported effects keep the incomplete marker.
+Automatic slot selection prefers confirmed comparisons, then usable provisional
+estimates, then genuinely incomplete comparisons; an unsupported hand swap cannot
+hide a usable provisional comparison. This reuses the cached score and changes
+no reader/sampling behavior.
+
+Validated in a separate browser preview against one frozen cached dashboard
+snapshot, retained only in process memory. No game refresh or debugger read was
+requested. Release 0.4.33 and a post-update live browser check were explicitly
+requested; source edits alone do not establish publication or installed status.
+Release-source validation: all 374 tests pass, the application bundle builds,
+and synthetic desktop/phone browser checks pass, including provisional-detail
+warnings and exclusion from confirmed-upgrade filters. An independent review
+caught the slot-selection issue above; both comparison paths have regression
+coverage for it.
 
 ### Missing-template fix (0.4.32 release source)
 
