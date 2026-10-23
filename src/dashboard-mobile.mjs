@@ -124,8 +124,6 @@ if (pack && sourceDetail) {
     target?.focus({preventScroll:true});
   });
   mobile.addEventListener('change', () => { updateView(); if (!mobile.matches && sheet.open) sheet.close(); });
-  const hud=document.querySelector('.hud');
-  if(hud)new ResizeObserver(()=>document.documentElement.style.setProperty('--hud-h',hud.getBoundingClientRect().height+'px')).observe(hud);
   updateView();
 }
 
@@ -149,8 +147,9 @@ if(phoneHud){
  }
 
  function place(){if(mobile.matches){document.body.append(phoneHud);const tools=document.querySelector('#connection-page>.panel-heading');if(about&&tools)tools.append(about);document.body.classList.remove('mobile-hud-compact');space.dataset.fullHeight=phoneHud.getBoundingClientRect().height;space.style.height=space.dataset.fullHeight+'px';density();}else{document.body.classList.remove('mobile-hud-compact');home.after(phoneHud);if(about)aboutHome.after(about);}}
- function measure(){if(mobile.matches&&!document.body.classList.contains('mobile-hud-compact')){space.dataset.fullHeight=phoneHud.getBoundingClientRect().height;space.style.height=space.dataset.fullHeight+'px';}document.documentElement.style.setProperty('--hud-h',phoneHud.getBoundingClientRect().height+'px');}
- new ResizeObserver(measure).observe(phoneHud);new ResizeObserver(()=>{if(!queued){queued=true;requestAnimationFrame(density);}}).observe(document.querySelector('main'));window.addEventListener('resize',()=>{place();measure();});mobile.addEventListener('change',()=>{place();measure();});
+ function measure(){const height=phoneHud.getBoundingClientRect().height,value=height+'px';if(mobile.matches&&!document.body.classList.contains('mobile-hud-compact')){space.dataset.fullHeight=height;if(space.style.height!==value)space.style.height=value;}if(document.documentElement.style.getPropertyValue('--hud-h')!==value)document.documentElement.style.setProperty('--hud-h',value);}
+ let measureQueued=false;
+ new ResizeObserver(()=>{if(!measureQueued){measureQueued=true;requestAnimationFrame(()=>{measureQueued=false;measure();});}}).observe(phoneHud);new ResizeObserver(()=>{if(!queued){queued=true;requestAnimationFrame(density);}}).observe(document.querySelector('main'));window.addEventListener('resize',()=>{place();measure();});mobile.addEventListener('change',()=>{place();measure();});
  window.addEventListener('scroll',()=>{if(!queued){queued=true;requestAnimationFrame(density);}},{passive:true});
  place();measure();
 }
