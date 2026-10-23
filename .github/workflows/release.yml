@@ -1,0 +1,120 @@
+name: Build and release desktop apps
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: desktop-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      release: ${{ steps.version.outputs.release }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const {version}=JSON.parse(fs.readFileSync('package.json','utf8'));
+          if(!/^\d+\.\d+\.\d+$/.test(version))throw Error('Use a stable semantic version in package.json');
+          const r=await fetch(`https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/releases/tags/v${version}`,{headers:{Authorization:`Bearer ${process.env.GH_TOKEN}`,'User-Agent':'DFO-Companion-CI'}});
+          if(r.status!==404&&!r.ok)throw Error('Cannot verify existing releases');
+          const release=r.status===404&&process.env.GITHUB_EVENT_NAME!=='pull_request';
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,`version=${version}\nrelease=${release}\n`);
+          NODE
+  mobile:
+    uses: ./.github/workflows/mobile.yml
+  build:
+    needs: plan
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win
+          - os: macos-latest
+            platform: mac
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - name: Check desktop and phone layouts with isolated fixtures
+        run: npm run test:visual
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visual-${{ matrix.platform }}
+          path: visual-results/*.png
+          if-no-files-found: ignore
+      - name: Build Electron app
+        run: npm run dist:${{ matrix.platform }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CSC_LINK: ${{ matrix.platform == 'mac' && secrets.MAC_CSC_LINK || secrets.WIN_CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ matrix.platform == 'mac' && secrets.MAC_CSC_KEY_PASSWORD || secrets.WIN_CSC_KEY_PASSWORD }}
+          MAC_SIGNED: ${{ matrix.platform == 'mac' && secrets.MAC_CSC_LINK != '' }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      - name: Test native Mac app replacement
+        if: matrix.platform == 'mac'
+        run: node scripts/smoke-mac-install.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.platform }}
+          if-no-files-found: error
+          path: |
+            dist/*.exe
+            dist/*.dmg
+            dist/*.zip
+            dist/*.blockmap
+            dist/latest*.yml
+  release:
+    needs: [plan, build, mobile]
+    if: needs.plan.outputs.release == 'true' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: desktop-*
+          merge-multiple: true
+          path: release
+      - name: Publish complete release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.plan.outputs.version }}
+          UPDATE_SIGNING_KEY: ${{ secrets.UPDATE_SIGNING_KEY }}
+        shell: bash
+        run: |
+          test -n "$(find release -maxdepth 1 -name '*.exe' -print -quit)"
+          test -n "$(find release -maxdepth 1 -name '*.dmg' -print -quit)"
+          test -n "$(find release -maxdepth 1 -name '*.zip' -print -quit)"
+          node scripts/sign-release.mjs release
+          cd release
+          sha256sum ./* > SHA256SUMS.txt
+          gh release create "v$VERSION" ./* --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "DFO Companion $VERSION" --notes "Windows and Apple Silicon Mac Electron apps. Mac builds use local ad-hoc signing until Developer ID credentials are configured. Automatic Mac installation of updates requires Developer ID signing."

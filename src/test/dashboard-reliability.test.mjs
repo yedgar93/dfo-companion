@@ -1,0 +1,7 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {currentTownTarget,questForView,positionEvidence,snapshotLocation,townObjectiveDoor} from '../dashboard-map-model.mjs';
+test('ambiguous residence and a destination in another town never receive a local objective pin',()=>{const q={id:'1',objective:'Deliver to Smith',destination:{locationName:'Town',buildingName:'House'}};const map={townName:'Town',shops:[{name:'House',mapKey:1},{name:'House',mapKey:2}]};assert.equal(currentTownTarget(map,q),null);assert.equal(currentTownTarget({...map,townName:'Other'},q),null);});
+test('removed dashboard quest selection cannot silently switch to another quest',()=>{assert.equal(questForView({views:[{id:'2'}],pinned:'2'},'1').quest,null);});
+test('stale and unavailable positions cannot provide directions or fall back to an older location',()=>{const now=Date.now();assert.equal(positionEvidence(new Date(now-11000).toISOString(),false,now).canGuide,false);assert.equal(positionEvidence(null,false,now).canGuide,false);assert.equal(positionEvidence(new Date(now).toISOString(),true,now).canGuide,false);assert.equal(snapshotLocation({pose:null,details:{location:{place:'old'}}}),null);});
+test('mapped door selection uses nearest valid door of the actual destination',()=>{const door=(x,key=1)=>({mapKey:key,position:{x,z:0,frame:'town local'}});assert.equal(townObjectiveDoor({entrances:{doors:[door(100),door(2),door(0,2)]}},{mapKey:1},{x:0,z:0}).position.x,2);});

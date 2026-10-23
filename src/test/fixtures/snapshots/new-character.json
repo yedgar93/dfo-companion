@@ -1,0 +1,414 @@
+{
+ "status": {
+  "kind": "live",
+  "title": "Live character",
+  "message": "Your character was read successfully. Refreshes run locally."
+ },
+ "reason": null,
+ "lastAttempt": "2026-10-22T18:00:00.000Z",
+ "lastSuccess": "2026-10-22T18:00:00.000Z",
+ "detailsAt": "2026-10-22T18:00:00.000Z",
+ "player": {
+  "identity": {
+   "name": "Mira",
+   "level": 1,
+   "className": "Warrior",
+   "race": "Nord"
+  },
+  "vitals": {
+   "health": {
+    "current": 30,
+    "max": 30
+   },
+   "magicka": {
+    "current": 10,
+    "max": 10
+   },
+   "fatigue": {
+    "current": 80,
+    "max": 80
+   }
+  },
+  "gold": 0
+ },
+ "details": {
+  "characterSheet": {
+   "factions": [],
+   "factionsTruncated": false,
+   "socialReputations": [
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "legalReputation": {},
+   "guildMemberships": {
+    "mortal": {},
+    "vampire": {}
+   },
+   "career": {
+    "primarySkills": [
+     28,
+     20,
+     14
+    ],
+    "majorSkills": [
+     0,
+     16,
+     21
+    ],
+    "minorSkills": [
+     2,
+     13,
+     22,
+     23,
+     29,
+     33
+    ],
+    "weaponArmorShieldsBitfield": 0,
+    "forbiddenMaterialsFlags": 0,
+    "abilityFlagsAndSpellPointsBitfield": 0,
+    "resistanceFlags": 0,
+    "attackModifierFlags": 0
+   },
+   "armor": 0,
+   "armorValues": null,
+   "currentBreath": 120,
+   "reflexes": 2,
+   "weightAllowanceMultiplier": 0
+  },
+  "attributes": {
+   "permanent": {
+    "strength": 55,
+    "intelligence": 30,
+    "willpower": 40,
+    "agility": 45,
+    "endurance": 55,
+    "personality": 35,
+    "speed": 45,
+    "luck": 45
+   },
+   "live": {
+    "strength": 55,
+    "intelligence": 30,
+    "willpower": 40,
+    "agility": 45,
+    "endurance": 55,
+    "personality": 35,
+    "speed": 45,
+    "luck": 45
+   }
+  },
+  "carrying": {
+   "complete": true,
+   "carriedKg": 0,
+   "capacityKg": 82
+  },
+  "comparisonContext": {
+   "careerFlags": 0,
+   "forbiddenMaterials": 0,
+   "restrictionEvidenceKnown": true,
+   "skills": [
+    {
+     "name": "Medical",
+     "display": 5,
+     "permanent": 3
+    },
+    {
+     "name": "Etiquette",
+     "display": 12,
+     "permanent": 12
+    },
+    {
+     "name": "Streetwise",
+     "display": 19,
+     "permanent": 19
+    },
+    {
+     "name": "Jumping",
+     "display": 26,
+     "permanent": 26
+    },
+    {
+     "name": "Orcish",
+     "display": 10,
+     "permanent": 10
+    },
+    {
+     "name": "Harpy",
+     "display": 17,
+     "permanent": 15
+    },
+    {
+     "name": "Giantish",
+     "display": 24,
+     "permanent": 24
+    },
+    {
+     "name": "Dragonish",
+     "display": 8,
+     "permanent": 8
+    },
+    {
+     "name": "Nymph",
+     "display": 15,
+     "permanent": 15
+    },
+    {
+     "name": "Daedric",
+     "display": 22,
+     "permanent": 22
+    },
+    {
+     "name": "Spriggan",
+     "display": 6,
+     "permanent": 4
+    },
+    {
+     "name": "Centaurian",
+     "display": 13,
+     "permanent": 13
+    },
+    {
+     "name": "Impish",
+     "display": 20,
+     "permanent": 20
+    },
+    {
+     "name": "Lockpicking",
+     "display": 27,
+     "permanent": 27
+    },
+    {
+     "name": "Mercantile",
+     "display": 11,
+     "permanent": 11
+    },
+    {
+     "name": "Pickpocket",
+     "display": 18,
+     "permanent": 16
+    },
+    {
+     "name": "Stealth",
+     "display": 25,
+     "permanent": 25
+    },
+    {
+     "name": "Swimming",
+     "display": 9,
+     "permanent": 9
+    },
+    {
+     "name": "Climbing",
+     "display": 16,
+     "permanent": 16
+    },
+    {
+     "name": "Backstabbing",
+     "display": 23,
+     "permanent": 23
+    },
+    {
+     "name": "Dodging",
+     "display": 7,
+     "permanent": 5
+    },
+    {
+     "name": "Running",
+     "display": 14,
+     "permanent": 14
+    },
+    {
+     "name": "Destruction",
+     "display": 21,
+     "permanent": 21
+    },
+    {
+     "name": "Restoration",
+     "display": 5,
+     "permanent": 5
+    },
+    {
+     "name": "Illusion",
+     "display": 12,
+     "permanent": 12
+    },
+    {
+     "name": "Alteration",
+     "display": 19,
+     "permanent": 17
+    },
+    {
+     "name": "Thaumaturgy",
+     "display": 26,
+     "permanent": 26
+    },
+    {
+     "name": "Mysticism",
+     "display": 10,
+     "permanent": 10
+    },
+    {
+     "name": "Short Blade",
+     "display": 17,
+     "permanent": 17
+    },
+    {
+     "name": "Long Blade",
+     "display": 24,
+     "permanent": 24
+    },
+    {
+     "name": "Hand-to-Hand",
+     "display": 8,
+     "permanent": 6
+    },
+    {
+     "name": "Axe",
+     "display": 15,
+     "permanent": 15
+    },
+    {
+     "name": "Blunt Weapon",
+     "display": 22,
+     "permanent": 22
+    },
+    {
+     "name": "Archery",
+     "display": 6,
+     "permanent": 6
+    },
+    {
+     "name": "Critical Strike",
+     "display": 13,
+     "permanent": 13
+    }
+   ],
+   "inventoryComplete": true,
+   "attributes": {
+    "strength": 55,
+    "intelligence": 30,
+    "willpower": 40,
+    "agility": 45,
+    "endurance": 55,
+    "personality": 35,
+    "speed": 45,
+    "luck": 45
+   },
+   "level": 1,
+   "race": "Nord",
+   "className": "Warrior",
+   "skillGroups": {
+    "primarySkills": [
+     28,
+     20,
+     14
+    ],
+    "majorSkills": [
+     0,
+     16,
+     21
+    ]
+   },
+   "carrying": {
+    "complete": true,
+    "carriedKg": 0,
+    "capacityKg": 82
+   }
+  },
+  "inventoryAvailable": true,
+  "inventoryTruncated": false,
+  "items": [],
+  "quests": [],
+  "questJournal": [],
+  "questTracker": {
+   "available": true,
+   "pinned": null,
+   "journalFocus": null,
+   "views": [],
+   "source": "Public on-screen tracker and current objective values"
+  },
+  "location": {
+   "mode": "dungeon",
+   "place": {
+    "name": "Privateer's Hold",
+    "regionName": "Daggerfall",
+    "regionIndex": 17
+   },
+   "position": {
+    "x": 1234.5,
+    "y": 0,
+    "z": -987.2
+   },
+   "mapPixel": {
+    "x": 207,
+    "y": 213
+   },
+   "orientation": {
+    "headingDegrees": 90
+   }
+  },
+  "locationAvailable": true,
+  "appearance": null,
+  "map": null,
+  "townMap": null,
+  "interiorMap": null
+ },
+ "sampling": false,
+ "pose": {
+  "capturedAt": "2026-10-22T18:00:00.000Z",
+  "location": {
+   "available": true,
+   "mode": "dungeon",
+   "place": {
+    "name": "Privateer's Hold",
+    "regionName": "Daggerfall",
+    "regionIndex": 17
+   },
+   "position": {
+    "x": 1234.5,
+    "y": 0,
+    "z": -987.2
+   },
+   "mapPixel": {
+    "x": 207,
+    "y": 213
+   },
+   "orientation": {
+    "headingDegrees": 90
+   }
+  },
+  "town": null
+ },
+ "assetsKey": "207,213",
+ "timings": {
+  "ownReadMs": 3,
+  "rendererCopyMs": 0.4,
+  "guard": {
+   "mode": "idle slices",
+   "intervalMs": 500,
+   "detailsIntervalMs": 4000,
+   "copyMs": 0.4,
+   "lane": "details"
+  },
+  "dungeonCopyMs": null,
+  "deferred": null,
+  "lanes": {
+   "own": 0.3,
+   "pose": 0.05,
+   "tracker": 0.04,
+   "journal": 0.02
+  },
+  "journalReused": true,
+  "totalMs": 4
+ },
+ "detailsVersion": "fixture|2026-10-22T18:00:00.000Z",
+ "detailError": null,
+ "stale": false,
+ "serverTime": "2026-10-22T18:00:00.000Z",
+ "refreshSeconds": 0.5,
+ "detailsRefreshSeconds": 4,
+ "assetsRefreshSeconds": 120
+}

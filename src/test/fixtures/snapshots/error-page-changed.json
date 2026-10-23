@@ -1,0 +1,19 @@
+{
+ "status": {
+  "kind": "error",
+  "title": "Unable to read the game",
+  "message": "The latest read failed. The companion will retry automatically; any saved readings below are marked as old."
+ },
+ "reason": "PAGE_CHANGED",
+ "lastAttempt": "2026-10-22T18:00:00.000Z",
+ "lastSuccess": null,
+ "detailsAt": null,
+ "player": null,
+ "details": null,
+ "sampling": false,
+ "stale": true,
+ "serverTime": "2026-10-22T18:00:00.000Z",
+ "refreshSeconds": 0.5,
+ "detailsRefreshSeconds": 4,
+ "assetsRefreshSeconds": 120
+}
