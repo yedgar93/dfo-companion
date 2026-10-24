@@ -10,6 +10,7 @@ import {projectDetails} from '../src/dashboard-model.mjs';
 const fixture=JSON.parse(await readFile(new URL('../src/test/fixtures/snapshots/town-full.json',import.meta.url),'utf8'));
 const item=(index,name,value,equipSlot=null)=>({index,name,equipSlot,group:'Jewellery',templateIndex:135,material:1,identified:true,magicKnown:true,enchantmentCount:0,special:false,effectsComplete:true,condition:{current:100,max:100},affixes:[{id:'stat',param:'intelligence',value}]});
 fixture.details.items=[item(0,'Worn strong ring',8,4),item(1,'Worn weak ring',1,5),item(2,'Small improvement',3),item(3,'Best intelligence ring',9)];
+fixture.details.items[3].affixes.push({id:'skill',param:29,value:2});
 fixture.details.comparisonContext={inventoryComplete:true,restrictionEvidenceKnown:true,careerFlags:0,forbiddenMaterials:0,skills:SKILL_NAMES.map(name=>({name,permanent:30,display:30,effective:30})),skillGroups:{primarySkills:[22,23,24],majorSkills:[25,26,27]},attributes:{strength:50,intelligence:50,willpower:50,agility:50,endurance:50,personality:50,speed:50,luck:50},level:5,race:'Breton'};
 const ringDetails=structuredClone(fixture.details);
 const rawItem=(name,templateIndex,extra={})=>({name,templateIndex,group:'Weapons',material:1,identified:true,affixes:[],enchantments:[],customEnchantments:[],condition:{current:100,max:100},...extra});
@@ -18,6 +19,7 @@ const rawDetails=projectDetails({identity:{level:5,race:'Breton'},attributes:{li
  rawItem('Identified claymore',122,{storedStats:{minDamage:2,maxDamage:19}}),rawItem('Identified bow',129),rawItem('Identified Thunderlock',560,{material:4}),
  rawItem('Unidentified Staff',115,{identified:false,affixes:null,enchantments:null,customEnchantments:null})]}},null);
 const possibleDetails=structuredClone(rawDetails);possibleDetails.items=[{...structuredClone(rawDetails.items[0]),name:'Known better longsword',equipSlot:null},{...structuredClone(rawDetails.items.at(-1)),equipSlot:19,displayStats:{...rawDetails.items.at(-1).displayStats,damage:{min:1,max:2}}}];
+const boundedDetails=structuredClone(ringDetails);boundedDetails.comparisonContext.attributes.intelligence=100;boundedDetails.items=[item(0,'Capped strong ring',10,4),item(1,'Capped other ring',10,5),item(2,'Unboosted ring',0)];
 let version=1;const port=Number(process.env.DFO_UPGRADE_TEST_PORT??19639);
 const snapshot=()=>({...fixture,lastSuccess:new Date().toISOString(),detailsAt:new Date().toISOString(),serverTime:new Date().toISOString(),detailsVersion:version});
 const server=createDashboardServer({snapshot},{port,launchGame:async()=>{throw Error('Game launch forbidden');},onManualRefresh:()=>{throw Error('Game reads forbidden');}});
@@ -37,14 +39,26 @@ try{
   const options=page.locator('.inventory-options summary');if(await options.isVisible())await options.click();
   await page.locator('#inventory-sort').selectOption('upgrades');
   assert.match(await page.locator('#inventory-items .item').first().innerText(),/Best intelligence ring/);
+  const bestRing=page.locator('#inventory-items .item').filter({hasText:'Best intelligence ring'}),smallRing=page.locator('#inventory-items .item').filter({hasText:'Small improvement'});
+  assert.equal(await bestRing.locator('.best-in-pack-tag').count(),1);assert.match(await bestRing.getAttribute('title'),/Best in pack for Ring/);
+  assert.equal(await bestRing.evaluate(card=>{const name=card.querySelector('.item-name').getBoundingClientRect(),tag=card.querySelector('.best-in-pack-tag').getBoundingClientRect();return name.bottom<=tag.top||tag.right<=name.left||tag.left>=name.right;}),true,'Best-in-pack label must not overlap the item name');
+  assert.equal(await smallRing.locator('.upgrade-indicator.upgrade').count(),1);assert.equal(await smallRing.locator('.best-in-pack-tag').count(),0);
   await page.locator('#inventory-items .item').filter({hasText:'Best intelligence ring'}).click();
   const detail=page.locator('#item-detail');await detail.waitFor({state:'visible'});
   assert.match(await detail.innerText(),/Recommended for your.*build/);
   assert.match(await detail.innerText(),/estimated score/);
+  await detail.locator('.score-breakdown > summary').click();
+  const breakdown=detail.getByRole('table',{name:'Score components',exact:true});assert.equal(await breakdown.isVisible(),true);
+  assert.match(await breakdown.innerText(),/intelligence/i);assert.match(await breakdown.innerText(),/\+8 ×/);assert.match(await breakdown.innerText(),/Conservative score change/);
+  await detail.locator('.score-scale > summary').click();
+  assert.match(await breakdown.innerText(),/Intelligence attribute/);assert.match(await breakdown.innerText(),/Long Blade skill/);assert.doesNotMatch(await breakdown.innerText(),/skill 29|stat intelligence/);
+  assert.equal(await detail.getByRole('table',{name:'Automatic build priorities',exact:true}).isVisible(),true);
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth),true,'Expanded score tables must fit the viewport');
+  assert.match(await detail.locator('.score-scale').innerText(),/intelligence/i);assert.match(await detail.locator('.score-breakdown').innerText(),/heuristic.*not DPS/);
   const target=detail.locator('.comparison-target select');await target.selectOption('4');
   assert.match(await detail.innerText(),/Replacing Worn strong ring/);
   // Character/snapshot replacement must clear the previous generation's result.
-  if(viewport.width>800){fixture.details.items=fixture.details.items.map(i=>i.index===3?{...i,identified:false,magicKnown:false}:i);version++;await page.waitForFunction(()=>!document.querySelector('#inventory-items .item[title^="Best intelligence ring"] .upgrade-indicator.upgrade'));}
+  if(viewport.width>800){fixture.details.items=fixture.details.items.map(i=>i.index===3?{...i,identified:false,magicKnown:false}:i);version++;await page.waitForFunction(()=>!document.querySelector('#inventory-items .item[title^="Best intelligence ring"] .upgrade-indicator.upgrade'));assert.equal(await bestRing.locator('.best-in-pack-tag').count(),0);}
   const sheet=page.locator('dialog.mobile-item-sheet');if(await sheet.isVisible())await page.keyboard.press('Escape');
   // Real reader-shaped input: no optional template/display enrichment at all.
   fixture.details=rawDetails;version++;
@@ -78,11 +92,18 @@ try{
   assert.equal(await wornGear.locator('.upgrade-indicator.provisional').count(),1);assert.equal(await wornGear.locator('.upgrade-indicator.upgrade').count(),0);
   assert.match(await wornGear.getAttribute('title'),/Possible upgrade in pack/);
   assert.match(await page.locator('#upgrade-summary').textContent(),/Possible upgrades in pack/);
+  assert.equal(await page.locator('#inventory-items .item').filter({hasText:'Known better longsword'}).locator('.best-in-pack-tag').count(),0);
   const equipmentTab=page.getByRole('button',{name:'Equipment',exact:true});if(await equipmentTab.count())await equipmentTab.click();
   await wornGear.click();assert.match(await detail.innerText(),/Possible upgrade: Known better longsword/);assert.match(await detail.innerText(),/hidden bonuses can change/);
   assert.equal(await detail.locator('.better-in-pack.provisional').count(),1);assert.equal(await detail.locator('.better-in-pack.upgrade').count(),0);
+  if(await sheet.isVisible())await sheet.getByRole('button',{name:'Done',exact:true}).click();
+  if(await inventoryTab.count())await inventoryTab.click();
+  fixture.details=boundedDetails;version++;
+  const boundedRing=page.locator('#inventory-items .item').filter({hasText:'Unboosted ring'});await boundedRing.waitFor({state:'visible'});await boundedRing.click();
+  await detail.locator('.score-breakdown > summary').click();const boundedTable=detail.getByRole('table',{name:'Score components',exact:true});
+  assert.match(await boundedTable.locator('tbody').innerText(),/ to /);assert.match(await boundedTable.locator('tfoot').innerText(),/Possible range/);assert.match(await boundedTable.locator('tfoot').innerText(),/ to /);
   assert.deepEqual(errors,[]);await page.close();
   fixture.details=structuredClone(ringDetails);version++;
  }
- console.log(JSON.stringify({passed:true,viewports:2,gameReads:0,checks:['score sorting','recommendation reason','explicit ring target','snapshot invalidation','raw equipment without template cache','provisional unidentified weapon estimates','positive provisional worn-slot suggestions','ranged timing explanation','no repeated refresh fades','no browser script errors']}));
+ console.log(JSON.stringify({passed:true,viewports:2,gameReads:0,checks:['score sorting','recommendation reason','score component breakdown','bounded score ranges','automatic scale weights','top confirmed best-in-pack tag','explicit ring target','snapshot invalidation','raw equipment without template cache','provisional unidentified weapon estimates','positive provisional worn-slot suggestions','ranged timing explanation','no repeated refresh fades','no browser script errors']}));
 }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}

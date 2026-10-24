@@ -47,7 +47,7 @@ export function inferProfile(context={}){
  const count=set=>[...favoured].filter(n=>set.has(n)).length;
  const magic=count(MAGIC_SKILLS),stealth=count(STEALTH_SKILLS),combat=[...favoured].filter(n=>WEAPON_SKILLS.includes(n)||n==='Critical Strike'||n==='Dodging').length;
  const lean=!favoured.size?null:magic>combat&&magic>=stealth?'magic':stealth>combat&&stealth>magic?'stealth':'combat';
- return {skillNames:skills.map(s=>s.name),favouredSkills:[...favoured],className:context.className??null,preferredWeapons,weaponSkills:weapons,armorClass:allowedArmor?(wornClass&&allowedArmor.includes(wornClass)?wornClass:allowedArmor.at(-1)??null):wornClass,allowedArmor,lean,known:!!skills.some(s=>fin(s.display))&&fin(flags)};
+ return {forbiddenWeapons:WEAPON_SKILLS.filter(forbidden),skillNames:skills.map(s=>s.name),favouredSkills:[...favoured],className:context.className??null,preferredWeapons,weaponSkills:weapons,armorClass:allowedArmor?(wornClass&&allowedArmor.includes(wornClass)?wornClass:allowedArmor.at(-1)??null):wornClass,allowedArmor,lean,known:!!skills.some(s=>fin(s.display))&&fin(flags)};
 }
 
 /** DFO formulas.js:88 damageModifier = floor((STR-50)/5) (DFU FormulaHelper.DamageModifier). */
@@ -129,9 +129,16 @@ export function affixWeight(x,profile){
  if(!KNOWN_AFFIX.has(x?.id))return null;
  if(x.id==='resist'&&!['fire','frost','shock','poison','magic'].includes(x.param))return null;
  if(x.id==='stat'){if(!STAT_WEIGHT.combat[x.param])return null;return profile.mix?Object.entries(profile.mix).reduce((v,[k,w])=>v+w*STAT_WEIGHT[k][x.param],0):STAT_WEIGHT[profile.lean??'combat'][x.param];}
- if(x.id==='skill'){const name=typeof x.param==='number'?SKILL_NAMES[x.param]:x.param;return !SKILL_NAMES.includes(name)?null:profile.preferredWeapons.includes(name)?1:(profile.favouredSkills??[]).includes(name)?.6:.2;}
+ if(x.id==='skill'){const name=typeof x.param==='number'?SKILL_NAMES[x.param]:x.param;return !SKILL_NAMES.includes(name)?null:profile.forbiddenWeapons?.includes(name)?0:profile.preferredWeapons.includes(name)?1:(profile.favouredSkills??[]).includes(name)?.6:.2;}
  const magic=profile.mix?.magic??(profile.lean==='magic'?1:0);
  return {armor:1,damage:1,weight:.3,resist:.4,focus:.1+.9*magic,castSpeed:.1+.7*magic,potency:.1+.9*magic,leech:.6,thorns:.4,wellspring:.1+.5*magic,elemental:.8,slayer:.4,technique:.5,warmth:.1,dry:.1,standing:.2}[x.id]??null;
+}
+/** Inspectable automatic scale. These are product priorities, not simulator stat weights. */
+export function buildScale(profile){
+ const attributes=Object.keys(STAT_WEIGHT.combat).map(name=>({name,weight:affixWeight({id:'stat',param:name},profile)}));
+ const skills=SKILL_NAMES.map(name=>({name,weight:affixWeight({id:'skill',param:name},profile)}));
+ const bonuses=[...KNOWN_AFFIX].filter(id=>!['stat','skill','armor','damage'].includes(id)).map(name=>({name,weight:affixWeight({id:name,param:name==='resist'?'magic':undefined},profile)}));
+ return {label:profile.label??profile.lean??'combat',source:'Automatic priorities from class skill groups and permanent skills; heuristic weights, not simulated DPS.',attributes,skills,bonuses};
 }
 /** Signed enchantment value for this build; drawbacks (negative values) count against. */
 export function enchantmentValue(items,profile){
@@ -223,7 +230,7 @@ export function buildProfile(context={},worn=[]){
  const priority=new Map;
  for(const [key,weight] of [['primarySkills',3],['majorSkills',2],['minorSkills',1]])for(const id of groups[key]??[]){const name=typeof id==='number'?SKILL_NAMES[id]:id;if(SKILL_NAMES.includes(name))priority.set(name,Math.max(priority.get(name)??0,weight));}
  const totals={combat:0,magic:0,stealth:0};
- for(const s of context.skills??[]){if(!fin(s.permanent??s.display))continue;const value=Math.max(0,s.permanent??s.display),strength=(priority.get(s.name)??0)+value/50;
+ for(const s of context.skills??[]){if(profile.forbiddenWeapons.includes(s.name)||!fin(s.permanent??s.display))continue;const value=Math.max(0,s.permanent??s.display),strength=(priority.get(s.name)??0)+value/50;
   if(WEAPON_SKILLS.includes(s.name)||['Dodging','Critical Strike'].includes(s.name))totals.combat+=strength;
   if(MAGIC_SKILLS.has(s.name))totals.magic+=strength;
   if(STEALTH_SKILLS.has(s.name))totals.stealth+=strength;
@@ -250,11 +257,18 @@ function totalsFor(items){
 
 /** Change only the copied context; never mutate the current snapshot or gear. */
 export function contextAfterSwap(context,beforeItems,afterItems){
- const before=totalsFor(beforeItems),after=totalsFor(afterItems),attributes={...context.attributes};
+ const before=totalsFor(beforeItems),after=totalsFor(afterItems),attributes={...context.attributes},attributeRanges={};
  const difference=(id,param)=>(after.get(id+'|'+param)?.value??0)-(before.get(id+'|'+param)?.value??0);
- for(const key of Object.keys(attributes))if(fin(attributes[key]))attributes[key]=Math.max(0,Math.min(Math.max(100,attributes[key]),attributes[key]+difference('stat',key)));
+ for(const key of Object.keys(attributes))if(fin(attributes[key])){
+  const live=attributes[key],delta=difference('stat',key);
+  attributes[key]=Math.max(0,Math.min(Math.max(100,live),live+delta));
+  // A copied capped value hides overflow. Do not reconstruct a permanent stat
+  // from equipment: the same live value permits both endpoint outcomes.
+  if(live>=100&&delta<0)attributeRanges[key]={min:Math.max(0,live+delta),max:live};
+  else if(live<=0&&delta>0)attributeRanges[key]={min:0,max:Math.min(100,delta)};
+ }
  const skills=(context.skills??[]).map(s=>{const delta=difference('skill',SKILL_NAMES.indexOf(s.name))+difference('skill',s.name);return {...s,display:fin(s.display)?Math.max(0,s.display+delta):s.display,effective:fin(s.effective)?Math.max(0,s.effective+delta):s.effective};});
- return {...context,attributes,skills};
+ return {...context,attributes,skills,attributeRanges};
 }
 
 // DFO b0765ab2 reference cycles: weaponStates.js SWING-LAW and default
@@ -279,7 +293,7 @@ export function weaponTempo(item,context){
 
 /** A bounded evaluator shared by every carried candidate in one pack snapshot. */
 export function createBuildEvaluator(context,worn,profile=buildProfile(context,worn)){
- const beforeTotals=totalsFor(worn);
+ const beforeTotals=totalsFor(worn),scale=buildScale(profile);
  const offense=(items,ctx)=>{
   const weapons=items.filter(i=>i.group==='Weapons'&&[19,21].includes(i.equipSlot));
   if(!weapons.length){
@@ -293,16 +307,30 @@ export function createBuildEvaluator(context,worn,profile=buildProfile(context,w
   return {known:scores.every(s=>s.known),value:scores.reduce((n,s)=>n+s.value,0)/scores.length,perSwing:scores.reduce((n,s)=>n+s.perSwing,0)/scores.length,tempoKnown:scores.every(s=>s.tempoKnown)};
  };
  const baselineOffense=offense(worn,context);
- return (candidate,removed,slot)=>{
+ return function evaluate(candidate,removed,slot,rangeMode=null){
   const after=worn.filter(i=>!removed.includes(i));after.push({...candidate,equipSlot:slot});
   const afterContext=contextAfterSwap(context,worn,after),afterTotals=totalsFor(after),unknown=[],components=[],notes=[];
-  let delta=0,armorUncertainty=0;const add=(label,value)=>{if(Math.abs(value)>1e-8){components.push({label,delta:value});delta+=value;}};
+  const ranges=Object.entries(afterContext.attributeRanges);
+  if(ranges.length&&rangeMode===null){
+   // All current attribute weights and reference offense formulas are monotone
+   // in attributes, so the two corners bound every hidden-overflow outcome.
+   const low=evaluate(candidate,removed,slot,'min'),high=evaluate(candidate,removed,slot,'max');
+   const merged=low.components.map(component=>{
+    const upper=high.components.find(c=>c.label===component.label)??{delta:0,quantity:0};
+    return {...component,deltaMin:Math.min(component.delta,upper.delta),deltaMax:Math.max(component.delta,upper.delta),...(fin(component.quantity)&&fin(upper.quantity)?{quantityMin:Math.min(component.quantity,upper.quantity),quantityMax:Math.max(component.quantity,upper.quantity)}:{})};
+   });
+   for(const component of high.components)if(!merged.some(c=>c.label===component.label))merged.push({...component,delta:0,deltaMin:Math.min(0,component.delta),deltaMax:Math.max(0,component.delta),...(fin(component.quantity)?{quantity:0,quantityMin:Math.min(0,component.quantity),quantityMax:Math.max(0,component.quantity)}:{})});
+   const minimum=Math.min(low.deltaMin,high.deltaMin),maximum=Math.max(low.deltaMax,high.deltaMax);
+   return {...low,known:low.known&&high.known,delta:minimum,deltaMin:minimum,deltaMax:maximum,boundedStats:true,attributeRanges:afterContext.attributeRanges,components:merged,unknowns:[...new Set([...low.unknowns,...high.unknowns])],notes:[...new Set([...low.notes,...high.notes,'Capped live attributes hide possible overflow; the score uses the least favorable attribute outcome within its range.'])],offensiveChangeMin:low.offensiveChange===null||high.offensiveChange===null?null:Math.min(low.offensiveChange,high.offensiveChange),offensiveChangeMax:low.offensiveChange===null||high.offensiveChange===null?null:Math.max(low.offensiveChange,high.offensiveChange)};
+  }
+  if(rangeMode!==null)for(const [key,range]of ranges)afterContext.attributes[key]=range[rangeMode];
+  let delta=0,armorUncertainty=0;const add=(label,value,details={})=>{if(Math.abs(value)>1e-8){components.push({label,delta:value,...details});delta+=value;}};
   const keys=new Set([...beforeTotals.keys(),...afterTotals.keys()]);
   for(const key of keys){const a=afterTotals.get(key),b=beforeTotals.get(key),row=a??b,change=(a?.value??0)-(b?.value??0);if(!change||['armor','damage'].includes(row.id))continue;
    const weight=affixWeight(row,profile);if(weight===null){unknown.push('An affix parameter cannot be evaluated for this build.');continue;}
    let effective=change;
    if(row.id==='stat'){if(fin(context.attributes?.[row.param]))effective=afterContext.attributes[row.param]-context.attributes[row.param];}
-   add(row.id+' '+(row.param??''),effective*weight);
+   add(row.id+' '+(row.param??''),effective*weight,{quantity:effective,weight});
   }
   // Re-score retained weapons as well: removing a +STR ring or weapon-skill
   // shield changes the weapon left in hand. The live baseline already has them.
@@ -315,7 +343,7 @@ export function createBuildEvaluator(context,worn,profile=buildProfile(context,w
     else{weaponComparisonBasis=perAttack?'per-attack':'per-second';offensiveChange=perAttack?next.perSwing-baselineOffense.perSwing:next.value-baselineOffense.value;
      if(perAttack)notes.push('Draw, reload and swing timing are not included: weapon output is compared per attack, not per second.');
      else if([...worn,...after].some(i=>i.group==='Weapons'&&[129,130,560,562].includes(i.templateIndex)))notes.push('Reference cadence assumes default instant bow shots and single-gun reloads; held draws, arm readiness and paired-hand timing can change actual output.');
-     add('reference weapon output',offensiveChange*(1+profile.mix.combat));}
+     add('reference weapon output',offensiveChange*(1+profile.mix.combat),{quantity:offensiveChange,weight:1+profile.mix.combat});}
    }else if(changesWeapon&&!(removed.length===1&&removed[0].group==='Weapons'&&candidate.templateIndex===removed[0].templateIndex&&candidate.material===removed[0].material))unknown.push('Weapon output cannot be estimated from these item and character stats.');}
   // Compare only changed protection. Unknown retained effects cancel; unknown
   // removed/incoming armour cannot silently become zero.
@@ -330,6 +358,6 @@ export function createBuildEvaluator(context,worn,profile=buildProfile(context,w
   if((changesResist||ench.armor||ench.carry)&&worn.some(i=>!removed.includes(i)&&(i.identified!==true||i.magicKnown===false||i.effectsComplete===false)))unknown.push('Stacking and caps are uncertain while other worn magical properties are unknown.');
   unknown.push(...ench.unknown);
   const neededOutput=!(changesWeapon||changesCombatStats)||offensiveChange!==null;
-  return {known:unknown.length===0&&profile.known&&neededOutput,delta,deltaMin:delta,deltaMax:delta+armorUncertainty,boundedArmor:armorUncertainty>0,components,unknowns:[...new Set(unknown)],notes,offensiveChange,weaponComparisonBasis,profile:profile.label,model:'Estimated build fit; reference combat and inferred priorities. Enemy, combat mods and tactics can change results.'};
+  return {known:unknown.length===0&&profile.known&&neededOutput,delta,deltaMin:delta,deltaMax:delta+armorUncertainty,boundedArmor:armorUncertainty>0,boundedStats:false,components,scale,unknowns:[...new Set(unknown)],notes,offensiveChange,weaponComparisonBasis,profile:profile.label,model:'Estimated build fit; reference combat and inferred priorities. Enemy, combat mods and tactics can change results.'};
  };
 }

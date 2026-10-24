@@ -95,7 +95,7 @@ test('custom armor uses RRI tables and a conservative range when leather or fur 
 
 test('overlapping armor variants show an explicit tradeoff and never a confirmed slot upgrade',()=>{
  const old=item({index:0,name:'Unknown leather or fur helm',group:'Armor',templateIndex:522,material:0,equipSlot:12,displayStats:null}),next=item({index:1,name:'Leather helm with armor bonus',group:'Armor',templateIndex:107,material:0,displayStats:{baseArmour:3},affixes:[{id:'armor',value:5}]}),session=createComparisonSession([old,next],context()),c=session.compare(next,12);
- assert(c.buildScore.deltaMin<0&&c.buildScore.deltaMax>0);assert.equal(c.kind,'tradeoff');assert.equal(c.unknowns.length,0);assert.equal(comparisonIndicator(c).kind,'tradeoff');assert.equal(comparisonIndicator(c).symbol,'↔');assert.match(c.reason,/variant uncertainty/);assert.equal(session.forSlot(12).length,0);assert.equal(session.suggestionsForSlot(12).length,0);
+ assert(c.buildScore.deltaMin<0&&c.buildScore.deltaMax>0);assert.equal(c.kind,'tradeoff');assert.equal(c.unknowns.length,0);assert.equal(comparisonIndicator(c).kind,'tradeoff');assert.equal(comparisonIndicator(c).symbol,'↔');assert.match(c.reason,/Bounded comparison/);assert.equal(session.forSlot(12).length,0);assert.equal(session.suggestionsForSlot(12).length,0);
 });
 
 test('armor-class profile reports the majority, with custom material families normalized',()=>{

@@ -1,6 +1,6 @@
 # DFO Companion: development handoff
 
-Last reconciled: 2026-10-23. Latest verified published baseline: **0.4.35**, release source `a36bf1e`, for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
+Last reconciled: 2026-10-23. Latest verified published baseline: **0.4.36**, release source `c5fe3d3`, for Windows x64 and Apple Silicon macOS. This is a durable handoff for a new developer, chat, or AI tool; it does not require access to the original conversation or original development computer.
 
 Read this file, `AGENTS.md`, `README.md`, and `docs/RELEASING.md` before changing the application. Inspect the current source and latest release: this document records findings at the baseline, not a promise that future game versions have identical internals. Keep this document updated as findings change.
 
@@ -43,6 +43,18 @@ Earlier standalone live NPC speech is separate evidence. Real Mac gameplay,
 integrated play-session acceptance, FPS/latency measurements and soak remain
 unverified. CI now checks source and packaged native/WASM loading on both OSes.
 This release contains no concurrent equipment-task refinements.
+
+## Pawn-style equipment refinement (code only, not released)
+
+The sequencing gate opened after independent verification that VoiceBox v0.4.36 was published and all native/mobile release jobs passed. Equipment changes are reconciled on that exact release, preserving its module. This is a code-only push: package version remains 0.4.36 and the existing release is not replaced.
+
+The automatic scale is now inspectable through buildScale; comparison components expose effective quantities and weights, including signed drawbacks and conservative ranges. An expandable UI table reconciles components to the total; nested weights explain class/permanent-skill inference and the heuristic nature of the model. Best-in-pack labels identify the strongest confirmed owned candidate for each explicit compatible-slot baseline; they do not claim an optimal simultaneous multi-item loadout. The index reuses prepared comparison cache and excludes provisional/blocked candidates.
+
+Forbidden weapon proficiencies have zero skill-affix weight and do not bias the inferred combat blend. Capped live attributes can conceal overflow: contextAfterSwap preserves finite attribute ranges; affected evaluations score both monotone endpoints and combine their bounds with armor uncertainty. Green requires a positive conservative endpoint; intervals reaching no change remain tradeoffs rather than certain downgrades. Current formula monotonicity is a prerequisite; future negative weights or new non-monotone effects require revisiting this bound.
+
+Pawn concepts were independently adapted from its upstream README and Pawn.lua (https://github.com/VgerMods/Pawn); no code or WoW class coefficients were copied. DFO-specific enchantments remain part of comparison, unlike Pawn's usual unenchanted baseline. Remaining limits include reference dual-hand timing rather than a combat simulator, automatic heuristic priorities rather than simulation-derived stat weights, and unmodeled magical effects remaining explicit unknowns.
+
+Validation: full local regression suite and desktop/phone synthetic browser checks pass; tests include caps, forbidden skills, component sums, slot baselines, cache invalidation, uncertainty, and label/table geometry. A frozen cached 131-item replay took about 28 ms including cooperative yields; building its best-fit index took about 0.3 ms locally. No extra game reads or polling changes were added. Private preview captures stay outside Git. Integration onto VoiceBox release c5fe3d3 passed 425/425 combined tests, desktop/phone equipment checks, full Electron visual checks, production bundling, and native VoiceBox synthetic enable/volume/audio/disable plus native dependency checks. VoiceBox module files, desktop integration and package/lockfile are unchanged from the release. The code-only equipment commit does not bump or overwrite v0.4.36; native release history remains intact.
 
 ## Upgrade scoring and unidentified labels (0.4.35)
 
