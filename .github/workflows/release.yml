@@ -65,6 +65,8 @@ jobs:
           name: visual-${{ matrix.platform }}
           path: visual-results/*.png
           if-no-files-found: ignore
+      - name: Check VoiceBox controls and native runtime without game access
+        run: npm run test:voicebox
       - name: Build Electron app
         run: npm run dist:${{ matrix.platform }}
         env:
@@ -75,6 +77,8 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      - name: Check packaged VoiceBox native libraries and IPC
+        run: node scripts/test-packaged-voicebox.cjs
       - name: Test native Mac app replacement
         if: matrix.platform == 'mac'
         run: node scripts/smoke-mac-install.mjs

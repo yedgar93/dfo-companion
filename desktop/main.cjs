@@ -8,7 +8,7 @@ const {setupUpdates}=require('./updates.cjs');
 const build=require('./build.json');
 const {showAbout}=require('./about.cjs');
 app.setName('DFO Companion');
-let window,helper,updates,quitting=false,shutdownStarted=false,shutdownDone=false;
+let voiceBox,window,helper,updates,quitting=false,shutdownStarted=false,shutdownDone=false;
 const restartFlag=path.join(app.getPath('userData'),'restart-in-background');
 const quietRestart=fileSystem.existsSync(restartFlag);if(quietRestart)try{fileSystem.unlinkSync(restartFlag);}catch{}
 const {restorePlan,captureState,readHandoff}=require('./window-state.cjs');
@@ -38,7 +38,10 @@ function createWindow(){
 if(!app.requestSingleInstanceLock({build:build.id}))app.quit();
 else{
  app.on('second-instance',()=>{if(window){if(window.isMinimized())window.restore();if(!window.isVisible())window.show();}});
- app.whenReady().then(()=>{
+ app.whenReady().then(async()=>{
+  const {createVoiceBoxRuntime,utilityWorkerFactory}=await import('./voicebox/runtime.mjs');
+  voiceBox=createVoiceBoxRuntime({directory:path.join(app.getPath('userData'),'voicebox'),workerFactory:utilityWorkerFactory(utilityProcess),send:message=>{if(window&&!window.isDestroyed())window.webContents.send('dfo:voicebox-event',message);},service:message=>helper?.postMessage({voiceBox:message})});
+  ipcMain.handle('dfo:voicebox-control',(event,message)=>{if(event.sender!==window?.webContents||event.senderFrame!==window?.webContents.mainFrame||event.senderFrame.url!==origin+'/')return null;return voiceBox.command(message);});
   ipcMain.handle('dfo:version',event=>event.sender===window?.webContents?app.getVersion():null);
   ipcMain.handle('dfo:check-for-updates',event=>{if(event.sender!==window?.webContents)return false;void updates?.check(true);return true;});
   if(app.dock)app.dock.setIcon(nativeImage.createFromPath(path.join(__dirname,'icon.png')));
@@ -46,11 +49,11 @@ else{
   updates=setupUpdates({app,updater:process.platform==='darwin'?new MacReleaseUpdater({app,publicKey}):autoUpdater,beforeRestart:()=>{saveHandoff();fileSystem.mkdirSync(path.dirname(restartFlag),{recursive:true});fileSystem.writeFileSync(restartFlag,'1');},dialog,shell:require('electron').shell,build,onStatus:status=>{updateStatus=status;updateMenu();showUpdateStatus();}});updateMenu();
   helper=utilityProcess.fork(path.join(__dirname,'service.mjs'),[],{serviceName:'DFO Companion data service',stdio:'pipe',env:{...process.env,DFO_COMPANION_ART_CONFIG:artworkConfig}});
   let ready=false;const deadline=setTimeout(()=>fail('The companion helper took too long to start.'),20000);
-  helper.on('message',async message=>{if(message.error)fail(message.error);else if(message.ready&&!ready){ready=true;clearTimeout(deadline);try{const response=await fetch(origin+'/api/identity',{signal:AbortSignal.timeout(3000),redirect:'error'});const identity=await response.json();if(!response.ok||!message.instanceToken||identity.instanceToken!==message.instanceToken)throw Error('The window reached a different companion helper. The old dashboard will not be opened.');await createWindow();}catch(error){fail(error.message);}}});
+  helper.on('message',async message=>{if(message.voiceBox){voiceBox.receive(message.voiceBox);return;}if(message.error)fail(message.error);else if(message.ready&&!ready){ready=true;clearTimeout(deadline);try{const response=await fetch(origin+'/api/identity',{signal:AbortSignal.timeout(3000),redirect:'error'});const identity=await response.json();if(!response.ok||!message.instanceToken||identity.instanceToken!==message.instanceToken)throw Error('The window reached a different companion helper. The old dashboard will not be opened.');await createWindow();}catch(error){fail(error.message);}}});
   helper.on('exit',code=>{clearTimeout(deadline);if(!quitting)fail('The companion data service stopped'+(code?' unexpectedly.':'.'));});
   helper.stderr?.on('data',data=>console.error(data.toString()));
   function fail(message){if(quitting)return;quitting=true;clearTimeout(deadline);dialog.showErrorBox('DFO Companion could not start',message);app.quit();}
  }).catch(error=>{dialog.showErrorBox('DFO Companion could not start',error.message);app.quit();});
- app.on('before-quit',event=>{if(shutdownDone)return;event.preventDefault();if(shutdownStarted)return;shutdownStarted=true;quitting=true;updates?.dispose();let killTimer,forceTimer;const finish=()=>{if(shutdownDone)return;shutdownDone=true;clearTimeout(killTimer);clearTimeout(forceTimer);app.quit();};if(!helper?.pid){finish();return;}helper.once('exit',finish);try{helper.postMessage('close');}catch{}killTimer=setTimeout(()=>helper?.kill(),1500);forceTimer=setTimeout(()=>{if(helper?.pid)try{process.kill(helper.pid,'SIGKILL');}catch{}finish();},3000);});
+ app.on('before-quit',event=>{if(shutdownDone)return;event.preventDefault();if(shutdownStarted)return;shutdownStarted=true;quitting=true;updates?.dispose();const speechShutdown=Promise.resolve(voiceBox?.close()).catch(()=>{});let killTimer,forceTimer;const finish=()=>{if(shutdownDone)return;shutdownDone=true;clearTimeout(killTimer);clearTimeout(forceTimer);void Promise.race([speechShutdown,new Promise(resolve=>setTimeout(resolve,1500))]).then(()=>app.quit());};if(!helper?.pid){finish();return;}helper.once('exit',finish);try{helper.postMessage('close');}catch{}killTimer=setTimeout(()=>helper?.kill(),1500);forceTimer=setTimeout(()=>{if(helper?.pid)try{process.kill(helper.pid,'SIGKILL');}catch{}finish();},3000);});
  app.on('window-all-closed',()=>app.quit());
 }

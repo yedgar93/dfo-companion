@@ -1,3 +1,4 @@
+import {EventEmitter} from 'node:events';
 import {acceptDungeonMapEvent} from './dashboard-dungeon-cache.mjs';
 import {interiorSceneKey} from './dashboard-interior-model.mjs';
 import {deriveCompatibleProfile} from './automatic-profile.mjs';
@@ -46,20 +47,22 @@ async function readCurrentOwnLocation(c,binding,manifest,onRefs=null){
 
 // These are the complete inspection protocol methods. There is no caller-supplied
 // expression/command/target and no breakpoint, pause, input, reload or patch path.
-const methods=new Set(['Runtime.enable','Runtime.disable','Runtime.addBinding','Runtime.removeBinding','Runtime.evaluate','Runtime.callFunctionOn','Runtime.getProperties','Runtime.releaseObjectGroup','Debugger.enable','Debugger.disable','Debugger.getScriptSource','DOM.getDocument','DOM.querySelector','DOM.resolveNode','DOM.getBoxModel','DOM.getOuterHTML','DOM.getAttributes','CSS.getComputedStyleForNode','DOM.disable','DOMDebugger.getEventListeners']);
+const methods=new Set(['Runtime.enable','Runtime.disable','Runtime.addBinding','Runtime.removeBinding','Runtime.evaluate','Runtime.callFunctionOn','Runtime.getProperties','Runtime.releaseObjectGroup','Debugger.enable','Debugger.disable','Debugger.getScriptSource','DOM.getDocument','DOM.querySelector','DOM.resolveNode','DOM.getBoxModel','DOM.getOuterHTML','DOM.getAttributes','CSS.getComputedStyleForNode','DOM.disable','DOMDebugger.getEventListeners','Page.enable','Page.getFrameTree','Page.addScriptToEvaluateOnNewDocument','Page.removeScriptToEvaluateOnNewDocument']);
 async function connect(address,Socket){
+ const events=new EventEmitter();
  const socket=new Socket(address),pending=new Map(),contexts=new Map(),scripts=new Map(),allScripts=new Map(),knownScriptIds=new Set(),traffic={calls:0,debuggerEnables:0,sourceReads:0};let id=0,closed=false;
  socket.addEventListener('message',e=>{
   if(typeof e.data!=='string'||e.data.length>24*1024*1024)return;
   let m;try{m=JSON.parse(e.data);}catch{return;}
   if(m.id){const p=pending.get(m.id);if(p){pending.delete(m.id);clearTimeout(p.timer);m.error?p.reject(Object.assign(new Error('INSPECTION_COMMAND_REFUSED'),{code:'INSPECTION_COMMAND_REFUSED'})):p.resolve(m.result);}return;}
+  if(m.method)try{events.emit(m.method,m.params);}catch{}
   if(m.method==='Runtime.bindingCalled'&&connection.dashboardBinding?.name===m.params?.name&&connection.dashboardBinding.contextId===m.params?.executionContextId){try{if(typeof m.params.payload==='string'&&m.params.payload.length<2000000){const value=JSON.parse(m.params.payload);if(value.mapEvent?.startsWith('dungeon-')){acceptDungeonMapEvent(connection,value);return;}if(value.mapEvent){connection.dashboardPlaces??=new Map;connection.dashboardMaps??=new Map;connection.dashboardMapPending??=new Map;const pending=connection.dashboardMapPending;if(value.mapEvent==='places')for(const row of (value.rows??[]).slice(0,64))connection.dashboardPlaces.set(row.x+','+row.y,row);if(value.mapEvent==='town-metadata'){const row=connection.dashboardMaps.get(value.key);if(row)connection.dashboardMaps.set(value.key,{...row,revision:Date.now(),location:value.location,shops:value.shops,publicYards:value.publicYards});}if(value.mapEvent==='town-start'){if(pending.size>2)pending.clear();pending.set(value.key,{location:value.location,shops:value.shops,publicYards:value.publicYards,townMap:{available:true,pixelKey:value.key,blocks:[],width:0,height:0,metresPerPixel:1.6}});}if(value.mapEvent==='town-block'){const row=pending.get(value.key);if(row&&row.townMap.blocks.length<144&&value.pixels?.length===4096)row.townMap.blocks.push({x:value.x,y:value.y,pixels:value.pixels});}if(value.mapEvent==='town-end'){const row=pending.get(value.key);if(row&&value.width>0&&value.height>0){row.townMap.width=value.width;row.townMap.height=value.height;if(connection.dashboardMaps.size>=8)connection.dashboardMaps.delete(connection.dashboardMaps.keys().next().value);row.revision=Date.now();connection.dashboardMaps.set(value.key,row);}pending.delete(value.key);}return;}if(typeof value?.available==='boolean'){const at=Date.now();connection.dashboardPush={value,at};if(value.available&&!value.dashboardCoreOnly)connection.dashboardDetailPush={value,at};traffic.pushSnapshots=(traffic.pushSnapshots??0)+1;}}}catch{}return;}
   if(m.method==='Runtime.executionContextCreated'){const c=m.params?.context;if(c?.auxData?.isDefault&&c.uniqueId)contexts.set(c.id,c);}
   if(m.method==='Runtime.executionContextDestroyed')contexts.delete(m.params?.executionContextId);
   if(m.method==='Runtime.executionContextsCleared'){contexts.clear();scripts.clear();allScripts.clear();knownScriptIds.clear();}
   if(m.method==='Debugger.scriptParsed'){const s=m.params;if(s?.scriptId)knownScriptIds.add(s.scriptId);if(s?.isModule&&/^dagger:\/\/game\/assets\/[\w-]+\.js$/.test(s.url))allScripts.set(s.scriptId,s);if(s?.isModule&&bundlePattern.test(s.url))scripts.set(s.scriptId,s);}
  });
- const rejectAll=()=>{closed=true;for(const p of pending.values()){clearTimeout(p.timer);p.reject(Object.assign(new Error('INSPECTION_DISCONNECTED'),{code:'INSPECTION_DISCONNECTED'}));}pending.clear();};
+ const rejectAll=()=>{if(closed)return;closed=true;events.emit('disconnect');for(const p of pending.values()){clearTimeout(p.timer);p.reject(Object.assign(new Error('INSPECTION_DISCONNECTED'),{code:'INSPECTION_DISCONNECTED'}));}pending.clear();};
  socket.addEventListener('close',rejectAll);socket.addEventListener('error',rejectAll);
  try{await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error('INSPECTION_CONNECT_TIMEOUT')),2500);socket.addEventListener('open',()=>{clearTimeout(timer);resolve();},{once:true});socket.addEventListener('error',()=>{clearTimeout(timer);reject(new Error('INSPECTION_CONNECT_FAILED'));},{once:true});});}catch(e){socket.close();throw e;}
  const send=(method,params={})=>{
@@ -68,7 +71,7 @@ async function connect(address,Socket){
   const messageId=++id;
   return new Promise((resolve,reject)=>{const timer=setTimeout(()=>{pending.delete(messageId);reject(Object.assign(new Error('INSPECTION_TIMEOUT'),{code:'INSPECTION_TIMEOUT'}));},4000);pending.set(messageId,{resolve,reject,timer});socket.send(JSON.stringify({id:messageId,method,params}));});
  };
- const connection={send,contexts,scripts,allScripts,knownScriptIds,traffic,get closed(){return closed;},close:()=>{if(connection.dashboardBinding&&!closed)void send('Runtime.removeBinding',{name:connection.dashboardBinding.name}).catch(()=>{});socket.close();}};return connection;
+ const connection={send,on:(event,fn)=>events.on(event,fn),off:(event,fn)=>events.off(event,fn),contexts,scripts,allScripts,knownScriptIds,traffic,get closed(){return closed;},close:()=>{if(connection.dashboardBinding&&!closed)void send('Runtime.removeBinding',{name:connection.dashboardBinding.name}).catch(()=>{});socket.close();}};return connection;
 }
 function value(reply,stage='INSPECTION'){
  if(reply?.exceptionDetails){

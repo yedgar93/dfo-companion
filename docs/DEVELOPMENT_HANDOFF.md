@@ -4,6 +4,46 @@ Last reconciled: 2026-10-23. Latest verified published baseline: **0.4.35**, rel
 
 Read this file, `AGENTS.md`, `README.md`, and `docs/RELEASING.md` before changing the application. Inspect the current source and latest release: this document records findings at the baseline, not a promise that future game versions have identical internals. Keep this document updated as findings change.
 
+## Optional VoiceBox module (0.4.36)
+
+VoiceBox is isolated under `desktop/voicebox/`, with compact renderer modules
+`src/voicebox-ui.mjs` and `src/voicebox-audio.mjs`. Connection shows only its
+checkbox, volume slider and one short explanation directly below Quiet alerts
+and above connection/freshness help. Desktop preload exposes a narrow IPC API;
+phone/browser views have no speech bridge or controls. Main checks sender and
+main-frame identity. No autoplay policy or sandbox setting is weakened.
+
+The data service shares the existing verified reader connection through
+`game-connection-events.mjs`. The transport adds optional event listeners and
+only the four Page methods needed for the narrow DOM observer; it does not add
+sampling, a second inspector or game launch. Toggle off removes only VoiceBox's
+observer/binding and kills its owned Electron utility speech process. Closing
+Companion stops speech while retaining the checkbox/volume preference for next
+start. No Python, SAPI, accessibility reader, extra terminal/browser or speech
+HTTP server is used. User still starts DFO manually inside Companion.
+
+Pinned runtime dependencies are onnxruntime-node1.30.0 and phonemizer1.2.1.
+Models download only on enable into userData/voicebox/models using shipped
+revision/size/SHA-256 allowlists (about340MB). Disabled defaults load no native
+model and install no dialogue observer. Native dependencies are unpacked from
+ASAR; only the target platform/architecture is included. Optional CUDA download
+is disabled in `.npmrc`. Preserve all module/dependency notices.
+
+Carried-forward policy includes logical entry deduplication, new-question
+interruption, service/Talk speaker links, stable per-character pitch (+/-15%)
+and pace (1.08 +/-4%), sentence-preserving synthesis, bounded caches/prefetch,
+and preloaded varied farewells with bounded live reaction lookup when available.
+General notice speech remains off; classic canvas dialogue is unsupported.
+See `docs/VOICEBOX.md` for the coverage/evidence boundary and data removal.
+
+Local Windows:415/415 tests, existing visual checks, native Electron checkbox/
+volume/disable and actual cached Kokoro through source and packaged ASAR passed.
+These integrated checks use synthetic dialogue, never attach to the game.
+Earlier standalone live NPC speech is separate evidence. Real Mac gameplay,
+integrated play-session acceptance, FPS/latency measurements and soak remain
+unverified. CI now checks source and packaged native/WASM loading on both OSes.
+This release contains no concurrent equipment-task refinements.
+
 ## Upgrade scoring and unidentified labels (0.4.35)
 
 Unidentified items must never use their stored magical name: projectDetails/normalizeItemName exposes only a bundled base-template label (or Unidentified item). Identified %it names resolve from copied template metadata or the bundled template cache. Hidden affixes, enchantments, description and rarity remain redacted. This changes copied presentation only.

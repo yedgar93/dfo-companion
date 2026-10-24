@@ -36,3 +36,20 @@ Local pairing QR encoding uses qrcode-generator1.4.4, Copyright (c) 2009 Kazuhik
 Jacquard 12 font (desktop/fonts/Jacquard12-Regular.ttf)
 Copyright 2023 The Soft Type Project Authors (https://github.com/scfried/soft-type-jacquard)
 Licensed under the SIL Open Font License, Version 1.1. Full text: desktop/fonts/OFL.txt
+
+Optional VoiceBox module:
+- DnfJeff/Daggerfall_Voicebox, MIT; full notice desktop/voicebox/vendor/VoiceBox-LICENSE.
+- Kokoro phonemization helper: hexgrad/kokoro and contributors including Xenova,
+  Apache-2.0; source blob and attribution in desktop/voicebox/vendor/NOTICE.md,
+  license in desktop/voicebox/vendor/Kokoro-LICENSE. The local ONNX adapter differs.
+- ONNX Runtime1.30.0, Microsoft and contributors, MIT; full text in
+  desktop/voicebox/vendor/ONNXRuntime-LICENSE; https://github.com/microsoft/onnxruntime.
+- phonemizer1.2.1, Xenova, Apache-2.0; full license in
+  desktop/voicebox/vendor/Phonemizer-LICENSE; source https://github.com/xenova/phonemizer.js.
+  Its WebAssembly phonemizer uses eSpeak NG; upstream source/build resources:
+  https://github.com/xenova/phonemizer.js and https://github.com/espeak-ng/espeak-ng.
+  eSpeak NG license text is included as desktop/voicebox/vendor/eSpeak-NG-COPYING.
+- Kokoro-82M-v1.0 ONNX weights and English voice data, Apache-2.0, are downloaded
+  separately from onnx-community/Kokoro-82M-v1.0-ONNX at revision
+  1939ad2a8e416c0acfeecc08a694d14ef25f2231. No weights are in the installer/repo.
+Dependency packages retain their own license files and notices.

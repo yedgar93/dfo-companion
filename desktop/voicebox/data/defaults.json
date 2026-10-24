@@ -1,0 +1,64 @@
+{
+  "enabled": false,
+  "voice": "af_heart",
+  "casting": "gendered",
+  "unknownGender": "ask",
+  "gendersByName": {
+    "Uthoryan Kinghouse": "male"
+  },
+  "voicePools": {
+    "female": [
+      "af_heart",
+      "bf_emma",
+      "af_kore",
+      "bf_isabella",
+      "af_jessica"
+    ],
+    "male": [
+      "bm_george",
+      "am_michael",
+      "bm_lewis",
+      "am_fenrir",
+      "bm_daniel"
+    ]
+  },
+  "narratorVoice": "bm_george",
+  "innkeeperVoice": "bm_george",
+  "merchantVoice": "bm_lewis",
+  "serviceVoices": {},
+  "serviceSpeakers": {},
+  "voicesByName": {
+    "Uthoryan Kinghouse": "bm_george"
+  },
+  "speed": 1.08,
+  "pitchVariation": 0.15,
+  "farewell": true,
+  "volume": 0.8,
+  "speakPlayer": false,
+  "notices": "off",
+  "farewellPhrases": [
+    "Goodbye.",
+    "Bye.",
+    "Farewell.",
+    "Safe travels.",
+    "Until next time.",
+    "Take care."
+  ],
+  "farewellPools": {
+    "friendly": [
+      "Safe travels, friend.",
+      "Always good to see you.",
+      "Take care, my friend.",
+      "Until next time, friend.",
+      "Come back soon."
+    ],
+    "hostile": [
+      "Leave me alone.",
+      "Stop talking to me.",
+      "Go away.",
+      "Get lost.",
+      "We are done here."
+    ]
+  },
+  "speedVariation": 0.04
+}

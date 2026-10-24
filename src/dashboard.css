@@ -624,3 +624,6 @@ h1,#character-meta,.hud-place>strong,.hud-place>small,#map-title,.quest h3,.curr
 .upgrade-indicator.provisional{color:#e5bc66;font-size:17px;line-height:17px;border-bottom:1px dotted #e5bc66;padding-bottom:2px}.gear-comparison.provisional h4{color:#e5bc66}
 
 #upgrade-summary.provisional{color:#e5bc66}
+
+/* Optional VoiceBox module: two compact desktop controls. */
+.voicebox-settings{border:1px solid var(--border,#747454);background:#171e14aa;padding:10px 12px;margin:0 0 22px}.voicebox-controls{display:flex;align-items:center;gap:16px;flex-wrap:wrap}.voicebox-controls label{display:flex;align-items:center;gap:7px;white-space:nowrap}.voicebox-volume{margin-left:auto}.voicebox-volume input{width:130px;accent-color:#cfbd76}.voicebox-settings p{font-size:12px;line-height:1.4;margin:5px 0 0;opacity:.85}.voicebox-controls input[type=checkbox]{width:16px;height:16px;flex:0 0 16px;margin:0;padding:0;accent-color:#cfbd76}

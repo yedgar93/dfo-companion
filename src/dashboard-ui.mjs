@@ -1,3 +1,4 @@
+import {installVoiceBox} from './voicebox-ui.mjs';
 import {installLayout} from './dashboard-layout.mjs';
 import {renderCharacterRecord} from './dashboard-character.mjs';
 import {installGameCursor} from './dashboard-cursor.mjs';
@@ -13,6 +14,7 @@ const NUMERIC_IDS=new Set(['health-value','magicka-value','fatigue-value','gold-
 const $=id=>document.getElementById(id),text=(id,s)=>{const n=$(id);if(NUMERIC_IDS.has(id))digitBoxes(n,s);else n.textContent=s;};
 installGameCursor();
 installLayout();
+installVoiceBox();
 const desktopBridge=window.dfoCompanion;
 if(desktopBridge){
  const versionButton=$('app-version');

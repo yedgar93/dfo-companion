@@ -35,6 +35,7 @@ DFO Companion is a **fan-made, unofficial** desktop app for **Windows** and **Ap
 | **Journal** | Active quests and their recorded details. |
 | **Phone view** | Optional view on your phone, paired by scanning a QR code. No PIN or code to type. |
 | **Quiet alerts** | Low health, worn-out gear and heavy load warnings, shown in the dashboard only. No sounds or OS notifications, and you can turn them off. |
+| **Optional VoiceBox** | Local Kokoro NPC speech with an enable checkbox and volume slider in Connection. Downloads voices once; see [VoiceBox setup and coverage](docs/VOICEBOX.md). |
 | **Auto-updates** | Checks GitHub Releases at startup and every five minutes, then updates and reopens only the companion. |
 
 ## Install

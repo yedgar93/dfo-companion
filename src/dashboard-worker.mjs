@@ -1,3 +1,4 @@
+import {publishGameConnection} from './game-connection-events.mjs';
 import {buildItemIcons} from './item-icon-assets.mjs';
 import {projectInteriorMap,assetSceneKey} from './dashboard-interior-model.mjs';
 import {buildDashboardMap,cachedTownKeys,prepareTownMap,cachedTownDetails,cachedMapLocation} from './dashboard-map-assets.mjs';
@@ -9,7 +10,7 @@ import {pathToFileURL} from 'node:url';
 export const ENABLE_INTERIOR_MAP=false;
 const inspectionSession={};let lastAssetScene=null,initialAssetsAttempted=false,lastMapArtwork=null,lastMapUpdate=null,lastProjectedAt=null,lastProjectedDetails=null,lastAssetsKey=null,lastAssets=null;
 let manualRefreshRequested=false;export function requestDashboardRefresh(){manualRefreshRequested=true;}
-export function closeDashboardReader(){inspectionSession.connection?.close();inspectionSession.connection=null;inspectionSession.sources=null;inspectionSession.lowImpact=null;}
+export function closeDashboardReader(){publishGameConnection(null);inspectionSession.connection?.close();inspectionSession.connection=null;inspectionSession.sources=null;inspectionSession.lowImpact=null;}
 const config=configuration({DFO_OBSERVER_ALLOW_ATTACH:'1',DFO_OBSERVER_CACHED_MODULE:'1',DFO_OBSERVER_SAMPLE_MS:'0'});
 export async function sampleDashboard({detailsDue=false,townKey=null}={}){
 let result;const started=Date.now();if(manualRefreshRequested){manualRefreshRequested=false;initialAssetsAttempted=false;inspectionSession.lowImpact=null;}
@@ -48,6 +49,7 @@ try{
  const reason=e.code??'READ_FAILED';result={available:false,reason};
  if(['DEBUG_ENDPOINT_UNAVAILABLE','DEBUG_CONNECTION_FAILED','INSPECTION_CONNECT_FAILED'].includes(reason)&&process.platform==='win32'){const diagnosis=connectionDiagnosis(inspectWindowsConnection());if(diagnosis.reason!=='CONNECTION_PRESENT')result={available:false,...diagnosis};}
 }
+publishGameConnection(inspectionSession.connection);
 if(result.timings)result.timings.inspection={...inspectionSession.stats,...inspectionSession.connection?.traffic};return result;
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){sampleDashboard({detailsDue:process.argv.includes('details'),townKey:process.argv.find(v=>v.startsWith('--town-key='))?.slice(11)}).then(r=>{closeDashboardReader();process.stdout.write(JSON.stringify(r));});}

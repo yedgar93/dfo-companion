@@ -1,0 +1,19 @@
+import {speechChunks} from './chunks.mjs';
+import {castVoice,characterPitch,characterSpeed} from './core/casting.mjs';
+// Host can live in Companion main; player can be an IPC facade to its renderer.
+export class PortableSpeech {
+  constructor({worker,player,settings,onStatus=()=>{}}){this.worker=worker;this.player=player;this.settings=settings;this.onStatus=onStatus;this.queue=[];this.generation=0;this.busy=false;this.prefetch=null;this.owner=null;this.warmTarget=null;this.warmed=new Map();}
+  async enable(){this.settings.enabled=true;this.onStatus({state:'loading'});const result=await this.worker.enable();this.onStatus({state:'ready',provider:result.provider});return result;}
+  enqueue(event){if(!this.settings.enabled)return;const chunks=speechChunks(event.text);if(chunks.length>24||this.queue.length+chunks.length+(this.prefetch?1:0)>24){this.onStatus({state:'queue-limit'});return;}
+    this.last=event;const accepted=performance.now();for(let i=0;i<chunks.length;i++)this.queue.push({...event,text:chunks[i],sentenceIndex:i,accepted,generation:this.generation});void this.pump();}
+  warmFarewell(event){this.warmTarget=event;void this.tryWarm();}
+  async tryWarm(){const event=this.warmTarget;if(!event||this.warming||!this.settings.enabled||this.worker.jobs?.size>=2)return;const casting=castVoice(event,this.settings);if(!casting.voice)return;const pitch=characterPitch(event,this.settings),speed=characterSpeed(event,this.settings),key=JSON.stringify([event.text,casting.voice,speed,pitch]);if(this.warmed.has(key))return;this.warming=true;const generation=this.generation;
+    try{const result=await this.worker.synth(event.text,casting.voice,speed,pitch);if(generation!==this.generation)return;this.warmed.set(key,result);while(this.warmed.size>8||[...this.warmed.values()].reduce((n,r)=>n+r.audio.byteLength,0)>2*1024*1024)this.warmed.delete(this.warmed.keys().next().value);this.onStatus({state:'farewell-ready'});}catch{}finally{this.warming=false;if(event!==this.warmTarget&&this.warmTarget)void this.tryWarm();}}
+  async prepare(job){if(job.generation!==this.generation)return null;const casting=castVoice(job,this.settings);if(!casting.voice)return null;
+    try{const pitch=characterPitch(job,this.settings),speed=characterSpeed(job,this.settings),cached=this.warmed.get(JSON.stringify([job.text,casting.voice,speed,pitch])),result=cached?{...cached,cacheHit:true}:await this.worker.synth(job.text,casting.voice,speed,pitch);return job.generation===this.generation?{job,result}:null;}catch(error){if(job.generation===this.generation)this.onStatus({state:'speech-error',message:error.message});return null;}}
+  async pump(){if(this.busy)return;this.busy=true;try{while(this.queue.length||this.prefetch){const pending=this.prefetch;this.prefetch=null;const job=pending?null:this.queue.shift();if(job)this.owner=job.sessionId;const prepared=await(pending??this.prepare(job));if(!prepared||prepared.job.generation!==this.generation)continue;this.owner=prepared.job.sessionId;
+      const playing=this.player.play(prepared.result.audio,prepared.result.rate,()=>this.onStatus({state:'playing',source:prepared.job.source,cacheHit:prepared.result.cacheHit,sentenceIndex:prepared.job.sentenceIndex,firstAudioMs:Math.round(performance.now()-prepared.job.accepted)}));if(this.queue.length)this.prefetch=this.prepare(this.queue.shift());void this.tryWarm();await playing;}}
+    catch(error){this.cancel();this.onStatus({state:'playback-error',message:error.message});}finally{this.busy=false;this.owner=null;}}
+  cancel(sessionId=null){if(sessionId){this.queue=this.queue.filter(job=>job.sessionId!==sessionId);if(this.owner!==sessionId)return;}else this.queue=[];this.generation++;this.warmTarget=null;this.worker.cancel();this.player.stop();}
+  async disable(){this.settings.enabled=false;this.cancel();await this.worker.disable();this.onStatus({state:'disabled'});}
+}
